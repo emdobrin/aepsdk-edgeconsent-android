@@ -15,17 +15,12 @@
  *  from Adobe.
  ******************************************************************************/
 
-package com.adobe.marketing.mobile.consentTestApp;
+package com.adobe.marketing.mobile;
 
-import androidx.appcompat.app.AppCompatActivity;
+class ConsentConstants {
 
-import android.os.Bundle;
+    static final String EXTENSION_VERSION = "1.0.0-alpha-1";
 
-public class MainActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
+    private ConsentConstants() {}
 }

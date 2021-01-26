@@ -15,17 +15,28 @@
  *  from Adobe.
  ******************************************************************************/
 
-package com.adobe.marketing.mobile.consentTestApp;
+package com.adobe.marketing.mobile;
 
-import androidx.appcompat.app.AppCompatActivity;
+class ConsentExtension extends Extension {
+    protected ConsentExtension(ExtensionApi extensionApi) {
+        super(extensionApi);
+    }
 
-import android.os.Bundle;
-
-public class MainActivity extends AppCompatActivity {
-
+    /**
+     * Required override. Each extension must have a unique name within the application.
+     * @return unique name of this extension
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected String getName() {
+        return "com.adobe.consent";
+    }
+
+    /**
+     * Optional override.
+     * @return the version of this extension
+     */
+    @Override
+    protected String getVersion() {
+        return ConsentConstants.EXTENSION_VERSION;
     }
 }
