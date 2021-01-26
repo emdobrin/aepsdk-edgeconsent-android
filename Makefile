@@ -26,7 +26,7 @@ ci-build: create-ci
 	(cp -r ./code/$(EXTENSION-LIBRARY-FOLDER-NAME)/build $(BUILD-ASSEMBLE-LOCATION))
 
 ci-build-app:
-	(./code/gradlew -p code/app assemblePhone)
+	(./code/gradlew -p code/app assemble)
 
 ci-unit-test: create-ci
 	(mkdir -p ci/unit-test)
