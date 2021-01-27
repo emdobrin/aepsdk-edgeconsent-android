@@ -31,8 +31,7 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.Signal;
 
 public class ConsentTestApplication extends Application {
-
-    private static final String LOG_TAG = "Consent Test Application";
+    private static final String LOG_TAG = "ConsentTestApplication";
 
     // TODO: fill in your Launch environment ID here
     private final String LAUNCH_ENVIRONMENT_ID = "";
@@ -61,12 +60,6 @@ public class ConsentTestApplication extends Application {
         } catch (InvalidInitException e) {
             e.printStackTrace();
         }
-
-        // register the extension
-        Edge.registerExtension();
-
-        // register assurance
-        Assurance.registerExtension();
 
         // once all the extensions are registered, call MobileCore.start(...) to start processing the events
         MobileCore.start(new AdobeCallback() {
