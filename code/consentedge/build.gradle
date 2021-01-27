@@ -204,7 +204,7 @@ task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebug
     executionData "$buildDir/jacoco/testPhoneDebugUnitTest.exec"
 
     reports {
-        xml.enabled false
+        xml.enabled true
         csv.enabled false
         html.enabled true
     }
@@ -222,7 +222,7 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
     ])
 
     reports {
-        xml.enabled false
+        xml.enabled true
         csv.enabled false
         html.enabled true
     }

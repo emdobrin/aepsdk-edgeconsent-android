@@ -30,15 +30,24 @@ jobs:
       - run:
           name: Javadoc
           command: make ci-javadoc
+      - store-artifacts:
+          path: ci/javadoc/build/reports
+
       - run:
           name: Build
           command: make ci-build
+
       - run:
           name: Build App
           command: make ci-build-app
+          
       - run:
           name: UnitTests
           command: make ci-unit-test
+      - store-artifacts:
+          path: ci/unit-test/build/reports
+      - store-test-results:
+          path: ci/unit-test/build/test-results
 
   publish:
     docker:
