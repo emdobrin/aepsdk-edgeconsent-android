@@ -39,9 +39,6 @@ jobs:
       - run:
           name: UnitTests
           command: make ci-unit-test
-      - run:
-          name: FunctionalTests
-          command: make ci-functional-test
 
   publish:
     docker:
