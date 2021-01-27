@@ -44,7 +44,6 @@ Once the connection is established and the events list starts getting populated,
 
 | Project                                                      | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [AEPEdge Extension](https://github.com/adobe/aepsdk-edge-android) | The Edge extension allows you to send data to the Adobe Experience Platform (AEP) from a mobile application. |
 | [AEP SDK Sample App for Android](https://github.com/adobe/aepsdk-sample-app-android) | Contains Android sample app for the AEP SDK.                 |
 
 ## Contributing
