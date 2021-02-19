@@ -9,7 +9,10 @@
   governing permissions and limitations under the License.
 */
 
-package com.adobe.marketing.mobile;
+package com.adobe.marketing.mobile.consent;
+
+import com.adobe.marketing.mobile.ExtensionErrorCallback;
+import com.adobe.marketing.mobile.MobileCore;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,8 +65,9 @@ public class ConsentTest {
         ExtensionErrorCallback extensionErrorCallback = callbackCaptor.getValue();
         Assert.assertNotNull("The extension callback should not be null", extensionErrorCallback);
 
+        // TODO - enable when ExtensionError creation is available
         // should not crash on calling the callback
-        extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
+        //extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
 
     }
 
