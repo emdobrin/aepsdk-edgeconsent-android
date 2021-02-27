@@ -11,27 +11,47 @@
 
 package com.adobe.marketing.mobile.consent;
 
-
 final class ConsentConstants {
 
     static final String LOG_TAG = "Consent";
     static final String EXTENSION_VERSION = "1.0.0-alpha-1";
     static final String EXTENSION_NAME = "com.adobe.consent";
 
+    final class EventDataKey {
+        static final String CONSENTS = "consents";
+        static final String MEATADATA = "metadata";
+        static final String TIME = "time";
+        static final String VALUE = "val";
+        private EventDataKey() { }
+    }
+
     final class EventSource {
         static final String CONSENT_PREFERENCE = "consent:preferences";
         static final String UPDATE_CONSENT = "com.adobe.eventSource.updateConsent";
         static final String REQUEST_CONSENT = "com.adobe.eventSource.requestConsent";
+        static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
         private EventSource() { }
     }
 
     final class EventType {
         static final String CONSENT = "com.adobe.eventType.consent";
         static final String EDGE = "com.adobe.eventType.edge";
-
         private EventType() { }
     }
 
-    private ConsentConstants() {
+    final class DataStoreKey {
+        static final String DATASTORE_NAME = "com.adobe.consent";
+        static final String CONSENT_PREFERENCES = "consent:preferences";
+        private DataStoreKey() { }
     }
+
+    final class EventNames {
+        static final String EDGE_CONSENT_UPDATE = "Edge Consent Update";
+        static final String CONSENTS_REQUEST = "Consents Request";
+        static final String CONSENT_RESPONSE = "Get Consents Response";
+        static final String CONSENT_PREFERENCES_UPDATED = "Consent Preferences Updated";
+        private EventNames() { }
+    }
+
+    private ConsentConstants() { }
 }

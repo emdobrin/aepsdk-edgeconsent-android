@@ -11,9 +11,12 @@
 
 package com.adobe.marketing.mobile.consent;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.ExtensionApi;
-import com.adobe.marketing.mobile.ExtensionError;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.MobileCore;
 
@@ -24,10 +27,18 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
+import java.util.Map;
+
+import static com.adobe.marketing.mobile.consent.ConsentTestUtil.CreateConsentXDMMap;
+import static com.adobe.marketing.mobile.consent.ConsentTestUtil.CreateConsentsXDMJSONString;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,9 +53,31 @@ public class ConsentExtensionTest {
     @Mock
     ExtensionApi mockExtensionApi;
 
+    @Mock
+    Application mockApplication;
+
+    @Mock
+    Context mockContext;
+
+    @Mock
+    ConsentManager mockConsentManager;
+
+    @Mock
+    SharedPreferences mockSharedPreference;
+
+    @Mock
+    SharedPreferences.Editor mockSharedPreferenceEditor;
+
 
     @Before
     public void setup() {
+        PowerMockito.mockStatic(MobileCore.class);
+
+        Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
+        Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
+        Mockito.when(mockContext.getSharedPreferences(ConsentConstants.DataStoreKey.DATASTORE_NAME, 0)).thenReturn(mockSharedPreference);
+        Mockito.when(mockSharedPreference.edit()).thenReturn(mockSharedPreferenceEditor);
+
         extension = new ConsentExtension(mockExtensionApi);
     }
 
@@ -94,8 +127,137 @@ public class ConsentExtensionTest {
     public void test_getVersion() {
         // test
         String moduleVersion = extension.getVersion();
-        assertEquals("getVesion should return the correct module version", ConsentConstants.EXTENSION_VERSION,
+        assertEquals("getVersion should return the correct module version", ConsentConstants.EXTENSION_VERSION,
                 moduleVersion);
+    }
+
+    // ========================================================================================
+    // handleConsentUpdate
+    // ========================================================================================
+    @Test
+    public void test_handleConsentUpdate() {
+        // setup
+        Event event = buildConsentUpdateEvent("y", "n");
+        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
+        // test
+        extension.handleConsentUpdate(event);
+
+        // verify
+        PowerMockito.verifyStatic(MobileCore.class, Mockito.times(2));
+        MobileCore.dispatchEvent(eventCaptor.capture(), any(ExtensionErrorCallback.class));
+
+        // verify the dispatched event
+        // verify
+        // Initial null and null
+        // Updated YES and NO
+        // Merged  YES and NO
+
+        // verify consent response event dispatched
+        Event consentResponseEvent = eventCaptor.getAllValues().get(0);
+        assertEquals(consentResponseEvent.getName(), ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED);
+        assertEquals(consentResponseEvent.getType(), ConsentConstants.EventType.CONSENT.toLowerCase());
+        assertEquals(consentResponseEvent.getSource(), ConsentConstants.EventSource.RESPONSE_CONTENT.toLowerCase());
+
+        assertEquals("y", ((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("collect")).get("val"));
+        assertEquals("n", ((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("adID")).get("val"));
+        assertNotNull(((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("metadata")).get("time"));
+
+        // verify edge consent event dispatched
+        Event edgeConsentUpdateEvent = eventCaptor.getAllValues().get(1);
+        assertEquals(edgeConsentUpdateEvent.getName(), ConsentConstants.EventNames.EDGE_CONSENT_UPDATE);
+        assertEquals(edgeConsentUpdateEvent.getType(), ConsentConstants.EventType.EDGE.toLowerCase());
+        assertEquals(edgeConsentUpdateEvent.getSource(), ConsentConstants.EventSource.UPDATE_CONSENT.toLowerCase());
+
+        assertEquals("y", ((Map) ((Map) edgeConsentUpdateEvent.getEventData().get("consents")).get("collect")).get("val"));
+        assertEquals("n", ((Map) ((Map) edgeConsentUpdateEvent.getEventData().get("consents")).get("adID")).get("val"));
+        assertNotNull(((Map) ((Map) edgeConsentUpdateEvent.getEventData().get("consents")).get("metadata")).get("time"));
+    }
+
+    @Test
+    public void test_handleConsentUpdate_MergesWithExistingConsents() {
+        // setup
+        setupExistingConsents(CreateConsentsXDMJSONString("n", "n"));
+        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+        final ArgumentCaptor<Map> sharedStateCaptor = ArgumentCaptor.forClass(Map.class);
+
+        // test
+        Event consentUpdateEvent = buildConsentUpdateEvent("y", null);
+        extension.handleConsentUpdate(consentUpdateEvent); // send update event which overrides collect consent to YES
+
+        // verify
+        // Initial NO and No
+        // Updated YES and null
+        // Merged  YES and NO
+
+        // verify dispatched event
+        PowerMockito.verifyStatic(MobileCore.class, Mockito.times(2));
+        MobileCore.dispatchEvent(eventCaptor.capture(), any(ExtensionErrorCallback.class));
+
+        // verify consent response event dispatched
+        Event consentResponseEvent = eventCaptor.getAllValues().get(0);
+        assertEquals("y", ((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("collect")).get("val"));
+        assertEquals("n", ((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("adID")).get("val"));
+        assertNotNull(((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("metadata")).get("time"));
+
+        // verify edge consent event dispatched
+        Event edgeConsentUpdateEvent = eventCaptor.getAllValues().get(1);
+        assertEquals("y", ((Map) ((Map) edgeConsentUpdateEvent.getEventData().get("consents")).get("collect")).get("val"));
+        assertEquals("n", ((Map) ((Map) edgeConsentUpdateEvent.getEventData().get("consents")).get("adID")).get("val"));
+        assertNotNull(((Map) ((Map) edgeConsentUpdateEvent.getEventData().get("consents")).get("metadata")).get("time"));
+
+        // verify XDM shared state
+        verify(mockExtensionApi, times(1)).setXDMSharedEventState(sharedStateCaptor.capture(), eq(consentUpdateEvent), any(ExtensionErrorCallback.class));
+        Map<String, Object> sharedState = sharedStateCaptor.getValue();
+        assertEquals("y", ((Map) ((Map) sharedState.get("consents")).get("collect")).get("val"));
+        assertEquals("n", ((Map) ((Map) sharedState.get("consents")).get("adID")).get("val"));
+        assertNotNull(((Map) ((Map) sharedState.get("consents")).get("metadata")).get("time"));
+    }
+
+    @Test
+    public void test_handleConsentUpdate_NullOrEmptyConsents() {
+        // setup event with no valid consents
+        setupExistingConsents(CreateConsentsXDMJSONString("n", "n"));
+
+        // test
+        extension.handleConsentUpdate(buildConsentUpdateEvent(null, null));
+
+        // verify
+        // Initial NO and NO
+        // Updated null and null
+        // No edge update event  dispatched
+        PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
+        MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
+    }
+
+    @Test
+    public void test_handleConsentUpdate_NullEventData() {
+        // setup
+        Event event = new Event.Builder("Consent Response", ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.UPDATE_CONSENT).setEventData(null).build();
+
+        // test
+        extension.handleConsentUpdate(event);
+
+        // verify
+        PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
+        MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
+    }
+
+
+    // ========================================================================================
+    // private methods
+    // ========================================================================================
+
+    private void setupExistingConsents(final String jsonString) {
+        Mockito.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null)).thenReturn(jsonString);
+        ConsentManager consentManager = new ConsentManager(); // loads the shared preference
+        Whitebox.setInternalState(extension, "consentManager", consentManager);
+    }
+
+    private Event buildConsentUpdateEvent(final String collectConsentString, final String adIdConsentString) {
+        Map<String, Object> eventData = CreateConsentXDMMap(collectConsentString, adIdConsentString);
+        Event event = new Event.Builder("Consent Update", ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.UPDATE_CONSENT).setEventData(eventData).build();
+        return event;
     }
 
 }
