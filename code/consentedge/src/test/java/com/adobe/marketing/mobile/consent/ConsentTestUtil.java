@@ -192,7 +192,8 @@ public class ConsentTestUtil {
         return allConsents;
     }
 
-    private static boolean isNullOrEmpty(final Map map ){
+
+    private static boolean isNullOrEmpty(final Map map){
         return (map == null || map.isEmpty());
     }
 }

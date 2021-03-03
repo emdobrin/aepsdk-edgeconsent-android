@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -25,25 +26,27 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ConsentListenerEdgeConsentPreferenceTest {
+public class ListenerEdgeConsentPreferenceTest {
 
     @Mock
     private ConsentExtension mockConsentExtension;
 
-    private ConsentListenerEdgeConsentPreference listener;
+    private ListenerEdgeConsentPreference listener;
 
     @Before
     public void setup() {
         mockConsentExtension = Mockito.mock(ConsentExtension.class);
         MobileCore.start(null);
-        listener = spy(new ConsentListenerEdgeConsentPreference(null, ConsentConstants.EventType.EDGE, ConsentConstants.EventSource.CONSENT_PREFERENCE));
+        listener = spy(new ListenerEdgeConsentPreference(null, ConsentConstants.EventType.EDGE, ConsentConstants.EventSource.CONSENT_PREFERENCE));
     }
 
     @Test
     public void testHear() {
         // setup
         Event event = new Event.Builder("Edge consent preference response event", ConsentConstants.EventType.EDGE,
-                ConsentConstants.EventSource.CONSENT_PREFERENCE).build();
+                ConsentConstants.EventSource.CONSENT_PREFERENCE).setEventData(new HashMap<String, Object>(){{
+                    put("somekey", "somevalue");
+        }}).build();
         doReturn(mockConsentExtension).when(listener).getConsentExtension();
 
         // test

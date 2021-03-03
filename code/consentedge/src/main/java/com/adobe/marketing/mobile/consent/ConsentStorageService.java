@@ -42,6 +42,7 @@ class ConsentStorageService {
             return null;
         }
 
+
         final String jsonString = sharedPreferences.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null);
 
         if (jsonString == null) {

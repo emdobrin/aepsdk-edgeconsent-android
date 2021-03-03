@@ -101,7 +101,7 @@ class Consents {
     /**
      * Dictionary representation of the available consents associated with this {@link Consents} object.
      * <p>
-     * Will make a deep copy of the avaialble consents map before sharing.
+     * Will make a deep copy of the available consents map before sharing.
      *
      * @return {@link Map} representing the Consents in XDM format
      */

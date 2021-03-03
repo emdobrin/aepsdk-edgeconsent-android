@@ -20,6 +20,8 @@ final class ConsentConstants {
     final class EventDataKey {
         static final String CONSENTS = "consents";
         static final String MEATADATA = "metadata";
+        static final String PAYLOAD = "payload";
+
         static final String TIME = "time";
         static final String VALUE = "val";
         private EventDataKey() { }
@@ -28,7 +30,7 @@ final class ConsentConstants {
     final class EventSource {
         static final String CONSENT_PREFERENCE = "consent:preferences";
         static final String UPDATE_CONSENT = "com.adobe.eventSource.updateConsent";
-        static final String REQUEST_CONSENT = "com.adobe.eventSource.requestConsent";
+        static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
         static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
         private EventSource() { }
     }
@@ -46,9 +48,10 @@ final class ConsentConstants {
     }
 
     final class EventNames {
-        static final String EDGE_CONSENT_UPDATE = "Edge Consent Update";
-        static final String CONSENTS_REQUEST = "Consents Request";
-        static final String CONSENT_RESPONSE = "Get Consents Response";
+        static final String EDGE_CONSENT_UPDATE = "Edge Consent Update Request";
+        static final String CONSENT_UPDATE_REQUEST = "Consent Update Request";
+        static final String GET_CONSENTS_REQUEST = "Get Consents Request";
+        static final String GET_CONSENTS_RESPONSE = "Get Consents Response";
         static final String CONSENT_PREFERENCES_UPDATED = "Consent Preferences Updated";
         private EventNames() { }
     }

@@ -184,7 +184,7 @@ public class ConsentManagerTest {
 
         // verify if correct data is written in shared preference
         verify(mockSharedPreferenceEditor, times(1)).putString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, CreateConsentsXDMJSONString("n", "n", "pi", SAMPLE_METADATA_TIMESTAMP_OTHER));
-        
+
     }
 
     @Test

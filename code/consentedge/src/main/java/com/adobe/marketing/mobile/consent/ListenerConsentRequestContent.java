@@ -17,7 +17,7 @@ import com.adobe.marketing.mobile.ExtensionListener;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 
-class ConsentListenerConsentUpdateConsent extends ExtensionListener {
+public class ListenerConsentRequestContent extends ExtensionListener {
 
     /**
      * Constructor.
@@ -26,20 +26,20 @@ class ConsentListenerConsentUpdateConsent extends ExtensionListener {
      * @param type         the {@link String} eventType this listener is registered to handle
      * @param source       the {@link String} eventSource this listener is registered to handle
      */
-    ConsentListenerConsentUpdateConsent(final ExtensionApi extensionApi, final String type, final String source) {
+    ListenerConsentRequestContent(final ExtensionApi extensionApi, final String type, final String source) {
         super(extensionApi, type, source);
     }
 
     /**
      * Method that gets called when event with event type {@link ConsentConstants.EventType#CONSENT}
-     * and with event source {@link ConsentConstants.EventSource#UPDATE_CONSENT}  is dispatched through eventHub.
+     * and with event source {@link ConsentConstants.EventSource#REQUEST_CONTENT} is dispatched through eventHub.
      *
      * @param event the consent update {@link Event} to be processed
      */
     @Override
     public void hear(final Event event) {
-        if (event == null || event.getEventData() == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Event or Event data is null. Ignoring the event listened by ConsentListenerConsentUpdateConsent");
+        if (event == null) {
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Event null. Ignoring the event listened by ListenerConsentRequestContent.");
             return;
         }
 
@@ -47,18 +47,18 @@ class ConsentListenerConsentUpdateConsent extends ExtensionListener {
 
         if (parentExtension == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
-                    "The parent extension, associated with the ConsentListenerConsentUpdateConsent is null, ignoring the consent update event.");
+                    "The parent extension, associated with the ListenerConsentRequestContent is null, ignoring the request content event.");
             return;
         }
 
-        parentExtension.handleConsentUpdate(event);
+        parentExtension.handleRequestContent(event);
     }
 
 
     /**
      * Returns the parent extension associated with the listener.
      *
-     * @return {a @link ConsentExtension} object registered with the eventHub
+     * @return a {@link ConsentExtension} object registered with the eventHub
      */
     ConsentExtension getConsentExtension() {
         return (ConsentExtension) getParentExtension();
