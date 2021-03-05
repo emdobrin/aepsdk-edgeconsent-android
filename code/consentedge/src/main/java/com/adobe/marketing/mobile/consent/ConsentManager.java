@@ -12,43 +12,70 @@
 package com.adobe.marketing.mobile.consent;
 
 class ConsentManager {
-    private Consents currentConsents;
+    private Consents updatedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
+    private Consents defaultConsents; // holds on to default consents obtained from configuration
 
     /**
      * Constructor.
      * <p>
-     * Initializes the {@link #currentConsents} from data in persistence.
+     * Initializes the {@link #updatedConsents} and {@link #defaultConsents} from data in persistence.
      */
     ConsentManager() {
-        currentConsents = ConsentStorageService.loadConsentsFromPersistence();
+        updatedConsents = ConsentStorageService.loadConsentsFromPersistence(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
+        defaultConsents = ConsentStorageService.loadConsentsFromPersistence(ConsentConstants.DataStoreKey.DEFAULT_CONSENT_PREFERENCES);
     }
 
     /**
-     * Merges the provided {@link Consents} with {@link #currentConsents} and persists them.
+     * Merges the provided {@link Consents} with {@link #updatedConsents} and persists them.
      *
      * @param newConsents the newly obtained consents that needs to be merged with existing consents
-     * @return {@link Consents} representing the current Consents after the merge
      */
     void mergeAndPersist(final Consents newConsents) {
         // merge and persist
-        if (currentConsents == null) {
-            currentConsents = new Consents(newConsents);
+        if (updatedConsents == null) {
+            updatedConsents = new Consents(newConsents);
         } else {
-            currentConsents.merge(newConsents);
+            updatedConsents.merge(newConsents);
         }
-        ConsentStorageService.saveConsentsToPersistence(currentConsents);
-        // make a copy of the merged consents and return
-        return;
+        ConsentStorageService.saveConsentsToPersistence(updatedConsents, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
     }
 
     /**
-     * Getter method to retrieve the {@link #currentConsents} of the Consent Extension.
-     * <p>
-     * The {@link #currentConsents} could be null if no consents were set.
+     * Updates and replaces the existing default consents with the passed in default consents.
      *
-     * @return the {@link #currentConsents}
+     * @param newDefaultConsents the default consent obtained from configuration response event
+     * @return true if `currentConsents` has been updated as a result of updating the default consents
+     */
+    boolean updateDefaultConsents(final Consents newDefaultConsents) {
+        // hold temp copy of current consents for comparison
+        Consents existingConsents = getCurrentConsents();
+
+        // update the default consent and persist it
+        defaultConsents = newDefaultConsents;
+        ConsentStorageService.saveConsentsToPersistence(defaultConsents, ConsentConstants.DataStoreKey.DEFAULT_CONSENT_PREFERENCES);
+
+        // return true, if current contents has been updated as a result of default consents
+        return !existingConsents.isEqual(getCurrentConsents());
+    }
+
+    /**
+     * Getter method to retrieve the current consents.
+     * <p>
+     * The current consents is computed by overriding the {@link #updatedConsents} over the {@link #defaultConsents}
+     * The returned consent is never null. When there is no {@code #updatedConsents} or {@code #defaultConsents}, still an empty consent object is returned.
+     *
+     * @return the sharable complete current consents of this user
      */
     Consents getCurrentConsents() {
+        // if defaults consents are not available, send updatedConsents
+        if (defaultConsents == null || defaultConsents.isEmpty()) {
+            return new Consents(updatedConsents);
+        }
+
+        // if default consents are available. Merge the current consents on top of it
+        final Consents currentConsents = new Consents(defaultConsents);
+        currentConsents.merge(updatedConsents);
+
         return currentConsents;
     }
 

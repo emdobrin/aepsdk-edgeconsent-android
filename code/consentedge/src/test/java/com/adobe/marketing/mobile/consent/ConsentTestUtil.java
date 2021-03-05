@@ -16,7 +16,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConsentTestUtil {
+class ConsentTestUtil {
 
     public static String SAMPLE_METADATA_TIMESTAMP = "2019-09-23T18:15:45Z";
     public static String SAMPLE_METADATA_TIMESTAMP_OTHER = "2020-07-23T18:16:45Z";
@@ -47,37 +47,43 @@ public class ConsentTestUtil {
      * }
      */
 
-    public static String CreateConsentsXDMJSONString(final String collectConsentString) {
+    static Map<String, Object> emptyConsentXDMMap() {
+        Map<String,Object> consentMap = new HashMap<>();
+        consentMap.put(ConsentConstants.EventDataKey.CONSENTS, new HashMap<String,Object>());
+        return consentMap;
+    }
+
+    static String CreateConsentsXDMJSONString(final String collectConsentString) {
         return CreateConsentsXDMJSONString(collectConsentString, null);
     }
 
-    public static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString) {
+    static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString) {
         return CreateConsentsXDMJSONString(collectConsentString, adIDConsentString, null);
     }
 
-    public static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString, final String time) {
+    static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString, final String time) {
         return CreateConsentsXDMJSONString(collectConsentString, adIDConsentString, null, time);
     }
 
-    public static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString, final String personalizeConsentString, final String time) {
+    static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString, final String personalizeConsentString, final String time) {
         Map<String, Object> consentDataMap = CreateConsentXDMMap(collectConsentString, adIDConsentString, personalizeConsentString, time);
         JSONObject jsonObject = new JSONObject(consentDataMap);
         return jsonObject.toString();
     }
 
-    public static Map<String, Object> CreateConsentXDMMap(final String collectConsentString) {
+    static Map<String, Object> CreateConsentXDMMap(final String collectConsentString) {
         return CreateConsentXDMMap(collectConsentString, null);
     }
 
-    public static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString) {
+    static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString) {
         return CreateConsentXDMMap(collectConsentString, adIDConsentString, null);
     }
 
-    public static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString, final String time) {
+    static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString, final String time) {
         return CreateConsentXDMMap(collectConsentString, adIDConsentString, null, time);
     }
 
-    public static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString, final String personalizeConsentString, final String time) {
+    static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString, final String personalizeConsentString, final String time) {
         Map<String, Object> consentData = new HashMap<String, Object>();
         Map<String, Object> consents = new HashMap<String, Object>();
         if (collectConsentString != null) {
@@ -118,7 +124,7 @@ public class ConsentTestUtil {
         return consentData;
     }
 
-    public static String readTimestamp(Consents consents) {
+    static String readTimestamp(Consents consents) {
         Map<String, Object> allConsentMap = getAllConsentsMap(consents);
         if (isNullOrEmpty(allConsentMap)) {
             return null;
@@ -132,7 +138,7 @@ public class ConsentTestUtil {
         return (String) collectMap.get(ConsentConstants.EventDataKey.TIME);
     }
 
-    public static String readCollectConsent(Consents consents) {
+    static String readCollectConsent(Consents consents) {
         Map<String, Object> allConsentMap = getAllConsentsMap(consents);
         if (isNullOrEmpty(allConsentMap)) {
             return null;
@@ -146,7 +152,7 @@ public class ConsentTestUtil {
         return (String) collectMap.get("val");
     }
 
-    public static String readAdIdConsent(Consents consents) {
+    static String readAdIdConsent(Consents consents) {
         Map<String, Object> allConsentMap = getAllConsentsMap(consents);
         if (isNullOrEmpty(allConsentMap)) {
             return null;
@@ -160,7 +166,7 @@ public class ConsentTestUtil {
         return (String) adIdMap.get("val");
     }
 
-    public static String readPersonalizeConsent(Consents consents) {
+    static String readPersonalizeConsent(Consents consents) {
         Map<String, Object> allConsentMap = getAllConsentsMap(consents);
         if (isNullOrEmpty(allConsentMap)) {
             return null;

@@ -26,7 +26,7 @@ import java.util.Map;
 class ConsentStorageService {
 
     /**
-     * Loads the consents from persistence.
+     * Loads the requested consents from persistence.
      * <p>
      * The jsonString from persistence is serialized into {@link Consents} object and returned.
      * <p>
@@ -35,7 +35,7 @@ class ConsentStorageService {
      *
      * @return {@link Consent} the previously persisted consents
      */
-    static Consents loadConsentsFromPersistence() {
+    static Consents loadConsentsFromPersistence(final String key) {
         final SharedPreferences sharedPreferences = getSharedPreference();
         if (sharedPreferences == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Shared Preference value is null. Unable to load saved consents from persistence.");
@@ -43,7 +43,7 @@ class ConsentStorageService {
         }
 
 
-        final String jsonString = sharedPreferences.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null);
+        final String jsonString = sharedPreferences.getString(key, null);
 
         if (jsonString == null) {
             MobileCore.log(LoggingMode.VERBOSE, ConsentConstants.LOG_TAG, "No previous consents were stored in persistence. Current consent is null");
@@ -71,7 +71,7 @@ class ConsentStorageService {
      *
      * @param consents the consents that needs to be persisted under key {@link ConsentConstants.DataStoreKey#CONSENT_PREFERENCES}
      */
-    static void saveConsentsToPersistence(final Consents consents) {
+    static void saveConsentsToPersistence(final Consents consents, final String key) {
         SharedPreferences sharedPreferences = getSharedPreference();
         if (sharedPreferences == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Shared Preference value is null. Unable to write consents to persistence.");
@@ -86,14 +86,14 @@ class ConsentStorageService {
         }
 
         if (consents.isEmpty()) {
-            editor.remove(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
+            editor.remove(key);
             editor.apply();
             return;
         }
 
         final JSONObject jsonObject = new JSONObject(consents.asXDMMap());
         final String jsonString = jsonObject.toString();
-        editor.putString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, jsonString);
+        editor.putString(key, jsonString);
         editor.apply();
     }
 
