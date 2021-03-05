@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile.consent;
 
 class ConsentManager {
     private Consents updatedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
-    private Consents defaultConsents; // holds on to default consents obtained from configuration
+    private Consents defaultConsents; // holds on to default consents obtained from configuration response
 
     /**
      * Constructor.
@@ -22,7 +22,6 @@ class ConsentManager {
      */
     ConsentManager() {
         updatedConsents = ConsentStorageService.loadConsentsFromPersistence(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
-        defaultConsents = ConsentStorageService.loadConsentsFromPersistence(ConsentConstants.DataStoreKey.DEFAULT_CONSENT_PREFERENCES);
     }
 
     /**
@@ -50,9 +49,8 @@ class ConsentManager {
         // hold temp copy of current consents for comparison
         Consents existingConsents = getCurrentConsents();
 
-        // update the default consent and persist it
+        // update the defaultConsents variable
         defaultConsents = newDefaultConsents;
-        ConsentStorageService.saveConsentsToPersistence(defaultConsents, ConsentConstants.DataStoreKey.DEFAULT_CONSENT_PREFERENCES);
 
         // return true, if current contents has been updated as a result of default consents
         return !existingConsents.isEqual(getCurrentConsents());

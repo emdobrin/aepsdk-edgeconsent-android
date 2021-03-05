@@ -20,8 +20,7 @@ class Consents {
     private Map<String, Object> consentsMap;
 
     // Suppresses default constructor.
-    private Consents() {
-    }
+    private Consents() { }
 
     /**
      * Copy Constructor.

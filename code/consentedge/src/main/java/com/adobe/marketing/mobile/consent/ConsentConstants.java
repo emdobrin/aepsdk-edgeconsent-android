@@ -45,7 +45,6 @@ final class ConsentConstants {
     final class DataStoreKey {
         static final String DATASTORE_NAME = "com.adobe.consent";
         static final String CONSENT_PREFERENCES = "consent:preferences";
-        static final String DEFAULT_CONSENT_PREFERENCES = "defaultconsent:preferences";
         private DataStoreKey() { }
     }
 

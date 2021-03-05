@@ -84,8 +84,6 @@ public class ConsentManagerTest {
         // setup
         final String updatedConsentsJSON = CreateConsentsXDMJSONString("y", null, SAMPLE_METADATA_TIMESTAMP);
         Mockito.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null)).thenReturn(updatedConsentsJSON);
-        final String defaultConsentJSON = CreateConsentsXDMJSONString("n", "y");
-        Mockito.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.DEFAULT_CONSENT_PREFERENCES, null)).thenReturn(defaultConsentJSON);
 
         // test
         consentManager = new ConsentManager();
@@ -93,7 +91,7 @@ public class ConsentManagerTest {
         // verify
         Consents currentConsents = consentManager.getCurrentConsents();
         assertEquals("y", readCollectConsent(currentConsents));
-        assertEquals("y", readAdIdConsent(currentConsents));
+        assertNull(readAdIdConsent(currentConsents));
         assertNull(ConsentTestUtil.readPersonalizeConsent(currentConsents));
         assertEquals(SAMPLE_METADATA_TIMESTAMP, ConsentTestUtil.readTimestamp(currentConsents));
     }
@@ -341,8 +339,6 @@ public class ConsentManagerTest {
         assertEquals("n", readCollectConsent(defaultConsents));
         assertNull(readAdIdConsent(defaultConsents)); // assert adID consent is null
 
-        // verify defaultConsent is written in preference
-        verify(mockSharedPreferenceEditor, times(1)).putString(ConsentConstants.DataStoreKey.DEFAULT_CONSENT_PREFERENCES, CreateConsentsXDMJSONString("n"));
     }
 
 
