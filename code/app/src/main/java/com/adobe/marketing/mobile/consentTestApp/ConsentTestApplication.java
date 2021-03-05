@@ -34,7 +34,7 @@ public class ConsentTestApplication extends Application {
     private static final String LOG_TAG = "ConsentTestApplication";
 
     // TODO: fill in your Launch environment ID here
-    private final String LAUNCH_ENVIRONMENT_ID = "";
+    private final String LAUNCH_ENVIRONMENT_ID = "3805cb8645dd/b854d6a34ab5/launch-bdc2d5a05f2a-development";
 
     @Override
     public void onCreate() {
