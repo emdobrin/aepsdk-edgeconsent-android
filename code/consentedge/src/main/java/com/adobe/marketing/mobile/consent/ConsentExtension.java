@@ -220,7 +220,7 @@ class ConsentExtension extends Extension {
      * @param event the {@link Event} that triggered the consents update
      */
     private void shareCurrentConsents(final Event event) {
-        Consents currentConsents = consentManager.getCurrentConsents();
+        final Consents currentConsents = consentManager.getCurrentConsents();
 
         // set the shared state
         ExtensionErrorCallback<ExtensionError> errorCallback = new ExtensionErrorCallback<ExtensionError>() {

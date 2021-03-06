@@ -11,6 +11,8 @@
 
 package com.adobe.marketing.mobile.consent;
 
+import java.util.HashMap;
+
 class ConsentManager {
     private Consents updatedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
     private Consents defaultConsents; // holds on to default consents obtained from configuration response
@@ -21,7 +23,12 @@ class ConsentManager {
      * Initializes the {@link #updatedConsents} and {@link #defaultConsents} from data in persistence.
      */
     ConsentManager() {
-        updatedConsents = ConsentStorageService.loadConsentsFromPersistence(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
+        updatedConsents = ConsentStorageService.loadConsentsFromPersistence();
+
+        // Initiate update consent with empty consent object if nothing is loaded from persistence
+        if (updatedConsents == null) {
+            updatedConsents = new Consents(new HashMap<String, Object>());
+        }
     }
 
     /**
@@ -31,12 +38,8 @@ class ConsentManager {
      */
     void mergeAndPersist(final Consents newConsents) {
         // merge and persist
-        if (updatedConsents == null) {
-            updatedConsents = new Consents(newConsents);
-        } else {
-            updatedConsents.merge(newConsents);
-        }
-        ConsentStorageService.saveConsentsToPersistence(updatedConsents, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
+        updatedConsents.merge(newConsents);
+        ConsentStorageService.saveConsentsToPersistence(updatedConsents);
     }
 
     /**
@@ -47,7 +50,7 @@ class ConsentManager {
      */
     boolean updateDefaultConsents(final Consents newDefaultConsents) {
         // hold temp copy of current consents for comparison
-        Consents existingConsents = getCurrentConsents();
+        final Consents existingConsents = getCurrentConsents();
 
         // update the defaultConsents variable
         defaultConsents = newDefaultConsents;
