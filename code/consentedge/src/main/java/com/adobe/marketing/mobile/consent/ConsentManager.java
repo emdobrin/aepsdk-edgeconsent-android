@@ -14,32 +14,32 @@ package com.adobe.marketing.mobile.consent;
 import java.util.HashMap;
 
 class ConsentManager {
-    private Consents updatedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
+    private Consents userOptedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
     private Consents defaultConsents; // holds on to default consents obtained from configuration response
 
     /**
      * Constructor.
      * <p>
-     * Initializes the {@link #updatedConsents} and {@link #defaultConsents} from data in persistence.
+     * Initializes the {@link #userOptedConsents} from data in persistence.
      */
     ConsentManager() {
-        updatedConsents = ConsentStorageService.loadConsentsFromPersistence();
+        userOptedConsents = ConsentStorageService.loadConsentsFromPersistence();
 
         // Initiate update consent with empty consent object if nothing is loaded from persistence
-        if (updatedConsents == null) {
-            updatedConsents = new Consents(new HashMap<String, Object>());
+        if (userOptedConsents == null) {
+            userOptedConsents = new Consents(new HashMap<String, Object>());
         }
     }
 
     /**
-     * Merges the provided {@link Consents} with {@link #updatedConsents} and persists them.
+     * Merges the provided {@link Consents} with {@link #userOptedConsents} and persists them.
      *
      * @param newConsents the newly obtained consents that needs to be merged with existing consents
      */
     void mergeAndPersist(final Consents newConsents) {
         // merge and persist
-        updatedConsents.merge(newConsents);
-        ConsentStorageService.saveConsentsToPersistence(updatedConsents);
+        userOptedConsents.merge(newConsents);
+        ConsentStorageService.saveConsentsToPersistence(userOptedConsents);
     }
 
     /**
@@ -55,27 +55,26 @@ class ConsentManager {
         // update the defaultConsents variable
         defaultConsents = newDefaultConsents;
 
-        // return true, if current contents has been updated as a result of default consents
-        return !existingConsents.isEqual(getCurrentConsents());
+        return !existingConsents.equals(getCurrentConsents());
     }
 
     /**
      * Getter method to retrieve the current consents.
      * <p>
-     * The current consents is computed by overriding the {@link #updatedConsents} over the {@link #defaultConsents}
-     * The returned consent is never null. When there is no {@code #updatedConsents} or {@code #defaultConsents}, still an empty consent object is returned.
+     * The current consents is computed by overriding the {@link #userOptedConsents} over the {@link #defaultConsents}
+     * The returned consent is never null. When there is no {@code #userOptedConsents} or {@code #defaultConsents}, still an empty consent object is returned.
      *
      * @return the sharable complete current consents of this user
      */
     Consents getCurrentConsents() {
-        // if defaults consents are not available, send updatedConsents
+        // if defaults consents are not available, return userOptedConsents
         if (defaultConsents == null || defaultConsents.isEmpty()) {
-            return new Consents(updatedConsents);
+            return new Consents(userOptedConsents);
         }
 
-        // if default consents are available. Merge the current consents on top of it
+        // if default consents are available. Merge the userOpted consents on top of it
         final Consents currentConsents = new Consents(defaultConsents);
-        currentConsents.merge(updatedConsents);
+        currentConsents.merge(userOptedConsents);
 
         return currentConsents;
     }

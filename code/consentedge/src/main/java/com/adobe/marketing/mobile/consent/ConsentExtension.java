@@ -194,13 +194,13 @@ class ConsentExtension extends Extension {
     void handleConfigurationResponse(final Event event) {
         final Map<String, Object> configData = event.getEventData();
         if (configData == null || configData.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Event data configuration response event is empty. Unable to read default consent. Dropping event.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Event data configuration response event is empty, unable to read configuration consent.default. Dropping event.");
             return;
         }
 
         final Map<String, Object> defaultConsentMap = (Map<String, Object>) configData.get(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT);
         if (defaultConsentMap == null || defaultConsentMap.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Default consent not found in configuration. Make sure Consent extension is installed in your mobile property");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "consent.default not found in configuration. Make sure Consent extension is installed in your mobile property");
             // do not return here, even with empty default consent go ahead and update the defaultConsent in ConsentManager
             // This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
         }
@@ -220,7 +220,7 @@ class ConsentExtension extends Extension {
      * @param event the {@link Event} that triggered the consents update
      */
     private void shareCurrentConsents(final Event event) {
-        final Consents currentConsents = consentManager.getCurrentConsents();
+        final Map<String,Object> xdmConsents = consentManager.getCurrentConsents().asXDMMap();
 
         // set the shared state
         ExtensionErrorCallback<ExtensionError> errorCallback = new ExtensionErrorCallback<ExtensionError>() {
@@ -230,11 +230,11 @@ class ConsentExtension extends Extension {
             }
         };
 
-        getApi().setXDMSharedEventState(currentConsents.asXDMMap(), event, errorCallback);
+        getApi().setXDMSharedEventState(xdmConsents, event, errorCallback);
 
 
         // create and dispatch an consent response event
-        final Event responseEvent = new Event.Builder(ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED, ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.RESPONSE_CONTENT).setEventData(currentConsents.asXDMMap()).build();
+        final Event responseEvent = new Event.Builder(ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED, ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.RESPONSE_CONTENT).setEventData(xdmConsents).build();
         ExtensionErrorCallback<ExtensionError> dispatchErrorCallback = new ExtensionErrorCallback<ExtensionError>() {
             @Override
             public void error(final ExtensionError extensionError) {

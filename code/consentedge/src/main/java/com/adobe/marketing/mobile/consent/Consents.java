@@ -114,18 +114,25 @@ class Consents {
     }
 
     /**
-     * Compares the current consent instance the with passed object
+     * Compares the current consent instance the with the passed object
      *
      * @return true, if both the consents are equal
      */
-    boolean isEqual(final Consents comparingConsent) {
-        if (comparingConsent == null) {
+    @Override
+    public boolean equals(final Object comparingConsentObject) {
+        if (comparingConsentObject == null) {
             return false;
         }
 
-        if (this == comparingConsent) {
+        if (this == comparingConsentObject) {
             return true;
         }
+
+        if (!(comparingConsentObject instanceof Consents)) {
+            return false;
+        }
+
+        Consents comparingConsent = (Consents) comparingConsentObject;
 
         if (consentsMap == null) {
             return comparingConsent.consentsMap == null;

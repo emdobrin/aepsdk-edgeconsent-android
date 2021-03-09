@@ -352,7 +352,7 @@ public class ConsentManagerTest {
         // Default Consent          Collect  NO AdID   NO
 
         // verify
-        // Updated  = YES
+        // Updated  = NO
         // Updated Current Consent  Collect YES AdID  NO
 
         // setup
@@ -454,6 +454,4 @@ public class ConsentManagerTest {
         assertEquals("n", readCollectConsent(defaultConsents));
         assertNull(readAdIdConsent(defaultConsents));
     }
-
-
 }

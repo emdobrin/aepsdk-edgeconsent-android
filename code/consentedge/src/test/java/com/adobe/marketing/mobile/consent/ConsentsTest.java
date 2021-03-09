@@ -239,7 +239,15 @@ public class ConsentsTest {
     @Test
     public void test_isEqual_sameObject() {
         Consents consents = new Consents(CreateConsentXDMMap("n"));
-        assertTrue(consents.isEqual(consents));
+        assertTrue(consents.equals(consents));
+    }
+
+    @Test
+    public void test_isEqual_WhenDifferentClass() {
+        Consents first = new Consents(CreateConsentXDMMap("n"));
+
+        assertFalse(first.equals("sd"));
+        assertFalse(first.equals(new Object()));
     }
 
     @Test
@@ -247,8 +255,8 @@ public class ConsentsTest {
         Consents first = new Consents(CreateConsentXDMMap("n"));
         Consents second = new Consents(CreateConsentXDMMap("y"));
 
-        assertFalse(first.isEqual(second));
-        assertFalse(second.isEqual(first));
+        assertFalse(first.equals(second));
+        assertFalse(second.equals(first));
     }
 
     @Test
@@ -256,29 +264,29 @@ public class ConsentsTest {
         Consents first = new Consents(CreateConsentXDMMap("y"));
         Consents second = new Consents(CreateConsentXDMMap("y"));
 
-        assertTrue(first.isEqual(second));
-        assertTrue(second.isEqual(first));
+        assertTrue(first.equals(second));
+        assertTrue(second.equals(first));
     }
 
     @Test
     public void test_isEqual_WhenNull() {
         Consents first = new Consents(CreateConsentXDMMap("y"));
-        assertFalse(first.isEqual(null));
+        assertFalse(first.equals(null));
     }
 
     @Test
     public void test_isEqual_WhenEmptyAndLoaded() {
         Consents first = new Consents(CreateConsentXDMMap("y"));
         Consents second = new Consents(new HashMap<String, Object>());
-        assertFalse(first.isEqual(second));
-        assertFalse(second.isEqual(first));
+        assertFalse(first.equals(second));
+        assertFalse(second.equals(first));
     }
 
     @Test
     public void test_isEqual_WhenEmptyConsentAndEqual() {
         Consents first = new Consents(new HashMap<String, Object>());
         Consents second = new Consents(new HashMap<String, Object>());
-        assertTrue(first.isEqual(second));
-        assertTrue(second.isEqual(first));
+        assertTrue(first.equals(second));
+        assertTrue(second.equals(first));
     }
 }

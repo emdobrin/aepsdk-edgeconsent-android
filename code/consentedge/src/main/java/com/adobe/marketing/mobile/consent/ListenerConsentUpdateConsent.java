@@ -47,7 +47,7 @@ class ListenerConsentUpdateConsent extends ExtensionListener {
 
         if (parentExtension == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
-                    "The parent extension, associated with the ListenerConsentUpdateConsent is null, ignoring the consent update event.");
+                    "The parent extension associated with the ListenerConsentUpdateConsent is null, ignoring this event.");
             return;
         }
 

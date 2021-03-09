@@ -47,7 +47,7 @@ public class ListenerConfigurationResponseContent extends ExtensionListener {
 
         if (parentExtension == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
-                    "The parent extension, associated with the ListenerConfigurationResponseContent is null, ignoring the request content event.");
+                    "The parent extension associated with the ListenerConfigurationResponseContent is null, ignoring this event.");
             return;
         }
 
