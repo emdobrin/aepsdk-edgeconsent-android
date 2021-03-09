@@ -26,7 +26,7 @@ import java.util.Map;
 class ConsentStorageService {
 
     /**
-     * Loads the consents from persistence.
+     * Loads the requested consents from persistence.
      * <p>
      * The jsonString from persistence is serialized into {@link Consents} object and returned.
      * <p>

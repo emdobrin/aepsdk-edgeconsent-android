@@ -38,6 +38,7 @@ final class ConsentConstants {
     final class EventType {
         static final String CONSENT = "com.adobe.eventType.consent";
         static final String EDGE = "com.adobe.eventType.edge";
+        static final String CONFIGURATION = "com.adobe.eventType.configuration";
         private EventType() { }
     }
 
@@ -54,6 +55,11 @@ final class ConsentConstants {
         static final String GET_CONSENTS_RESPONSE = "Get Consents Response";
         static final String CONSENT_PREFERENCES_UPDATED = "Consent Preferences Updated";
         private EventNames() { }
+    }
+
+    final class ConfigurationKey {
+        static final String DEFAULT_CONSENT = "consent.default";
+        private ConfigurationKey() { }
     }
 
     private ConsentConstants() { }

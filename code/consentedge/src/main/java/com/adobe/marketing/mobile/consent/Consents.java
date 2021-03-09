@@ -20,8 +20,7 @@ class Consents {
     private Map<String, Object> consentsMap;
 
     // Suppresses default constructor.
-    private Consents() {
-    }
+    private Consents() { }
 
     /**
      * Copy Constructor.
@@ -99,20 +98,47 @@ class Consents {
     }
 
     /**
-     * Dictionary representation of the available consents associated with this {@link Consents} object.
+     * XDMMap representation of the available consents associated with this {@link Consents} object.
      * <p>
      * Will make a deep copy of the available consents map before sharing.
+     * An empty XDMFormatted consent Map is returned if there are no consents present in this object.
      *
      * @return {@link Map} representing the Consents in XDM format
      */
     Map<String, Object> asXDMMap() {
-        if (isEmpty()) {
-            return null;
-        }
+        Map<String, Object> internalConsentMap = consentsMap != null ? Utility.deepCopy(consentsMap) : new HashMap<String, Object>();
 
         Map<String, Object> xdmFormattedMap = new HashMap<>();
-        xdmFormattedMap.put(ConsentConstants.EventDataKey.CONSENTS, Utility.deepCopy(consentsMap));
+        xdmFormattedMap.put(ConsentConstants.EventDataKey.CONSENTS, internalConsentMap);
         return xdmFormattedMap;
+    }
+
+    /**
+     * Compares the current consent instance the with the passed object
+     *
+     * @return true, if both the consents are equal
+     */
+    @Override
+    public boolean equals(final Object comparingConsentObject) {
+        if (comparingConsentObject == null) {
+            return false;
+        }
+
+        if (this == comparingConsentObject) {
+            return true;
+        }
+
+        if (!(comparingConsentObject instanceof Consents)) {
+            return false;
+        }
+
+        Consents comparingConsent = (Consents) comparingConsentObject;
+
+        if (consentsMap == null) {
+            return comparingConsent.consentsMap == null;
+        }
+
+        return this.consentsMap.equals(comparingConsent.consentsMap);
     }
 
 }

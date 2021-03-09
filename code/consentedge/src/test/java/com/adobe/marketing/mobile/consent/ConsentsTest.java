@@ -10,7 +10,6 @@ import static com.adobe.marketing.mobile.consent.ConsentTestUtil.CreateConsentXD
 import static com.adobe.marketing.mobile.consent.ConsentTestUtil.SAMPLE_METADATA_TIMESTAMP;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -155,13 +154,13 @@ public class ConsentsTest {
     }
 
     @Test
-    public void test_AsMap_whenEmptyConsents() {
+    public void test_AsXDMMap_whenEmptyConsents() {
         // setup
         Map<String, Object> consentData = ConsentTestUtil.CreateConsentXDMMap(null, null);
         Consents consents = new Consents(consentData);
 
         // test and verify
-        assertNull(consents.asXDMMap());
+        assertEquals(ConsentTestUtil.emptyConsentXDMMap(), consents.asXDMMap());
     }
 
     // ========================================================================================
@@ -232,5 +231,62 @@ public class ConsentsTest {
 
         // verify
         assertNull(ConsentTestUtil.readTimestamp(consents));
+    }
+
+    // ========================================================================================
+    // Test method : isEqual
+    // ========================================================================================
+    @Test
+    public void test_isEqual_sameObject() {
+        Consents consents = new Consents(CreateConsentXDMMap("n"));
+        assertTrue(consents.equals(consents));
+    }
+
+    @Test
+    public void test_isEqual_WhenDifferentClass() {
+        Consents first = new Consents(CreateConsentXDMMap("n"));
+
+        assertFalse(first.equals("sd"));
+        assertFalse(first.equals(new Object()));
+    }
+
+    @Test
+    public void test_isEqual_WhenDifferent() {
+        Consents first = new Consents(CreateConsentXDMMap("n"));
+        Consents second = new Consents(CreateConsentXDMMap("y"));
+
+        assertFalse(first.equals(second));
+        assertFalse(second.equals(first));
+    }
+
+    @Test
+    public void test_isEqual_WhenSame() {
+        Consents first = new Consents(CreateConsentXDMMap("y"));
+        Consents second = new Consents(CreateConsentXDMMap("y"));
+
+        assertTrue(first.equals(second));
+        assertTrue(second.equals(first));
+    }
+
+    @Test
+    public void test_isEqual_WhenNull() {
+        Consents first = new Consents(CreateConsentXDMMap("y"));
+        assertFalse(first.equals(null));
+    }
+
+    @Test
+    public void test_isEqual_WhenEmptyAndLoaded() {
+        Consents first = new Consents(CreateConsentXDMMap("y"));
+        Consents second = new Consents(new HashMap<String, Object>());
+        assertFalse(first.equals(second));
+        assertFalse(second.equals(first));
+    }
+
+    @Test
+    public void test_isEqual_WhenEmptyConsentAndEqual() {
+        Consents first = new Consents(new HashMap<String, Object>());
+        Consents second = new Consents(new HashMap<String, Object>());
+        assertTrue(first.equals(second));
+        assertTrue(second.equals(first));
     }
 }
