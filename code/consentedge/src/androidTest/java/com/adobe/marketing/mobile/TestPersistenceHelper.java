@@ -20,7 +20,7 @@ import com.adobe.marketing.mobile.consent.ConsentTestConstants;
 import java.util.ArrayList;
 
 /**
- * Helper class to add and remove persisted data to extension concerned with testing Consents.
+ * Helper class to update and remove persisted data to extension concerned with testing Consents.
  */
 public class TestPersistenceHelper {
 
@@ -29,6 +29,39 @@ public class TestPersistenceHelper {
         add(ConsentTestConstants.DataStoreKey.CONFIG_DATASTORE);
     }};
 
+    /**
+     * Helper method to update the {@link SharedPreferences} data.
+     * @param datastore the name of the datastore to be updated
+     * @param key the persisted data key that has to be updated
+     * @param value the new value
+     */
+    public static void updatePersistence(final String datastore, final String key, final String value) {
+        final Application application = MobileCore.getApplication();
+        if (application == null) {
+            return;
+        }
+
+        final Context context = application.getApplicationContext();
+        if (context == null) {
+            return;
+        }
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(datastore, Context.MODE_PRIVATE);;
+        if (sharedPreferences == null) {
+            return;
+        }
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (editor == null) {
+            return;
+        }
+        editor.putString(key,value);
+        editor.apply();
+    }
+
+    /**
+     * Clears the Configuration and Consent extension's persisted data
+     */
     public static void resetKnownPersistence() {
         final Application application = MobileCore.getApplication();
         if (application == null) {
