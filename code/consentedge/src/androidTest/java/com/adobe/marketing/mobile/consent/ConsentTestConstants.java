@@ -49,6 +49,12 @@ public class ConsentTestConstants {
         private DataStoreKey() { }
     }
 
+    public final class SharedStateName {
+        public static final String CONFIG = "com.adobe.module.eventhub";
+        public static final String EVENT_HUB = "com.adobe.module.eventhub";
+        private SharedStateName() { }
+    }
+
     public final class EventNames {
         public static final String EDGE_CONSENT_UPDATE = "Edge Consent Update Request";
         public static final String CONSENT_UPDATE_REQUEST = "Consent Update Request";

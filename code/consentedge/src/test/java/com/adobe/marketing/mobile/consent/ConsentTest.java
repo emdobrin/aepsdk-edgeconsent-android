@@ -36,7 +36,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -73,7 +72,7 @@ public class ConsentTest {
         Consent.registerExtension();
         final ArgumentCaptor<ExtensionErrorCallback> callbackCaptor = ArgumentCaptor.forClass(ExtensionErrorCallback.class);
 
-        // The monitor extension should register with core
+        // The consent extension should register with core
         PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
         MobileCore.registerExtension(ArgumentMatchers.eq(ConsentExtension.class), callbackCaptor.capture());
 

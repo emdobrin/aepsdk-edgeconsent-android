@@ -111,6 +111,8 @@ class MonitorExtension extends Extension {
 	public void wildcardProcessor(final Event event) {
 		if (TestConstants.EventType.MONITOR.equalsIgnoreCase(event.getType())) {
 			if (TestConstants.EventSource.SHARED_STATE_REQUEST.equalsIgnoreCase(event.getSource())) {
+				processSharedStateRequest(event);
+			} else if (TestConstants.EventSource.XDM_SHARED_STATE_REQUEST.equalsIgnoreCase(event.getSource())) {
 				processXDMSharedStateRequest(event);
 			} else if (TestConstants.EventSource.UNREGISTER.equalsIgnoreCase(event.getSource())) {
 				processUnregisterRequest(event);
@@ -145,7 +147,7 @@ class MonitorExtension extends Extension {
 	}
 
 	/**
-	 * Processor which retrieves and dispatches the shared state for the state owner specified
+	 * Processor which retrieves and dispatches the XDM shared state for the state owner specified
 	 * in the request.
 	 * @param event
 	 */
@@ -163,6 +165,35 @@ class MonitorExtension extends Extension {
 		}
 
 		EventData sharedState = getApi().getXDMSharedEventState(stateOwner, event);
+
+		Event responseEvent = new Event.Builder("Get Shared State Response", TestConstants.EventType.MONITOR,
+				TestConstants.EventSource.XDM_SHARED_STATE_RESPONSE)
+				.setEventData(sharedState == null ? null : sharedState.toObjectMap())
+				.setPairID(event.getResponsePairID())
+				.build();
+
+		MobileCore.dispatchResponseEvent(responseEvent, event, null);
+	}
+
+	/**
+	 * Processor which retrieves and dispatches the shared state for the state owner specified
+	 * in the request.
+	 * @param event
+	 */
+	private void processSharedStateRequest(final Event event) {
+		EventData eventData = event.getData();
+
+		if (eventData == null) {
+			return;
+		}
+
+		String stateOwner = eventData.optString(TestConstants.EventDataKey.STATE_OWNER, null);
+
+		if (stateOwner == null) {
+			return;
+		}
+
+		EventData sharedState = getApi().getSharedEventState(stateOwner, event);
 
 		Event responseEvent = new Event.Builder("Get Shared State Response", TestConstants.EventType.MONITOR,
 				TestConstants.EventSource.SHARED_STATE_RESPONSE)

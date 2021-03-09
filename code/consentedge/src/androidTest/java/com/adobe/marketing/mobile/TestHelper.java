@@ -139,7 +139,7 @@ public class TestHelper {
 	 *
 	 * @param timeoutMillis max waiting time
 	 */
-	private static void waitForThreads(final int timeoutMillis) {
+	public static void waitForThreads(final int timeoutMillis) {
 		int TEST_DEFAULT_TIMEOUT_MS = 1000;
 		int TEST_DEFAULT_SLEEP_MS = 50;
 		int TEST_INITIAL_SLEEP_MS = 100;
@@ -386,6 +386,49 @@ public class TestHelper {
 		}
 
 		return receivedEvents.containsKey(eventSpec) ? receivedEvents.get(eventSpec) : Collections.<Event>emptyList();
+	}
+
+
+	/**
+	 * Synchronous call to get the shared state for the specified {@code stateOwner}.
+	 * This API throws an assertion failure in case of timeout.
+	 * @param stateOwner the owner extension of the shared state (typically the name of the extension)
+	 * @param timeout how long should this method wait for the requested shared state, in milliseconds
+	 * @return latest shared state of the given {@code stateOwner} or null if no shared state was found
+	 * @throws InterruptedException
+	 */
+	public static Map<String, Object> getSharedStateFor(final String stateOwner, int timeout) throws InterruptedException {
+		Event event = new Event.Builder("Get Shared State Request", TestConstants.EventType.MONITOR,
+				TestConstants.EventSource.SHARED_STATE_REQUEST)
+				.setEventData(new HashMap<String, Object>() {
+					{
+						put(TestConstants.EventDataKey.STATE_OWNER, stateOwner);
+					}
+				})
+				.build();
+
+		final ADBCountDownLatch latch = new ADBCountDownLatch(1);
+		final Map<String, Object> sharedState = new HashMap<>();
+		MobileCore.dispatchEventWithResponseCallback(event,
+				new AdobeCallback<Event>() {
+					@Override
+					public void call(Event event) {
+						if (event.getEventData() != null) {
+							sharedState.putAll(event.getEventData());
+						}
+
+						latch.countDown();
+					}
+				},
+				new ExtensionErrorCallback<ExtensionError>() {
+					@Override
+					public void error(ExtensionError extensionError) {
+						MobileCore.log(LoggingMode.ERROR, TAG, "Failed to get shared state for " + stateOwner + ": " + extensionError);
+					}
+				});
+
+		assertTrue("Timeout waiting for shared state " + stateOwner, latch.await(timeout, TimeUnit.MILLISECONDS));
+		return sharedState.isEmpty() ? null : sharedState;
 	}
 
 	/**
