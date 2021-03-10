@@ -60,6 +60,7 @@ public class Consent {
     public static void update(final Map<String,Object> xdmFormattedConsents) {
         if (xdmFormattedConsents == null || xdmFormattedConsents.isEmpty()) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Null/Empty consents passed to Consent.update() Public API. Ignoring the API call.");
+            return;
         }
 
         // create and dispatch an consent fragments update event

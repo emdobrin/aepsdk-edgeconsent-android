@@ -114,18 +114,12 @@ public class ConsentTest {
 
     @Test
     public void testUpdate_withNull() {
-        // setup
-        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-
         // test
         Consent.update(null);
 
         // verify
-        PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
-        MobileCore.dispatchEvent(eventCaptor.capture(), any(ExtensionErrorCallback.class));
-
-        Event dispatchedEvent = eventCaptor.getValue();
-        assertTrue(dispatchedEvent.getEventData().isEmpty());
+        PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
+        MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
     }
 
     // ========================================================================================
