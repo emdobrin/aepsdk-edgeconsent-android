@@ -441,7 +441,7 @@ public class TestHelper {
 	 */
 	public static Map<String, Object> getXDMSharedStateFor(final String stateOwner, int timeout) throws InterruptedException {
 		Event event = new Event.Builder("Get Shared State Request", TestConstants.EventType.MONITOR,
-				TestConstants.EventSource.SHARED_STATE_REQUEST)
+				TestConstants.EventSource.XDM_SHARED_STATE_REQUEST)
 				.setEventData(new HashMap<String, Object>() {
 					{
 						put(TestConstants.EventDataKey.STATE_OWNER, stateOwner);

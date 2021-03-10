@@ -57,6 +57,26 @@ public class TestPersistenceHelper {
         }
         editor.putString(key,value);
         editor.apply();
+        editor.commit();
+    }
+
+    public static String readPersistedData(final String datastore, final String key) {
+        final Application application = MobileCore.getApplication();
+        if (application == null) {
+            return null;
+        }
+
+        final Context context = application.getApplicationContext();
+        if (context == null) {
+            return null;
+        }
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(datastore, Context.MODE_PRIVATE);;
+        if (sharedPreferences == null) {
+            return null;
+        }
+
+        return sharedPreferences.getString(key, null);
     }
 
     /**
