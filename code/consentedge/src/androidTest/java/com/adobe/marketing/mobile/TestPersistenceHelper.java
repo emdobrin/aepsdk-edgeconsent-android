@@ -57,7 +57,6 @@ public class TestPersistenceHelper {
         }
         editor.putString(key,value);
         editor.apply();
-        editor.commit();
     }
 
     public static String readPersistedData(final String datastore, final String key) {
