@@ -161,6 +161,10 @@ public class ConsentDefaultsTests {
         assertNull(persistedJson);
     }
 
+    // --------------------------------------------------------------------------------------------
+    // private helper methods
+    // --------------------------------------------------------------------------------------------
+
     private void initWithDefaultConsent(final Map<String,Object> defaultConsentMap) throws InterruptedException {
         HashMap<String, Object> config = new HashMap<String, Object>() {
             {

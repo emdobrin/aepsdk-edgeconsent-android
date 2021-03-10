@@ -227,6 +227,9 @@ public class ConsentBootUpTests {
 //        assertEquals("vi", xdmSharedState.get("consents.personalize.val"));
     }
 
+    // --------------------------------------------------------------------------------------------
+    // private helper methods
+    // --------------------------------------------------------------------------------------------
 
     private void initExtensionWithPersistedDataAndDefaults(final Map<String, Object> persistedData, final Map<String, Object> defaultConsentMap) throws InterruptedException {
 

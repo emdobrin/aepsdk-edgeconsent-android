@@ -59,6 +59,12 @@ public class TestPersistenceHelper {
         editor.apply();
     }
 
+    /**
+     * Reads the requested persisted data from datastore.
+     * @param datastore the name of the datastore to be read
+     * @param key that needs to be read
+     * @return the persisted data in {@code String}
+     */
     public static String readPersistedData(final String datastore, final String key) {
         final Application application = MobileCore.getApplication();
         if (application == null) {
