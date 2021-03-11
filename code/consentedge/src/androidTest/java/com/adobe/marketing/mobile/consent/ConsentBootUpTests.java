@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import static com.adobe.marketing.mobile.TestHelper.getDispatchedEventsWith;
+import static com.adobe.marketing.mobile.TestHelper.getXDMSharedStateFor;
 import static com.adobe.marketing.mobile.TestHelper.resetTestExpectations;
 import static com.adobe.marketing.mobile.TestHelper.waitForThreads;
 import static com.adobe.marketing.mobile.consent.ConsentTestUtil.CreateConsentXDMMap;
@@ -81,13 +82,13 @@ public class ConsentBootUpTests {
         assertEquals("vi", responseMap.get("consents.personalize.content.val"));
         assertEquals(SAMPLE_METADATA_TIMESTAMP, responseMap.get("consents.metadata.time"));
 
-        // TODO: Uncomment after XDM shared state on Bootup is fixed
-//        // verify xdm shared state //
-//        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
-//        assertEquals(4, xdmSharedState.size());
-//        assertEquals("y", xdmSharedState.get("consents.collect.val"));
-//        assertEquals("n", xdmSharedState.get("consents.adID.val"));
-//        assertEquals("vi", xdmSharedState.get("consents.personalize.val"));
+        // verify xdm shared state
+        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
+        assertEquals(4, xdmSharedState.size());
+        assertEquals("p", xdmSharedState.get("consents.collect.val"));
+        assertEquals("n", xdmSharedState.get("consents.adID.val"));
+        assertEquals("vi", xdmSharedState.get("consents.personalize.content.val"));
+        assertEquals(SAMPLE_METADATA_TIMESTAMP, xdmSharedState.get("consents.metadata.time"));
     }
 
     @Test
@@ -120,12 +121,10 @@ public class ConsentBootUpTests {
         Map<String, String> responseMap = flattenMap((Map) getConsentResponse.get(ConsentTestConstants.GetConsentHelper.VALUE));
         assertEquals("y", responseMap.get("consents.collect.val"));
 
-
-        // TODO: Uncomment after XDM shared state on Bootup is fixed
-//        // verify xdm shared state //
-//        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
-//        assertEquals(1, xdmSharedState.size());
-//        assertEquals("y", xdmSharedState.get("consents.collect.val"));
+        // verify xdm shared state //
+        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
+        assertEquals(1, xdmSharedState.size());
+        assertEquals("y", xdmSharedState.get("consents.collect.val"));
     }
 
 
@@ -153,18 +152,15 @@ public class ConsentBootUpTests {
         assertEquals(1, consentResponseData.size());
         assertEquals("n", consentResponseData.get("consents.collect.val"));
 
-
         //  verify getConsent API
         Map<String, Object> getConsentResponse = getConsentsSync();
         Map<String, String> responseMap = flattenMap((Map) getConsentResponse.get(ConsentTestConstants.GetConsentHelper.VALUE));
         assertEquals("n", responseMap.get("consents.collect.val"));
 
-
-        // TODO: Uncomment after XDM shared state on Bootup is fixed
-//        // verify xdm shared state //
-//        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
-//        assertEquals(1, xdmSharedState.size());
-//        assertEquals("n", xdmSharedState.get("consents.collect.val"));
+        // verify xdm shared state //
+        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
+        assertEquals(1, xdmSharedState.size());
+        assertEquals("n", xdmSharedState.get("consents.collect.val"));
     }
 
     @Test
@@ -197,7 +193,6 @@ public class ConsentBootUpTests {
         MobileCore.updateConfiguration(config);
         waitForThreads(2000);
 
-
         // verify consent response event dispatched
         List<Event> consentResponseEvents = getDispatchedEventsWith(ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.RESPONSE_CONTENT);
         assertEquals(1, consentResponseEvents.size());
@@ -208,7 +203,6 @@ public class ConsentBootUpTests {
         assertEquals("vi", consentResponseData.get("consents.personalize.content.val"));
         assertNotNull(consentResponseData.get("consents.metadata.time"));
 
-
         //  verify getConsent API
         Map<String, Object> getConsentResponse = getConsentsSync();
         Map<String, String> responseMap = flattenMap((Map) getConsentResponse.get(ConsentTestConstants.GetConsentHelper.VALUE));
@@ -217,14 +211,13 @@ public class ConsentBootUpTests {
         assertEquals("vi", responseMap.get("consents.personalize.content.val"));
         assertNotNull(consentResponseData.get("consents.metadata.time"));
 
-
-        // TODO: Uncomment after XDM shared state on Bootup is fixed
-//        // verify xdm shared state //
-//        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
-//        assertEquals(4, xdmSharedState.size());
-//        assertEquals("n", xdmSharedState.get("consents.collect.val"));
-//        assertEquals("n", xdmSharedState.get("consents.adID.val"));
-//        assertEquals("vi", xdmSharedState.get("consents.personalize.val"));
+        // verify xdm shared state
+        Map<String, String> xdmSharedState = flattenMap(getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 1000));
+        assertEquals(4, xdmSharedState.size());
+        assertEquals("n", xdmSharedState.get("consents.collect.val"));
+        assertEquals("n", xdmSharedState.get("consents.adID.val"));
+        assertEquals("vi", xdmSharedState.get("consents.personalize.content.val"));
+        assertNotNull(xdmSharedState.get("consents.metadata.time"));
     }
 
     // --------------------------------------------------------------------------------------------

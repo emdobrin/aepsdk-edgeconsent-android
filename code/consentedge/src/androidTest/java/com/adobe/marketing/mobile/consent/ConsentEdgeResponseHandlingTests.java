@@ -147,7 +147,6 @@ public class ConsentEdgeResponseHandlingTests {
         assertNotNull(xdmSharedState.get("consents.metadata.time"));
 
         // verify persisted data
-
         final String persistedJson = TestPersistenceHelper.readPersistedData(ConsentConstants.DataStoreKey.DATASTORE_NAME, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
         Map<String,Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
         Map<String, String> flattenPersistedMap = flattenMap(persistedMap);

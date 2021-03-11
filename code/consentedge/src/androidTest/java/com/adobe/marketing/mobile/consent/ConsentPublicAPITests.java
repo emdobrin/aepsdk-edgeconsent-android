@@ -268,7 +268,7 @@ public class ConsentPublicAPITests {
         Consent.getConsents(null);
 
         // verify shared state set
-        Map<String,Object> sharedState = getXDMSharedStateFor(ConsentTestConstants.EXTENSION_NAME, 2000);
+        Map<String,Object> sharedState = getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 2000);
         assertNotNull(sharedState);
     }
 
