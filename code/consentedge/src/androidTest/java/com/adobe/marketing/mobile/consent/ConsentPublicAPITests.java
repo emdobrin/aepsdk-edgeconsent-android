@@ -83,7 +83,6 @@ public class ConsentPublicAPITests {
         Map<String, Object> consents = new HashMap<String, Object>();
         consents.put(ConsentConstants.EventDataKey.CONSENTS, collectConsent);
         Consent.update(consents);
-        waitForThreads(1000);
 
         // verify event dispatched
         List<Event> dispatchEvents = getDispatchedEventsWith(ConsentConstants.EventType.EDGE,
