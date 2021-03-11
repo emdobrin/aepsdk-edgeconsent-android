@@ -235,8 +235,6 @@ public class ConsentPublicAPITests {
     public void testGetConsentsAPI() {
         // setup
         Consent.update(ConsentTestUtil.CreateConsentXDMMap("y"));
-        waitForThreads(2000);
-        resetTestExpectations();
 
         // test
         Map<String, Object> getConsentResponse = getConsentsSync();
@@ -261,8 +259,6 @@ public class ConsentPublicAPITests {
     public void testGetConsentsAPI_NoCallback() throws InterruptedException {
         // setup
         Consent.update(ConsentTestUtil.CreateConsentXDMMap("y"));
-        waitForThreads(2000);
-        resetTestExpectations();
 
         // test
         Consent.getConsents(null);

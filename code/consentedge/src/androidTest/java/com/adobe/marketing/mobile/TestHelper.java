@@ -74,10 +74,8 @@ public class TestHelper {
 						defaultApplication = Instrumentation.newApplication(CustomApplication.class, context);
 					}
 
-					MobileCore.setCore(null);
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
 					MobileCore.setApplication(defaultApplication);
-					TestPersistenceHelper.resetKnownPersistence();
 
 					try {
 						base.evaluate();

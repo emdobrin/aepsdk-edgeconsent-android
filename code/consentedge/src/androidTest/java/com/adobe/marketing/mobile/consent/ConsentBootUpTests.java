@@ -225,8 +225,6 @@ public class ConsentBootUpTests {
     // --------------------------------------------------------------------------------------------
 
     private void initExtensionWithPersistedDataAndDefaults(final Map<String, Object> persistedData, final Map<String, Object> defaultConsentMap) throws InterruptedException {
-
-        TestPersistenceHelper.resetKnownPersistence();
         if (persistedData != null) {
             final JSONObject persistedJSON = new JSONObject(persistedData);
             TestPersistenceHelper.updatePersistence(ConsentConstants.DataStoreKey.DATASTORE_NAME, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, persistedJSON.toString());
