@@ -62,7 +62,7 @@ public class ListenerEventHubBootTest {
         listener.hear(event);
 
         // verify
-        verify(mockConsentExtension, times(0)).handleConsentUpdate(any(Event.class));
+        verify(mockConsentExtension, times(0)).handleEventHubBoot(any(Event.class));
     }
 
 }
