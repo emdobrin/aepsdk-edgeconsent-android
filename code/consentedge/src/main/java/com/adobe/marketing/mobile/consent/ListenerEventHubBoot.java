@@ -17,7 +17,7 @@ import com.adobe.marketing.mobile.ExtensionListener;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 
-public class ListenerEventHubBooted extends ExtensionListener {
+public class ListenerEventHubBoot extends ExtensionListener {
     /**
      * Constructor.
      *
@@ -25,7 +25,7 @@ public class ListenerEventHubBooted extends ExtensionListener {
      * @param type         the {@link String} eventType this listener is registered to handle
      * @param source       the {@link String} eventSource this listener is registered to handle
      */
-    ListenerEventHubBooted(final ExtensionApi extensionApi, final String type, final String source) {
+    ListenerEventHubBoot(final ExtensionApi extensionApi, final String type, final String source) {
         super(extensionApi, type, source);
     }
 
@@ -42,7 +42,7 @@ public class ListenerEventHubBooted extends ExtensionListener {
 
         if (parentExtension == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
-                    "The parent extension associated with the ListenerEventHubBooted is null, ignoring this event.");
+                    "The parent extension associated with the ListenerEventHubBoot is null, ignoring this event.");
             return;
         }
 
