@@ -152,7 +152,6 @@ public class ConsentDefaultsTests {
     @Test
     public void test_DefaultConsent_NotSavedInPersistence() throws Exception {
         // setup
-        TestPersistenceHelper.resetKnownPersistence();
         initWithDefaultConsent(CreateConsentXDMMap("y", "n"));
         waitForThreads(2000);
 

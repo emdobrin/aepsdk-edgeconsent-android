@@ -36,25 +36,10 @@ public class TestPersistenceHelper {
      * @param value the new value
      */
     public static void updatePersistence(final String datastore, final String key, final String value) {
-        final Application application = MobileCore.getApplication();
-        if (application == null) {
-            return;
-        }
-
+        final Application application = TestHelper.defaultApplication;
         final Context context = application.getApplicationContext();
-        if (context == null) {
-            return;
-        }
-
         SharedPreferences sharedPreferences = context.getSharedPreferences(datastore, Context.MODE_PRIVATE);;
-        if (sharedPreferences == null) {
-            return;
-        }
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        if (editor == null) {
-            return;
-        }
         editor.putString(key,value);
         editor.apply();
     }
@@ -66,21 +51,9 @@ public class TestPersistenceHelper {
      * @return the persisted data in {@code String}
      */
     public static String readPersistedData(final String datastore, final String key) {
-        final Application application = MobileCore.getApplication();
-        if (application == null) {
-            return null;
-        }
-
+        final Application application = TestHelper.defaultApplication;
         final Context context = application.getApplicationContext();
-        if (context == null) {
-            return null;
-        }
-
         SharedPreferences sharedPreferences = context.getSharedPreferences(datastore, Context.MODE_PRIVATE);;
-        if (sharedPreferences == null) {
-            return null;
-        }
-
         return sharedPreferences.getString(key, null);
     }
 
@@ -88,26 +61,11 @@ public class TestPersistenceHelper {
      * Clears the Configuration and Consent extension's persisted data
      */
     public static void resetKnownPersistence() {
-        final Application application = MobileCore.getApplication();
-        if (application == null) {
-            return;
-        }
-
+        final Application application = TestHelper.defaultApplication;
         final Context context = application.getApplicationContext();
-        if (context == null) {
-            return;
-        }
-
         for (String eachDatastore : knownDatastoreName) {
             SharedPreferences sharedPreferences = context.getSharedPreferences(eachDatastore, Context.MODE_PRIVATE);;
-            if (sharedPreferences == null) {
-                return;
-            }
-
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (editor == null) {
-                return;
-            }
             editor.clear();
             editor.apply();
         }

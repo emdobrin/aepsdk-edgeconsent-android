@@ -42,6 +42,7 @@ public class TestHelper {
 	private static final String TAG = "TestHelper";
 	static final int WAIT_TIMEOUT_MS = 1000;
 	static final int WAIT_EVENT_TIMEOUT_MS = 2000;
+	static Application defaultApplication;
 
 	// List of threads to wait for after test execution
 	private static List<String> knownThreads = new ArrayList<String>();
@@ -68,15 +69,15 @@ public class TestHelper {
 			return new Statement() {
 				@Override
 				public void evaluate() throws Throwable {
-					Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-					Application application = Instrumentation.newApplication(CustomApplication.class, context);
+					if (defaultApplication == null) {
+						Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+						defaultApplication = Instrumentation.newApplication(CustomApplication.class, context);
+					}
 
-
+					MobileCore.setCore(null);
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
-					MobileCore.setApplication(application);
-					// Clear Edge date store as it cannot use the FunctionalTestLocalStorageService
-
-					MobileCore.log(LoggingMode.DEBUG, "SetupCoreRule", "Execute '" + description.getMethodName() + "'");
+					MobileCore.setApplication(defaultApplication);
+					TestPersistenceHelper.resetKnownPersistence();
 
 					try {
 						base.evaluate();
