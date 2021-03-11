@@ -66,5 +66,29 @@ public class ConsentPublicAPITests {
         latch.await();
         resetTestExpectations();
     }
-    
+
+    // --------------------------------------------------------------------------------------------
+    // Tests for Consent.update() API
+    // --------------------------------------------------------------------------------------------
+    @Test
+    public void testUpdateAPI() throws InterruptedException {
+        // test
+        Map<String, Object> collectConsent = new HashMap<String, Object>();
+        collectConsent.put("collect", new HashMap<String, String>() {
+            {
+                put(ConsentConstants.EventDataKey.VALUE, "y");
+            }
+        });
+
+        Map<String, Object> consents = new HashMap<String, Object>();
+        consents.put(ConsentConstants.EventDataKey.CONSENTS, collectConsent);
+        Consent.update(consents);
+        waitForThreads(1000);
+
+        // verify event dispatched
+        List<Event> dispatchEvents = getDispatchedEventsWith(ConsentConstants.EventType.EDGE,
+                ConsentConstants.EventSource.UPDATE_CONSENT);
+        assertEquals(1, dispatchEvents.size());
+
+    }
 }
