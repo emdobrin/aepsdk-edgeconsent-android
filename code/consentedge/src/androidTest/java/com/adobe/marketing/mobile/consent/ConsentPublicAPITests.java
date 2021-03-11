@@ -57,6 +57,12 @@ public class ConsentPublicAPITests {
 
     @Before
     public void setup() throws Exception {
+        HashMap<String, Object> config = new HashMap<String, Object>() {
+            {
+                put("consents", "optedin");
+            }
+        };
+        MobileCore.updateConfiguration(config);
         Consent.registerExtension();
 
         final CountDownLatch latch = new CountDownLatch(1);
@@ -261,9 +267,9 @@ public class ConsentPublicAPITests {
         // test
         Consent.getConsents(null);
 
-        // verify that it does not dispatch an request event
-        List<Event> consentRequestEvent = getDispatchedEventsWith(ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.REQUEST_CONTENT);
-        assertEquals(0, consentRequestEvent.size());
+        // verify shared state set
+        Map<String,Object> sharedState = getXDMSharedStateFor(ConsentTestConstants.EXTENSION_NAME, 2000);
+        assertNotNull(sharedState);
     }
 
 }

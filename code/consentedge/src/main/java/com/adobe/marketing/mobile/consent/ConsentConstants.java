@@ -32,6 +32,7 @@ final class ConsentConstants {
         static final String UPDATE_CONSENT = "com.adobe.eventSource.updateConsent";
         static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
         static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
+        static final String BOOTED = "com.adobe.eventSource.booted";
         private EventSource() { }
     }
 
@@ -39,6 +40,7 @@ final class ConsentConstants {
         static final String CONSENT = "com.adobe.eventType.consent";
         static final String EDGE = "com.adobe.eventType.edge";
         static final String CONFIGURATION = "com.adobe.eventType.configuration";
+        static final String HUB = "com.adobe.eventType.hub";
         private EventType() { }
     }
 
