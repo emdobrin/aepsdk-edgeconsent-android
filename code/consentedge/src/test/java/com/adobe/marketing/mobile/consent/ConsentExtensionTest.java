@@ -98,7 +98,7 @@ public class ConsentExtensionTest {
         // constructor is called in the setup step()
 
         // verify 3 listeners are registered
-        verify(mockExtensionApi, times(4)).registerEventListener(anyString(),
+        verify(mockExtensionApi, times(5)).registerEventListener(anyString(),
                 anyString(), any(Class.class), any(ExtensionErrorCallback.class));
 
         // verify listeners are registered with correct event source and type
@@ -110,6 +110,8 @@ public class ConsentExtensionTest {
                 eq(ConsentConstants.EventSource.REQUEST_CONTENT), eq(ListenerConsentRequestContent.class), callbackCaptor.capture());
         verify(mockExtensionApi, times(1)).registerEventListener(eq(ConsentConstants.EventType.CONFIGURATION),
                 eq(ConsentConstants.EventSource.RESPONSE_CONTENT), eq(ListenerConfigurationResponseContent.class), callbackCaptor.capture());
+        verify(mockExtensionApi, times(1)).registerEventListener(eq(ConsentConstants.EventType.HUB),
+                eq(ConsentConstants.EventSource.BOOTED), eq(ListenerEventHubBoot.class), callbackCaptor.capture());
 
         // verify the callback
         ExtensionErrorCallback extensionErrorCallback = callbackCaptor.getValue();
@@ -129,6 +131,7 @@ public class ConsentExtensionTest {
 
         // test
         extension = new ConsentExtension(mockExtensionApi);
+        extension.handleEventHubBoot(buildBootEvent());
 
         verify(mockExtensionApi, times(1)).setXDMSharedEventState(sharedStateCaptor.capture(), sharedStateEventCaptor.capture(), any(ExtensionErrorCallback.class));
         Map<String, Object> sharedState = sharedStateCaptor.getValue();
@@ -150,6 +153,7 @@ public class ConsentExtensionTest {
 
         // test
         extension = new ConsentExtension(mockExtensionApi);
+        extension.handleEventHubBoot(buildBootEvent());
 
         verify(mockExtensionApi, times(0)).setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));
         PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
@@ -584,6 +588,10 @@ public class ConsentExtensionTest {
             put(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT, consentMap);
         }};
         return new Event.Builder("Configuration Response Event", ConsentConstants.EventType.CONFIGURATION, ConsentConstants.EventSource.RESPONSE_CONTENT).setEventData(configEventData).build();
+    }
+
+    private Event buildBootEvent() {
+        return new Event.Builder("EventHub Boot", ConsentConstants.EventType.HUB, ConsentConstants.EventSource.BOOTED).build();
     }
 
 }

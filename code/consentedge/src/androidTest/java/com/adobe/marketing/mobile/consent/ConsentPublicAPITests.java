@@ -89,9 +89,5 @@ public class ConsentPublicAPITests {
                 ConsentConstants.EventSource.UPDATE_CONSENT);
         assertEquals(1, dispatchEvents.size());
 
-        // verify shared state set
-        Map<String,Object> sharedState = getXDMSharedStateFor(ConsentTestConstants.EXTENSION_NAME, 2000);
-        assertNotNull(sharedState);
     }
-
 }
