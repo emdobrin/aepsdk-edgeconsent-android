@@ -41,6 +41,10 @@ class ConsentExtension extends Extension {
      *      and EventSource {@link ConsentConstants.EventSource#UPDATE_CONSENT}</li>
      *     <li> Listener {@link ListenerConsentRequestContent} to listen for event with eventType {@link ConsentConstants.EventType#CONSENT}
      *      and EventSource {@link ConsentConstants.EventSource#REQUEST_CONTENT}</li>
+     *      <li> Listener {@link ListenerConfigurationResponseContent} to listen for event with eventType {@link ConsentConstants.EventType#CONFIGURATION}
+     *      and EventSource {@link ConsentConstants.EventSource#RESPONSE_CONTENT}</li>
+     *       <li> Listener {@link ListenerEventHubBoot} to listen for event with eventType {@link ConsentConstants.EventType#HUB}
+     *      and EventSource {@link ConsentConstants.EventSource#BOOTED}</li>
      * </ul>
      * <p>
      * Thread : Background thread created by MobileCore
@@ -61,13 +65,9 @@ class ConsentExtension extends Extension {
         extensionApi.registerEventListener(ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.UPDATE_CONSENT, ListenerConsentUpdateConsent.class, listenerErrorCallback);
         extensionApi.registerEventListener(ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.REQUEST_CONTENT, ListenerConsentRequestContent.class, listenerErrorCallback);
         extensionApi.registerEventListener(ConsentConstants.EventType.CONFIGURATION, ConsentConstants.EventSource.RESPONSE_CONTENT, ListenerConfigurationResponseContent.class, listenerErrorCallback);
+        extensionApi.registerEventListener(ConsentConstants.EventType.HUB, ConsentConstants.EventSource.BOOTED, ListenerEventHubBoot.class, listenerErrorCallback);
         consentManager = new ConsentManager();
 
-        // share the initial XDMSharedState on bootUp
-        Consents currentConsents = consentManager.getCurrentConsents();
-        if (!currentConsents.isEmpty()) {
-            shareCurrentConsents(null);
-        }
     }
 
     /**
@@ -88,6 +88,21 @@ class ConsentExtension extends Extension {
     @Override
     protected String getVersion() {
         return ConsentConstants.EXTENSION_VERSION;
+    }
+
+    /**
+     * Call this method with the EventHub's Boot event to handle the boot operation of the {@code Consent} Extension.
+     * <p>
+     * On boot share the initial consents loaded from persistence to XDM shared state.
+     *
+     * @param event the boot {@link Event}
+     */
+    void handleEventHubBoot(final Event event) {
+        // share the initial XDMSharedState on bootUp
+        Consents currentConsents = consentManager.getCurrentConsents();
+        if (!currentConsents.isEmpty()) {
+            shareCurrentConsents(null);
+        }
     }
 
     /**
@@ -210,7 +225,6 @@ class ConsentExtension extends Extension {
         }
     }
 
-
     /**
      * Creates an XDM Shared state with the consents provided and then dispatches {@link ConsentConstants.EventNames#CONSENT_PREFERENCES_UPDATED}
      * event to eventHub to notify other concerned extensions about the Consent changes.
@@ -220,7 +234,7 @@ class ConsentExtension extends Extension {
      * @param event the {@link Event} that triggered the consents update
      */
     private void shareCurrentConsents(final Event event) {
-        final Map<String,Object> xdmConsents = consentManager.getCurrentConsents().asXDMMap();
+        final Map<String, Object> xdmConsents = consentManager.getCurrentConsents().asXDMMap();
 
         // set the shared state
         ExtensionErrorCallback<ExtensionError> errorCallback = new ExtensionErrorCallback<ExtensionError>() {
