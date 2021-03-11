@@ -101,7 +101,7 @@ class ConsentExtension extends Extension {
         // share the initial XDMSharedState on bootUp
         Consents currentConsents = consentManager.getCurrentConsents();
         if (!currentConsents.isEmpty()) {
-            shareCurrentConsents(null);
+            shareCurrentConsents(event);
         }
     }
 
