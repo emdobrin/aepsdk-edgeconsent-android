@@ -42,6 +42,7 @@ public class TestHelper {
 	private static final String TAG = "TestHelper";
 	static final int WAIT_TIMEOUT_MS = 1000;
 	static final int WAIT_EVENT_TIMEOUT_MS = 2000;
+	static Application defaultApplication;
 
 	// List of threads to wait for after test execution
 	private static List<String> knownThreads = new ArrayList<String>();
@@ -68,15 +69,13 @@ public class TestHelper {
 			return new Statement() {
 				@Override
 				public void evaluate() throws Throwable {
-					Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-					Application application = Instrumentation.newApplication(CustomApplication.class, context);
-
+					if (defaultApplication == null) {
+						Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+						defaultApplication = Instrumentation.newApplication(CustomApplication.class, context);
+					}
 
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
-					MobileCore.setApplication(application);
-					// Clear Edge date store as it cannot use the FunctionalTestLocalStorageService
-
-					MobileCore.log(LoggingMode.DEBUG, "SetupCoreRule", "Execute '" + description.getMethodName() + "'");
+					MobileCore.setApplication(defaultApplication);
 
 					try {
 						base.evaluate();
@@ -441,7 +440,7 @@ public class TestHelper {
 	 */
 	public static Map<String, Object> getXDMSharedStateFor(final String stateOwner, int timeout) throws InterruptedException {
 		Event event = new Event.Builder("Get Shared State Request", TestConstants.EventType.MONITOR,
-				TestConstants.EventSource.SHARED_STATE_REQUEST)
+				TestConstants.EventSource.XDM_SHARED_STATE_REQUEST)
 				.setEventData(new HashMap<String, Object>() {
 					{
 						put(TestConstants.EventDataKey.STATE_OWNER, stateOwner);
