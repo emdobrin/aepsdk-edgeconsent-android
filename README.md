@@ -1,9 +1,9 @@
-# Adobe Experience Platform Consent Mobile Extension
+# Adobe Experience Platform Consent Collection Mobile Extension
 
 
 ## About this project
 
-The AEP Edge Consent Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks) and requires the `MobileCore` extension.
+The AEP Consent Collection mobile extension enables consent preferences collection from your mobile app when using the [Adobe Experience Platform Mobile SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks) and the Edge Network extension.
 
 
 ### Installation
@@ -36,7 +36,7 @@ $ adb shell am start -W -a  android.intent.action.VIEW -d "testapp://main?adb_va
 
 Note: replace ADD_YOUR_SESSION_ID_HERE with your Assurance session identifier.
 
-Once the connection is established and the events list starts getting populated, you can filter the Edge Consent extension events by typing `Consent` in the `Search Events` search box. See full list of available events [here](https://aep-sdks.gitbook.io/docs/beta/experience-platform-extension/experience-platform-debugging#event-types-handled-by-the-aep-mobile-extension).
+Once the connection is established and the events list starts getting populated, you can filter the Edge Consent extension events by typing `Consent` in the `Search Events` search box.
 
 
 
