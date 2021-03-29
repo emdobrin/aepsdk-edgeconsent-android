@@ -181,7 +181,7 @@ class ConsentExtension extends Extension {
         // 2. same consent as current and with same timestamp
         // then ignore this event and do not update the sharedState unnecessarily
         final Consents currentConsent = consentManager.getCurrentConsents();
-        if (newConsents.getTimestamp() == null || newConsents.getTimestamp().equals(currentConsent.getTimestamp())){
+        if (newConsents.getTimestamp() == null || newConsents.getTimestamp().equals(currentConsent.getTimestamp())) {
             if (newConsents.equalsIgnoreTimeStamp(currentConsent)) {
                 MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge. There is no modification from existing consent data");
                 return;

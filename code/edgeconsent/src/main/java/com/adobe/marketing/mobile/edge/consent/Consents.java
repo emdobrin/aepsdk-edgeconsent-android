@@ -76,7 +76,7 @@ final class Consents {
      * @return timestamp in ISO 8601 date-time string, null if consents does not have timestamp in its metadata
      */
     String getTimestamp() {
-        if(isEmpty()){
+        if (isEmpty()) {
             return null;
         }
         try {
@@ -204,7 +204,7 @@ final class Consents {
 
         metaDataContents.remove(ConsentConstants.EventDataKey.TIME);
 
-        if(metaDataContents.size() == 0) {
+        if (metaDataContents.isEmpty()) {
             consentsMap.remove(ConsentConstants.EventDataKey.MEATADATA);
         } else {
             consentsMap.put(ConsentConstants.EventDataKey.MEATADATA, metaDataContents);
