@@ -182,7 +182,7 @@ class ConsentExtension extends Extension {
         if (newConsents.getTimestamp() == null || newConsents.getTimestamp().equals(currentConsent.getTimestamp())) {
 
             // compare the consents ignoring the timestamp
-            if (newConsents.equalsIgnoreTimeStamp(currentConsent)) {
+            if (newConsents.equalsIgnoreTimestamp(currentConsent)) {
                 MobileCore.log(LoggingMode.VERBOSE, ConsentConstants.LOG_TAG, "ConsentExtension - Ignoring the consent:preferences handle event from Edge Network. There is no modification from existing consent data");
                 return;
             }

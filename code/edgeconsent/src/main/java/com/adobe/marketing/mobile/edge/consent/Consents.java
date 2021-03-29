@@ -175,7 +175,7 @@ final class Consents {
      *
      * @return true, if both the consents are equal ignoring timestamp
      */
-    boolean equalsIgnoreTimeStamp(final Consents comparingConsent) {
+    boolean equalsIgnoreTimestamp(final Consents comparingConsent) {
         if (comparingConsent == null) {
             return false;
         }
