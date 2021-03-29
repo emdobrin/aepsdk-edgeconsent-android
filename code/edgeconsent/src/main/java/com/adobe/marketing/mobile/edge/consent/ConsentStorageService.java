@@ -25,7 +25,8 @@ import java.util.Map;
 
 final class ConsentStorageService {
 
-    private ConsentStorageService(){}
+    private ConsentStorageService() {
+    }
 
     /**
      * Loads the requested consents from persistence.

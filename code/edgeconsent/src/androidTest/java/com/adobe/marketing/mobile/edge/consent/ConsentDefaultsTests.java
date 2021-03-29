@@ -72,7 +72,7 @@ public class ConsentDefaultsTests {
 
         // verify Public API Call
         Map<String, Object> getConsentResponse = getConsentsSync();
-        Map<String, String> responseMap = flattenMap((Map)getConsentResponse.get(ConsentTestConstants.GetConsentHelper.VALUE));
+        Map<String, String> responseMap = flattenMap((Map) getConsentResponse.get(ConsentTestConstants.GetConsentHelper.VALUE));
         assertEquals("y", responseMap.get("consents.collect.val"));
     }
 
@@ -90,7 +90,7 @@ public class ConsentDefaultsTests {
         // verify in (XDMSharedState)
 
         // setup
-        initWithDefaultConsent(CreateConsentXDMMap("y","n")); // Initiate with collectConsent = y and adID = n
+        initWithDefaultConsent(CreateConsentXDMMap("y", "n")); // Initiate with collectConsent = y and adID = n
         Consent.update(CreateConsentXDMMap("n")); // // Initiate with collectConsent = n
         waitForThreads(1000);
 
@@ -162,7 +162,7 @@ public class ConsentDefaultsTests {
     // private helper methods
     // --------------------------------------------------------------------------------------------
 
-    private void initWithDefaultConsent(final Map<String,Object> defaultConsentMap) throws InterruptedException {
+    private void initWithDefaultConsent(final Map<String, Object> defaultConsentMap) throws InterruptedException {
         HashMap<String, Object> config = new HashMap<String, Object>() {
             {
                 put(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT, defaultConsentMap);

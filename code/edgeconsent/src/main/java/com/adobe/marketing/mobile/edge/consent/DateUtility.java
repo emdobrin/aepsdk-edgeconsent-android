@@ -18,7 +18,9 @@ import java.util.TimeZone;
 
 final class DateUtility {
 
-    private DateUtility(){}
+    private DateUtility() {
+    }
+
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     /**

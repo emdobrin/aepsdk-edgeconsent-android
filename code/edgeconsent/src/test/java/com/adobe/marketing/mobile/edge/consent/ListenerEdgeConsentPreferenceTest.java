@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -44,8 +45,8 @@ public class ListenerEdgeConsentPreferenceTest {
     public void testHear() {
         // setup
         Event event = new Event.Builder("Edge consent preference response event", ConsentConstants.EventType.EDGE,
-                ConsentConstants.EventSource.CONSENT_PREFERENCE).setEventData(new HashMap<String, Object>(){{
-                    put("somekey", "somevalue");
+                ConsentConstants.EventSource.CONSENT_PREFERENCE).setEventData(new HashMap<String, Object>() {{
+            put("somekey", "somevalue");
         }}).build();
         doReturn(mockConsentExtension).when(listener).getConsentExtension();
 

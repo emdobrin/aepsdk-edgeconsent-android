@@ -24,7 +24,8 @@ import java.util.Map;
 
 public class Consent {
 
-    private Consent() { }
+    private Consent() {
+    }
 
     /**
      * Returns the version of the {@code Consent} extension
@@ -57,7 +58,7 @@ public class Consent {
      *
      * @param xdmFormattedConsents An {@link Map} of consents in predefined XDMformat
      */
-    public static void update(final Map<String,Object> xdmFormattedConsents) {
+    public static void update(final Map<String, Object> xdmFormattedConsents) {
         if (xdmFormattedConsents == null || xdmFormattedConsents.isEmpty()) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Consent - Null/Empty consents passed to update API. Ignoring the API call.");
             return;
@@ -81,10 +82,10 @@ public class Consent {
      * Callback is invoked with null value if no consents were assigned to this user.
      *
      * @param callback a {@link AdobeCallback} of {@link Map} invoked with current consents of the extension
-     *                  If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} can be returned in the
-     *  				eventuality of any error that occurred while getting the user consents.
+     *                 If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} can be returned in the
+     *                 eventuality of any error that occurred while getting the user consents.
      */
-    public static void getConsents(final AdobeCallback<Map<String,Object>> callback) {
+    public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
         if (callback == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Consent - Unexpected null callback, provide a callback to retrieve current consents.");
             return;
@@ -117,16 +118,17 @@ public class Consent {
 
     /**
      * When an {@link AdobeCallbackWithError} is provided, the fail method will be called with provided {@link AdobeError}.
+     *
      * @param callback should not be null, should be instance of {@code AdobeCallbackWithError}
-     * @param error the {@code AdobeError} returned back in the callback
+     * @param error    the {@code AdobeError} returned back in the callback
      */
-    private static void returnError (final AdobeCallback<Map<String,Object>> callback, final AdobeError error) {
+    private static void returnError(final AdobeCallback<Map<String, Object>> callback, final AdobeError error) {
         if (callback == null) {
             return;
         }
 
-        final AdobeCallbackWithError<Map<String,Object>> adobeCallbackWithError = callback instanceof AdobeCallbackWithError ?
-                (AdobeCallbackWithError<Map<String,Object>>) callback : null;
+        final AdobeCallbackWithError<Map<String, Object>> adobeCallbackWithError = callback instanceof AdobeCallbackWithError ?
+                (AdobeCallbackWithError<Map<String, Object>>) callback : null;
 
         if (adobeCallbackWithError != null) {
             adobeCallbackWithError.fail(error);

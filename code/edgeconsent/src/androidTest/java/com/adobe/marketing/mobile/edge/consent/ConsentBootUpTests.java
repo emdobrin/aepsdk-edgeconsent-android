@@ -178,10 +178,10 @@ public class ConsentBootUpTests {
         // setup and test
         initExtensionWithPersistedDataAndDefaults(CreateConsentXDMMap("y"), CreateConsentXDMMap("y", "y"));
         Consent.update(CreateConsentXDMMap("n"));
-        MobileCore.dispatchEvent(buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("n",null, "vi", SAMPLE_METADATA_TIMESTAMP)),null);
+        MobileCore.dispatchEvent(buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("n", null, "vi", SAMPLE_METADATA_TIMESTAMP)), null);
         HashMap<String, Object> config = new HashMap<String, Object>() {
             {
-                put(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT, CreateConsentXDMMap("y","n"));
+                put(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT, CreateConsentXDMMap("y", "n"));
             }
         };
         waitForThreads(2000);

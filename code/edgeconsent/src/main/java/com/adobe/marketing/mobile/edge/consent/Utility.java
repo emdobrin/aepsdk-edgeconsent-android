@@ -45,7 +45,7 @@ final class Utility {
         final Iterator<String> keysIterator = jsonObject.keys();
 
         while (keysIterator.hasNext()) {
-            String nextKey  = keysIterator.next();
+            String nextKey = keysIterator.next();
             Object value = null;
             Object returnValue;
 
@@ -61,7 +61,7 @@ final class Utility {
             }
 
             if (value instanceof JSONObject) {
-                returnValue = toMap((JSONObject)value);
+                returnValue = toMap((JSONObject) value);
             } else if (value instanceof JSONArray) {
                 returnValue = toList((JSONArray) value);
             } else {
@@ -106,7 +106,7 @@ final class Utility {
             }
 
             if (value instanceof JSONObject) {
-                returnValue = toMap((JSONObject)value);
+                returnValue = toMap((JSONObject) value);
             } else if (value instanceof JSONArray) {
                 returnValue = toList((JSONArray) value);
             } else {
@@ -139,6 +139,7 @@ final class Utility {
         return null;
     }
 
-    private Utility(){}
+    private Utility() {
+    }
 
 }

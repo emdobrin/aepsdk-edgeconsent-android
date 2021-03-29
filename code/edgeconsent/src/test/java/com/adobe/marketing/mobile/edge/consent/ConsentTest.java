@@ -44,7 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 @PrepareForTest({MobileCore.class})
 public class ConsentTest {
 
-    private static Map<String,Object> SAMPLE_CONSENTS_MAP = ConsentTestUtil.CreateConsentXDMMap("y");
+    private static Map<String, Object> SAMPLE_CONSENTS_MAP = ConsentTestUtil.CreateConsentXDMMap("y");
 
     @Before
     public void setup() {
@@ -102,9 +102,9 @@ public class ConsentTest {
         MobileCore.dispatchEvent(eventCaptor.capture(), callbackCaptor.capture());
 
         Event dispatchedEvent = eventCaptor.getValue();
-        assertEquals(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,dispatchedEvent.getName());
-        assertEquals(ConsentConstants.EventType.CONSENT.toLowerCase(),dispatchedEvent.getType());
-        assertEquals(ConsentConstants.EventSource.UPDATE_CONSENT.toLowerCase(),dispatchedEvent.getSource());
+        assertEquals(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST, dispatchedEvent.getName());
+        assertEquals(ConsentConstants.EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
+        assertEquals(ConsentConstants.EventSource.UPDATE_CONSENT.toLowerCase(), dispatchedEvent.getSource());
         assertEquals(SAMPLE_CONSENTS_MAP, dispatchedEvent.getEventData());
 
         // TODO - enable when ExtensionError creation is available
@@ -131,7 +131,7 @@ public class ConsentTest {
         final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
         final ArgumentCaptor<AdobeCallback> adobeCallbackCaptor = ArgumentCaptor.forClass(AdobeCallback.class);
         final ArgumentCaptor<ExtensionErrorCallback> extensionErrorCallbackCaptor = ArgumentCaptor.forClass(ExtensionErrorCallback.class);
-        final List<Map<String,Object>> callbackReturnValues = new ArrayList<>();
+        final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
 
         // test
         Consent.getConsents(new AdobeCallback<Map<String, Object>>() {
@@ -147,9 +147,9 @@ public class ConsentTest {
 
         // verify the dispatched event details
         Event dispatchedEvent = eventCaptor.getValue();
-        assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST,dispatchedEvent.getName());
-        assertEquals(ConsentConstants.EventType.CONSENT.toLowerCase(),dispatchedEvent.getType());
-        assertEquals(ConsentConstants.EventSource.REQUEST_CONTENT.toLowerCase(),dispatchedEvent.getSource());
+        assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
+        assertEquals(ConsentConstants.EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
+        assertEquals(ConsentConstants.EventSource.REQUEST_CONTENT.toLowerCase(), dispatchedEvent.getSource());
         assertTrue(dispatchedEvent.getEventData().isEmpty());
 
         //verify callback responses
@@ -187,7 +187,8 @@ public class ConsentTest {
             }
 
             @Override
-            public void call(Object o) { }
+            public void call(Object o) {
+            }
         };
 
         // test
@@ -201,7 +202,7 @@ public class ConsentTest {
         adobeCallbackCaptor.getValue().call(null);
 
         // verify
-        assertTrue((boolean)errorCapture.get(KEY_IS_ERRORCALLBACK_CALLED));
+        assertTrue((boolean) errorCapture.get(KEY_IS_ERRORCALLBACK_CALLED));
         assertEquals(AdobeError.UNEXPECTED_ERROR, errorCapture.get(KEY_CAPTUREDERRORCALLBACK));
 
     }
@@ -209,7 +210,7 @@ public class ConsentTest {
     // ========================================================================================
     // Private method
     // ========================================================================================
-    private Event buildConsentResponseEvent (final Map<String, Object> eventData) {
+    private Event buildConsentResponseEvent(final Map<String, Object> eventData) {
         return new Event.Builder(ConsentConstants.EventNames.GET_CONSENTS_RESPONSE, ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.RESPONSE_CONTENT).setEventData(eventData).build();
     }
 }
