@@ -11,12 +11,12 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 final class Consents {
+
     private Map<String, Object> consentsMap = new HashMap<>();
 
     // Suppresses default constructor.
@@ -61,9 +61,15 @@ final class Consents {
         if (isEmpty()) {
             return;
         }
-        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
-        if (metaDataContents == null || metaDataContents.isEmpty()) {
-            metaDataContents = new HashMap<>();
+
+        Map<String, Object> metaDataContents;
+        try {
+            metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
+            if (metaDataContents == null || metaDataContents.isEmpty()) {
+                metaDataContents = new HashMap<>();
+            }
+        } catch (final ClassCastException exception) {
+            return;
         }
 
         metaDataContents.put(ConsentConstants.EventDataKey.TIME, DateUtility.dateToISO8601String(new Date(timeStamp)));
@@ -129,9 +135,9 @@ final class Consents {
      * @return {@link Map} representing the Consents in XDM format
      */
     Map<String, Object> asXDMMap() {
-        Map<String, Object> internalConsentMap = consentsMap != null ? Utility.deepCopy(consentsMap) : new HashMap<String, Object>();
+        final Map<String, Object> internalConsentMap = consentsMap != null ? Utility.deepCopy(consentsMap) : new HashMap<String, Object>();
 
-        Map<String, Object> xdmFormattedMap = new HashMap<>();
+        final Map<String, Object> xdmFormattedMap = new HashMap<>();
         xdmFormattedMap.put(ConsentConstants.EventDataKey.CONSENTS, internalConsentMap);
         return xdmFormattedMap;
     }

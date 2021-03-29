@@ -63,9 +63,6 @@ public class ConsentExtensionTest {
     Context mockContext;
 
     @Mock
-    ConsentManager mockConsentManager;
-
-    @Mock
     SharedPreferences mockSharedPreference;
 
     @Mock

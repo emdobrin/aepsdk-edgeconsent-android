@@ -41,8 +41,8 @@ final class Utility {
             return null;
         }
 
-        Map<String, Object> jsonAsMap = new HashMap<String, Object>();
-        Iterator<String> keysIterator = jsonObject.keys();
+        final Map<String, Object> jsonAsMap = new HashMap<>();
+        final Iterator<String> keysIterator = jsonObject.keys();
 
         while (keysIterator.hasNext()) {
             String nextKey  = keysIterator.next();
@@ -53,7 +53,7 @@ final class Utility {
                 value = jsonObject.get(nextKey);
             } catch (JSONException e) {
                 MobileCore.log(LoggingMode.DEBUG, LOG_TAG,
-                        "toMap - Unable to convert jsonObject to Map for key " + nextKey + ", skipping.");
+                        "Utility(toMap) - Unable to convert jsonObject to Map for key " + nextKey + ", skipping.");
             }
 
             if (value == null) {
@@ -74,7 +74,6 @@ final class Utility {
         return jsonAsMap;
     }
 
-
     /**
      * Converts provided {@link JSONArray} into {@link List} for any number of levels which can be used as event data
      * This method is recursive.
@@ -88,7 +87,7 @@ final class Utility {
             return null;
         }
 
-        List<Object> jsonArrayAsList = new ArrayList<Object>();
+        final List<Object> jsonArrayAsList = new ArrayList<>();
         int size = jsonArray.length();
 
         for (int i = 0; i < size; i++) {
@@ -99,7 +98,7 @@ final class Utility {
                 value = jsonArray.get(i);
             } catch (JSONException e) {
                 MobileCore.log(LoggingMode.DEBUG, LOG_TAG,
-                        "toList - Unable to convert jsonObject to List for index " + i + ", skipping.");
+                        "Utility(toList) - Unable to convert jsonObject to List for index " + i + ", skipping.");
             }
 
             if (value == null) {
@@ -134,7 +133,7 @@ final class Utility {
         try {
             return toMap(new JSONObject(map));
         } catch (NullPointerException e) {
-            MobileCore.log(LoggingMode.DEBUG, LOG_TAG, "deepCopy - Unable to deep copy map, json string invalid.");
+            MobileCore.log(LoggingMode.DEBUG, LOG_TAG, "Utility(deepCopy) - Unable to deep copy map, json string invalid.");
         }
 
         return null;
