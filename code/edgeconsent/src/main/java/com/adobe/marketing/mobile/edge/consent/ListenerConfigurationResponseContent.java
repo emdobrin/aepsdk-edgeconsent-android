@@ -17,7 +17,7 @@ import com.adobe.marketing.mobile.ExtensionListener;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 
-public class ListenerConfigurationResponseContent extends ExtensionListener {
+class ListenerConfigurationResponseContent extends ExtensionListener {
 
     /**
      * Constructor.

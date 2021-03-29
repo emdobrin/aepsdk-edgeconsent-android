@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -38,8 +37,7 @@ import org.powermock.reflect.Whitebox;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.adobe.marketing.mobile.edge.consent.ConsentTestUtil.CreateConsentXDMMap;
-import static com.adobe.marketing.mobile.edge.consent.ConsentTestUtil.CreateConsentsXDMJSONString;
+import static com.adobe.marketing.mobile.edge.consent.ConsentTestUtil.*;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -430,10 +428,10 @@ public class ConsentExtensionTest {
     }
 
     // ========================================================================================
-    // handleEdgeConsentPreference
+    // handleEdgeConsentPreferenceHandle
     // ========================================================================================
     @Test
-    public void test_handleEdgeConsentPreference() throws Exception {
+    public void test_handleEdgeConsentPreferenceHandle() throws Exception {
         // setup
         Event event = buildEdgeConsentPreferenceEvent("{\n" +
                 "                            \"payload\": [\n" +
@@ -457,7 +455,7 @@ public class ConsentExtensionTest {
         final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
         // test
-        extension.handleEdgeConsentPreference(event);
+        extension.handleEdgeConsentPreferenceHandle(event);
 
 
         // verify
@@ -485,7 +483,7 @@ public class ConsentExtensionTest {
     }
 
     @Test
-    public void test_handleEdgeConsentPreference_MergesWithExistingConsents() throws Exception {
+    public void test_handleEdgeConsentPreferenceHandle_MergesWithExistingConsents() throws Exception {
         // setup
         setupExistingConsents(CreateConsentsXDMJSONString("n", "n"));
         Event event = buildEdgeConsentPreferenceEvent("{\n" +
@@ -507,7 +505,7 @@ public class ConsentExtensionTest {
         final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
         // test
-        extension.handleEdgeConsentPreference(event);
+        extension.handleEdgeConsentPreferenceHandle(event);
 
 
         // verify
@@ -533,10 +531,102 @@ public class ConsentExtensionTest {
         assertNotNull(((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("metadata")).get("time"));
     }
 
+
     @Test
-    public void test_handleEdgeConsentPreference_InvalidPayload() throws Exception {
+    public void test_handleEdgeConsentPreferenceHandle_SameConsentAndTimeStamp() throws Exception {
+        // setup
+        setupExistingConsents(CreateConsentsXDMJSONString("y", "y", "sometime"));
+        Event event = buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("y", "y", "sometime"));
+
         // test
-        extension.handleEdgeConsentPreference(buildEdgeConsentPreferenceEvent("{\n" +
+        extension.handleEdgeConsentPreferenceHandle(event);
+
+        // verify
+        verifyNoSharedStateChange();
+        verifyNoEventDispatched();
+    }
+
+
+    @Test
+    public void test_handleEdgeConsentPreferenceHandle_SameConsentAndNoTimeStamp() throws Exception {
+        // setup
+        setupExistingConsents(CreateConsentsXDMJSONString("y", "y", "sometime"));
+        Event event = buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("y", "y"));
+
+        // test
+        extension.handleEdgeConsentPreferenceHandle(event);
+
+        // verify
+        verifyNoSharedStateChange();
+        verifyNoEventDispatched();
+    }
+
+    @Test
+    public void test_handleEdgeConsentPreferenceHandle_SameConsentAndDifferentTimeStamp() throws Exception {
+        // setup
+        setupExistingConsents(CreateConsentsXDMJSONString("y", "y", "sometime"));
+        Event event = buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("y", "y", "different"));
+        final ArgumentCaptor<Map> sharedStateCaptor = ArgumentCaptor.forClass(Map.class);
+        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
+        // test
+        extension.handleEdgeConsentPreferenceHandle(event);
+
+        // verify XDM shared state is set
+        verify(mockExtensionApi, times(1)).setXDMSharedEventState(sharedStateCaptor.capture(), eq(event), any(ExtensionErrorCallback.class));
+        Map<String, Object> sharedState = sharedStateCaptor.getValue();
+        assertNotNull(((Map) ((Map) sharedState.get("consents")).get("metadata")).get("time"));
+
+        // verify consent response event is dispatched
+        PowerMockito.verifyStatic(MobileCore.class, times(1));
+        MobileCore.dispatchEvent(eventCaptor.capture(), any(ExtensionErrorCallback.class));
+        Event consentResponseEvent = eventCaptor.getAllValues().get(0);
+        assertNotNull(((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("metadata")).get("time"));
+    }
+
+    @Test
+    public void test_handleEdgeConsentPreferenceHandle_SameConsentAndDifferentMetadataWithNoTimeStamp() throws Exception {
+        // setup
+        setupExistingConsents(CreateConsentsXDMJSONString("y", "y", "sometime"));
+        Event event = buildEdgeConsentPreferenceEvent("{\n" +
+                "  \"payload\": [\n" +
+                "    {\n" +
+                "      \"collect\": {\n" +
+                "        \"val\": \"y\"\n" +
+                "      },\n" +
+                "      \"adID\": {\n" +
+                "        \"val\": \"y\"\n" +
+                "      },\n" +
+                "      \"metadata\": {\n" +
+                "        \"key\": \"value\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"type\": \"consent:preferences\"\n" +
+                "}");
+
+        // test
+        extension.handleEdgeConsentPreferenceHandle(event);
+        final ArgumentCaptor<Map> sharedStateCaptor = ArgumentCaptor.forClass(Map.class);
+        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
+        // verify
+        // verify XDM shared state is set
+        verify(mockExtensionApi, times(1)).setXDMSharedEventState(sharedStateCaptor.capture(), eq(event), any(ExtensionErrorCallback.class));
+        Map<String, Object> sharedState = sharedStateCaptor.getValue();
+        assertNotNull(((Map) ((Map) sharedState.get("consents")).get("metadata")).get("time"));
+
+        // verify consent response event is dispatched
+        PowerMockito.verifyStatic(MobileCore.class, times(1));
+        MobileCore.dispatchEvent(eventCaptor.capture(), any(ExtensionErrorCallback.class));
+        Event consentResponseEvent = eventCaptor.getAllValues().get(0);
+        assertNotNull(((Map) ((Map) consentResponseEvent.getEventData().get("consents")).get("metadata")).get("time"));
+    }
+
+    @Test
+    public void test_handleEdgeConsentPreferenceHandle_InvalidPayload() throws Exception {
+        // test
+        extension.handleEdgeConsentPreferenceHandle(buildEdgeConsentPreferenceEvent("{\n" +
                 "  \"payload\": {\n" +
                 "    \"adId\": {\n" +
                 "      \"val\": \"n\"\n" +
@@ -544,22 +634,22 @@ public class ConsentExtensionTest {
                 "  }\n" +
                 "}"));
 
-        // verify shared state is not set
-        verify(mockExtensionApi, times(0)).setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));
-        PowerMockito.verifyStatic(MobileCore.class, times(0));
-        MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
+        // verify
+        verifyNoSharedStateChange();
+        verifyNoEventDispatched();
     }
 
     @Test
-    public void test_handleEdgeConsentPreference_NullEventData() {
+    public void test_handleEdgeConsentPreferenceHandle_NullEventData() {
         // setup
         Event event = new Event.Builder("Edge Consent Response", ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.UPDATE_CONSENT).setEventData(null).build();
 
         // test
-        extension.handleEdgeConsentPreference(event);
+        extension.handleEdgeConsentPreferenceHandle(event);
 
-        // verify shared state is not set
-        verify(mockExtensionApi, times(0)).setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));
+        // verify
+        verifyNoSharedStateChange();
+        verifyNoEventDispatched();
     }
 
     // ========================================================================================
@@ -592,6 +682,16 @@ public class ConsentExtensionTest {
 
     private Event buildBootEvent() {
         return new Event.Builder("EventHub Boot", ConsentConstants.EventType.HUB, ConsentConstants.EventSource.BOOTED).build();
+    }
+
+    private void verifyNoSharedStateChange() {
+        verify(mockExtensionApi, times(0)).setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));
+
+    }
+
+    private void verifyNoEventDispatched() {
+        PowerMockito.verifyStatic(MobileCore.class, times(0));
+        MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
     }
 
 }

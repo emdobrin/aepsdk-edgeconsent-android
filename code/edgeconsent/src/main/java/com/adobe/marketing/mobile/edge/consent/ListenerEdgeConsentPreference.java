@@ -51,7 +51,7 @@ class ListenerEdgeConsentPreference extends ExtensionListener {
             return;
         }
 
-        parentExtension.handleEdgeConsentPreference(event);
+        parentExtension.handleEdgeConsentPreferenceHandle(event);
     }
 
     /**

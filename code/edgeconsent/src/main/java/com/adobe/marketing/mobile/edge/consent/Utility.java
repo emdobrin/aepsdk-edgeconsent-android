@@ -27,7 +27,7 @@ import java.util.Map;
 
 import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
 
-class Utility {
+final class Utility {
 
     /**
      * Method to serialize jsonObject to Map.

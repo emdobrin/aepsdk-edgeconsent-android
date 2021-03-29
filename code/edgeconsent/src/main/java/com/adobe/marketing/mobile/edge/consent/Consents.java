@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-class Consents {
-    private Map<String, Object> consentsMap;
+final class Consents {
+    private Map<String, Object> consentsMap = new HashMap<>();
 
     // Suppresses default constructor.
     private Consents() { }
@@ -45,7 +45,11 @@ class Consents {
         }
 
         Object allConsents = xdmMap.get(ConsentConstants.EventDataKey.CONSENTS);
-        consentsMap = (allConsents instanceof HashMap) ? Utility.deepCopy((Map<String, Object>) allConsents) : null;
+        try {
+            consentsMap = (allConsents instanceof HashMap) ? Utility.deepCopy((Map<String, Object>) allConsents) : new HashMap<String, Object>();
+        } catch (final ClassCastException exp) {
+            consentsMap = new HashMap<>();
+        }
     }
 
     /**
@@ -57,15 +61,34 @@ class Consents {
         if (isEmpty()) {
             return;
         }
-        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.MEATADATA);
+        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
         if (metaDataContents == null || metaDataContents.isEmpty()) {
             metaDataContents = new HashMap<>();
         }
 
         metaDataContents.put(ConsentConstants.EventDataKey.TIME, DateUtility.dateToISO8601String(new Date(timeStamp)));
-        consentsMap.put(ConsentConstants.EventDataKey.MEATADATA, metaDataContents);
+        consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
     }
 
+    /**
+     * Retrieves the timestamp for this {@link Consents}.
+     *
+     * @return timestamp in ISO 8601 date-time string, null if consents does not have timestamp in its metadata
+     */
+    String getTimestamp() {
+        if (isEmpty()) {
+            return null;
+        }
+        try {
+            final Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
+            if (metaDataContents == null) {
+                return null;
+            }
+            return (String) metaDataContents.get(ConsentConstants.EventDataKey.TIME);
+        } catch (final ClassCastException exp) {
+            return null;
+        }
+    }
 
     /**
      * Verifies if the consents associated with the current object is empty.
@@ -139,6 +162,47 @@ class Consents {
         }
 
         return this.consentsMap.equals(comparingConsent.consentsMap);
+    }
+
+    /**
+     * Compares the current consent instance the with the passed object ignoring the timestamp field in metadata
+     *
+     * @return true, if both the consents are equal ignoring timestamp
+     */
+    boolean equalsIgnoreTimeStamp(final Consents comparingConsent) {
+        if (comparingConsent == null) {
+            return false;
+        }
+
+        if (this == comparingConsent) {
+            return true;
+        }
+
+        final Consents originalConsentCopy = new Consents(this);
+        final Consents comparingConsentCopy = new Consents(comparingConsent);
+
+        originalConsentCopy.removeTimeStamp();
+        comparingConsentCopy.removeTimeStamp();
+
+        return originalConsentCopy.consentsMap.equals(comparingConsentCopy.consentsMap);
+    }
+
+    /**
+     * Private helper method to remove metadata timestamp from this {@link Consents}
+     */
+    private void removeTimeStamp() {
+        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
+        if (metaDataContents == null || metaDataContents.isEmpty()) {
+            return;
+        }
+
+        metaDataContents.remove(ConsentConstants.EventDataKey.TIME);
+
+        if (metaDataContents.isEmpty()) {
+            consentsMap.remove(ConsentConstants.EventDataKey.METADATA);
+        } else {
+            consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
+        }
     }
 
 }
