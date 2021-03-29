@@ -53,7 +53,7 @@ public class ListenerEdgeConsentPreferenceTest {
         listener.hear(event);
 
         // verify
-        verify(mockConsentExtension, times(1)).handleEdgeConsentPreference(event);
+        verify(mockConsentExtension, times(1)).handleEdgeConsentPreferenceHandle(event);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ListenerEdgeConsentPreferenceTest {
         listener.hear(event);
 
         // verify
-        verify(mockConsentExtension, times(0)).handleEdgeConsentPreference(any(Event.class));
+        verify(mockConsentExtension, times(0)).handleEdgeConsentPreferenceHandle(any(Event.class));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ListenerEdgeConsentPreferenceTest {
         listener.hear(null);
 
         // verify
-        verify(mockConsentExtension, times(0)).handleEdgeConsentPreference(any(Event.class));
+        verify(mockConsentExtension, times(0)).handleEdgeConsentPreferenceHandle(any(Event.class));
     }
 
 }

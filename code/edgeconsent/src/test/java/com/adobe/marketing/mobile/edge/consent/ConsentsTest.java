@@ -237,13 +237,13 @@ public class ConsentsTest {
     // Test method : isEqual
     // ========================================================================================
     @Test
-    public void test_isEqual_sameObject() {
+    public void test_equals_sameObject() {
         Consents consents = new Consents(CreateConsentXDMMap("n"));
         assertTrue(consents.equals(consents));
     }
 
     @Test
-    public void test_isEqual_WhenDifferentClass() {
+    public void test_equals_WhenDifferentClass() {
         Consents first = new Consents(CreateConsentXDMMap("n"));
 
         assertFalse(first.equals("sd"));
@@ -251,7 +251,7 @@ public class ConsentsTest {
     }
 
     @Test
-    public void test_isEqual_WhenDifferent() {
+    public void test_equals_WhenDifferent() {
         Consents first = new Consents(CreateConsentXDMMap("n"));
         Consents second = new Consents(CreateConsentXDMMap("y"));
 
@@ -260,7 +260,7 @@ public class ConsentsTest {
     }
 
     @Test
-    public void test_isEqual_WhenSame() {
+    public void test_equals_WhenSame() {
         Consents first = new Consents(CreateConsentXDMMap("y"));
         Consents second = new Consents(CreateConsentXDMMap("y"));
 
@@ -269,13 +269,13 @@ public class ConsentsTest {
     }
 
     @Test
-    public void test_isEqual_WhenNull() {
+    public void test_equals_WhenNull() {
         Consents first = new Consents(CreateConsentXDMMap("y"));
         assertFalse(first.equals(null));
     }
 
     @Test
-    public void test_isEqual_WhenEmptyAndLoaded() {
+    public void test_equals_WhenEmptyAndLoaded() {
         Consents first = new Consents(CreateConsentXDMMap("y"));
         Consents second = new Consents(new HashMap<String, Object>());
         assertFalse(first.equals(second));
@@ -283,10 +283,104 @@ public class ConsentsTest {
     }
 
     @Test
-    public void test_isEqual_WhenEmptyConsentAndEqual() {
+    public void test_equals_WhenEmptyConsentAndEqual() {
         Consents first = new Consents(new HashMap<String, Object>());
         Consents second = new Consents(new HashMap<String, Object>());
         assertTrue(first.equals(second));
         assertTrue(second.equals(first));
     }
+
+    // ========================================================================================
+    // Test method : isEqualIgnoresTimestamp
+    // ========================================================================================
+    @Test
+    public void test_equalsIgnoreTimeStamp_sameObject() {
+        Consents consents = new Consents(CreateConsentXDMMap("n"));
+        assertTrue(consents.equalsIgnoreTimeStamp(consents));
+
+        Consents consentWithTimestamp = new Consents(CreateConsentXDMMap("n"));
+        consentWithTimestamp.setTimestamp(1616985318);
+        assertTrue(consents.equalsIgnoreTimeStamp(consents));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_whenDifferentClass() {
+        Consents first = new Consents(CreateConsentXDMMap("n"));
+
+        assertFalse(first.equalsIgnoreTimeStamp("sd"));
+        assertFalse(first.equalsIgnoreTimeStamp(new Object()));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_whenNull() {
+        Consents consents = new Consents(CreateConsentXDMMap("y"));
+        assertFalse(consents.equalsIgnoreTimeStamp(null));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_WhenEmptyConsentAndEqual() {
+        Consents first = new Consents(new HashMap<String, Object>());
+        Consents second = new Consents(new HashMap<String, Object>());
+        assertTrue(first.equalsIgnoreTimeStamp(second));
+        assertTrue(second.equalsIgnoreTimeStamp(first));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_SameConsentAndSameTimeStamp() {
+        Consents first = new Consents(CreateConsentXDMMap("y"));
+        Consents second = new Consents(CreateConsentXDMMap("y"));
+
+        assertTrue(first.equals(second));
+        assertTrue(second.equals(first));
+
+        // compare after setting timestamp
+        first.setTimestamp(1616985318);
+        second.setTimestamp(1616985318);
+
+        assertTrue(first.equalsIgnoreTimeStamp(second));
+        assertTrue(second.equalsIgnoreTimeStamp(first));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_SameConsentsAndDifferentTimestamp() {
+        Consents first = new Consents(CreateConsentXDMMap("y"));
+        Consents second = new Consents(CreateConsentXDMMap("y"));
+        Consents third = new Consents(CreateConsentXDMMap("y"));
+
+        first.setTimestamp(1616985318);
+        second.setTimestamp(1616985319);
+
+        // compare first and second
+        assertTrue(first.equalsIgnoreTimeStamp(second));
+        assertTrue(second.equalsIgnoreTimeStamp(first));
+
+        // compare first and third
+        assertTrue(first.equalsIgnoreTimeStamp(third));
+        assertTrue(third.equalsIgnoreTimeStamp(first));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_DifferentConsentsAndSameTimestamp() {
+        Consents first = new Consents(CreateConsentXDMMap("n"));
+        Consents second = new Consents(CreateConsentXDMMap("y"));
+
+        first.setTimestamp(1616985318);
+        second.setTimestamp(1616985318);
+
+        assertFalse(first.equalsIgnoreTimeStamp(second));
+        assertFalse(second.equalsIgnoreTimeStamp(first));
+    }
+
+    @Test
+    public void test_equalsIgnoreTimeStamp_DifferentConsentsAndDifferentTimestamp() {
+        Consents first = new Consents(CreateConsentXDMMap("n"));
+        Consents second = new Consents(CreateConsentXDMMap("y"));
+
+        first.setTimestamp(1616985318);
+        second.setTimestamp(1616985320);
+
+        assertFalse(first.equalsIgnoreTimeStamp(second));
+        assertFalse(second.equalsIgnoreTimeStamp(first));
+    }
+
 }

@@ -274,7 +274,6 @@ class ConsentTestUtil {
         return Collections.<String, String>emptyMap();
     }
 
-
     /**
      * Deserialize {@code JsonNode} and flatten to provided {@code map}.
      * For example, a JSON such as "{xdm: {stitchId: myID, eventType: myType}}" is flattened
@@ -324,7 +323,6 @@ class ConsentTestUtil {
 
         return allConsents;
     }
-
 
     private static boolean isNullOrEmpty(final Map map){
         return (map == null || map.isEmpty());
