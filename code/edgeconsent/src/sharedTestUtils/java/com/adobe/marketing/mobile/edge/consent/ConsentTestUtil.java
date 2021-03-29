@@ -135,7 +135,7 @@ class ConsentTestUtil {
         if (time != null) {
             Map<String, String> metaDataMap = new HashMap<String, String>();
             metaDataMap.put(ConsentConstants.EventDataKey.TIME, time);
-            consents.put(ConsentConstants.EventDataKey.MEATADATA, metaDataMap);
+            consents.put(ConsentConstants.EventDataKey.METADATA, metaDataMap);
         }
 
         consentData.put(ConsentConstants.EventDataKey.CONSENTS, consents);
@@ -148,7 +148,7 @@ class ConsentTestUtil {
             return null;
         }
 
-        Map<String, Object> collectMap = (Map<String, Object>) allConsentMap.get(ConsentConstants.EventDataKey.MEATADATA);
+        Map<String, Object> collectMap = (Map<String, Object>) allConsentMap.get(ConsentConstants.EventDataKey.METADATA);
         if (isNullOrEmpty(collectMap)) {
             return null;
         }

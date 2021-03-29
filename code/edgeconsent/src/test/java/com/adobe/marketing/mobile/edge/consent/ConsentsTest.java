@@ -304,14 +304,6 @@ public class ConsentsTest {
     }
 
     @Test
-    public void test_equalsIgnoreTimeStamp_whenDifferentClass() {
-        Consents first = new Consents(CreateConsentXDMMap("n"));
-
-        assertFalse(first.equalsIgnoreTimeStamp("sd"));
-        assertFalse(first.equalsIgnoreTimeStamp(new Object()));
-    }
-
-    @Test
     public void test_equalsIgnoreTimeStamp_whenNull() {
         Consents consents = new Consents(CreateConsentXDMMap("y"));
         assertFalse(consents.equalsIgnoreTimeStamp(null));

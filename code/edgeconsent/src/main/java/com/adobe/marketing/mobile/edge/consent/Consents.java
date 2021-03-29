@@ -61,13 +61,13 @@ final class Consents {
         if (isEmpty()) {
             return;
         }
-        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.MEATADATA);
+        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
         if (metaDataContents == null || metaDataContents.isEmpty()) {
             metaDataContents = new HashMap<>();
         }
 
         metaDataContents.put(ConsentConstants.EventDataKey.TIME, DateUtility.dateToISO8601String(new Date(timeStamp)));
-        consentsMap.put(ConsentConstants.EventDataKey.MEATADATA, metaDataContents);
+        consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
     }
 
     /**
@@ -80,7 +80,7 @@ final class Consents {
             return null;
         }
         try {
-            final Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.MEATADATA);
+            final Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
             if (metaDataContents == null) {
                 return null;
             }
@@ -169,20 +169,14 @@ final class Consents {
      *
      * @return true, if both the consents are equal ignoring timestamp
      */
-    boolean equalsIgnoreTimeStamp(final Object comparingConsentObject) {
-        if (comparingConsentObject == null) {
+    boolean equalsIgnoreTimeStamp(final Consents comparingConsent) {
+        if (comparingConsent == null) {
             return false;
         }
 
-        if (this == comparingConsentObject) {
+        if (this == comparingConsent) {
             return true;
         }
-
-        if (!(comparingConsentObject instanceof Consents)) {
-            return false;
-        }
-
-        Consents comparingConsent = (Consents) comparingConsentObject;
 
         final Consents originalConsentCopy = new Consents(this);
         final Consents comparingConsentCopy = new Consents(comparingConsent);
@@ -197,7 +191,7 @@ final class Consents {
      * Private helper method to remove metadata timestamp from this {@link Consents}
      */
     private void removeTimeStamp() {
-        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.MEATADATA);
+        Map<String, Object> metaDataContents = (Map<String, Object>) consentsMap.get(ConsentConstants.EventDataKey.METADATA);
         if (metaDataContents == null || metaDataContents.isEmpty()) {
             return;
         }
@@ -205,9 +199,9 @@ final class Consents {
         metaDataContents.remove(ConsentConstants.EventDataKey.TIME);
 
         if (metaDataContents.isEmpty()) {
-            consentsMap.remove(ConsentConstants.EventDataKey.MEATADATA);
+            consentsMap.remove(ConsentConstants.EventDataKey.METADATA);
         } else {
-            consentsMap.put(ConsentConstants.EventDataKey.MEATADATA, metaDataContents);
+            consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
         }
     }
 

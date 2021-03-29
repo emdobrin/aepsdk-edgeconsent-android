@@ -19,7 +19,7 @@ final class ConsentConstants {
 
     final class EventDataKey {
         static final String CONSENTS = "consents";
-        static final String MEATADATA = "metadata";
+        static final String METADATA = "metadata";
         static final String PAYLOAD = "payload";
 
         static final String TIME = "time";

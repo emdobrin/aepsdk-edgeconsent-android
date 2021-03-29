@@ -157,19 +157,19 @@ class ConsentExtension extends Extension {
         try {
             payload = (List<Map<String, Object>>) eventData.get(ConsentConstants.EventDataKey.PAYLOAD);
         } catch (ClassCastException exp) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge, invalid payload.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent:preferences handle event from Edge Network, invalid payload.");
             return;
         }
 
         if (payload == null || payload.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge, empty/missing payload.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent:preferences handle event from Edge Network, empty/missing payload.");
             return;
         }
 
         // bail out if no valid consents are found in eventData
         final Consents newConsents = new Consents(prepareConsentXDMMapWithPayload(payload.get(0)));
         if (newConsents.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge, no valid consent data found.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent:preferences handle event from Edge Network, no valid consent data found.");
             return;
         }
 
@@ -184,7 +184,7 @@ class ConsentExtension extends Extension {
 
             // compare the consents ignoring the timestamp
             if (newConsents.equalsIgnoreTimeStamp(currentConsent)) {
-                MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge. There is no modification from existing consent data");
+                MobileCore.log(LoggingMode.VERBOSE, ConsentConstants.LOG_TAG, "Ignoring the consent:preferences handle event from Edge Network. There is no modification from existing consent data");
                 return;
             }
         }
