@@ -19,7 +19,6 @@ import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -182,6 +181,8 @@ class ConsentExtension extends Extension {
         // then ignore this event and do not update the sharedState unnecessarily
         final Consents currentConsent = consentManager.getCurrentConsents();
         if (newConsents.getTimestamp() == null || newConsents.getTimestamp().equals(currentConsent.getTimestamp())) {
+
+            // compare the consents ignoring the timestamp
             if (newConsents.equalsIgnoreTimeStamp(currentConsent)) {
                 MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge. There is no modification from existing consent data");
                 return;
