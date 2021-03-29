@@ -19,6 +19,7 @@ import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -148,7 +149,7 @@ class ConsentExtension extends Extension {
      *
      * @param event the Edge consent preferences response {@link Event} to be processed
      */
-    void handleEdgeConsentPreference(final Event event) {
+    void handleEdgeConsentPreferenceHandle(final Event event) {
         // bail out if event data is empty
         final Map<String, Object> eventData = event.getEventData();
 
@@ -157,27 +158,39 @@ class ConsentExtension extends Extension {
         try {
             payload = (List<Map<String, Object>>) eventData.get(ConsentConstants.EventDataKey.PAYLOAD);
         } catch (ClassCastException exp) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Invalid payload from edge server. Dropping event.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge, invalid payload.");
             return;
         }
 
         if (payload == null || payload.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "consent.preferences response event from edge is missing payload. Dropping event.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge, empty/missing payload.");
             return;
         }
-
 
         // bail out if no valid consents are found in eventData
         final Consents newConsents = new Consents(prepareConsentXDMMapWithPayload(payload.get(0)));
         if (newConsents.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Unable to find valid consent data from edge consent preference response event. Dropping event.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge, no valid consent data found.");
             return;
+        }
+
+
+        // If the consentPreferences handle has
+        // 1. same consent as current and without timestamp
+        // or
+        // 2. same consent as current and with same timestamp
+        // then ignore this event and do not update the sharedState unnecessarily
+        final Consents currentConsent = consentManager.getCurrentConsents();
+        if (newConsents.getTimestamp() == null || newConsents.getTimestamp().equals(currentConsent.getTimestamp())){
+            if (newConsents.equalsIgnoreTimeStamp(currentConsent)) {
+                MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Ignoring the consent.preference handle event from edge. There is no modification from existing consent data");
+                return;
+            }
         }
 
         // update the timestamp and share the updatedConsents as XDMSharedState and dispatch the consent response event
         newConsents.setTimestamp(event.getTimestamp());
         consentManager.mergeAndPersist(newConsents);
-
         shareCurrentConsents(event);
     }
 
