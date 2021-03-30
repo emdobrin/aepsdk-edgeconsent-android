@@ -39,7 +39,7 @@ class ListenerConfigurationResponseContent extends ExtensionListener {
     @Override
     public void hear(final Event event) {
         if (event == null || event.getEventData() == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Event or Event data is null. Ignoring the event listened by ListenerConfigurationResponseContent");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ListenerConfigurationResponseContent - Event or Event data is null. Ignoring the event.");
             return;
         }
 
@@ -47,7 +47,7 @@ class ListenerConfigurationResponseContent extends ExtensionListener {
 
         if (parentExtension == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
-                    "The parent extension associated with the ListenerConfigurationResponseContent is null, ignoring this event.");
+                    "ListenerConfigurationResponseContent - The parent extension associated with this listener is null, ignoring this event.");
             return;
         }
 

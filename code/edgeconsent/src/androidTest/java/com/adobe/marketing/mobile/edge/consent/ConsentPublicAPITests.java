@@ -139,7 +139,7 @@ public class ConsentPublicAPITests {
 
         //verify persisted data
         final String persistedJson = TestPersistenceHelper.readPersistedData(ConsentConstants.DataStoreKey.DATASTORE_NAME, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
-        Map<String,Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
+        Map<String, Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
         Map<String, String> flattenPersistedMap = flattenMap(persistedMap);
         assertEquals(2, flattenPersistedMap.size());
         assertEquals("y", flattenPersistedMap.get("consents.collect.val"));
@@ -263,7 +263,7 @@ public class ConsentPublicAPITests {
         Consent.getConsents(null);
 
         // verify shared state set
-        Map<String,Object> sharedState = getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 2000);
+        Map<String, Object> sharedState = getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 2000);
         assertNotNull(sharedState);
     }
 

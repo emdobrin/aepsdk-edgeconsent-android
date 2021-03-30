@@ -23,7 +23,10 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-class ConsentStorageService {
+final class ConsentStorageService {
+
+    private ConsentStorageService() {
+    }
 
     /**
      * Loads the requested consents from persistence.
@@ -38,7 +41,7 @@ class ConsentStorageService {
     static Consents loadConsentsFromPersistence() {
         final SharedPreferences sharedPreferences = getSharedPreference();
         if (sharedPreferences == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Shared Preference value is null. Unable to load saved consents from persistence.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ConsentStorageService - Shared Preference value is null. Unable to load saved consents from persistence.");
             return null;
         }
 
@@ -46,18 +49,17 @@ class ConsentStorageService {
         final String jsonString = sharedPreferences.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null);
 
         if (jsonString == null) {
-            MobileCore.log(LoggingMode.VERBOSE, ConsentConstants.LOG_TAG, "No previous consents were stored in persistence. Current consent is null");
+            MobileCore.log(LoggingMode.VERBOSE, ConsentConstants.LOG_TAG, "ConsentStorageService - No previous consents were stored in persistence. Current consent is null");
             return null;
         }
 
         try {
             final JSONObject jsonObject = new JSONObject(jsonString);
             final Map<String, Object> consentMap = Utility.toMap(jsonObject);
-            final Consents loadedConsents = new Consents(consentMap);
-            return loadedConsents;
+            return new Consents(consentMap);
 
         } catch (JSONException exception) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Serialization error while reading consent jsonString from persistence. Unable to load saved consents from persistence.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ConsentStorageService - Serialization error while reading consent jsonString from persistence. Unable to load saved consents from persistence.");
             return null;
         }
     }
@@ -74,14 +76,14 @@ class ConsentStorageService {
     static void saveConsentsToPersistence(final Consents consents) {
         SharedPreferences sharedPreferences = getSharedPreference();
         if (sharedPreferences == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Shared Preference value is null. Unable to write consents to persistence.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ConsentStorageService - Shared Preference value is null. Unable to write consents to persistence.");
             return;
         }
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
         if (editor == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Shared Preference Editor is null. Unable to write consents to persistence.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ConsentStorageService - Shared Preference Editor is null. Unable to write consents to persistence.");
             return;
         }
 
@@ -107,13 +109,13 @@ class ConsentStorageService {
     private static SharedPreferences getSharedPreference() {
         final Application application = MobileCore.getApplication();
         if (application == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Application value is null. Unable to read/write consent data from persistence.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ConsentStorageService - Application value is null. Unable to read/write consent data from persistence.");
             return null;
         }
 
         final Context context = application.getApplicationContext();
         if (context == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Context value is null. Unable to read/write consent data from persistence.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ConsentStorageService - Context value is null. Unable to read/write consent data from persistence.");
             return null;
         }
 

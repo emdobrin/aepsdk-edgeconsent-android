@@ -24,7 +24,8 @@ import java.util.Map;
 
 public class Consent {
 
-    private Consent() { }
+    private Consent() {
+    }
 
     /**
      * Returns the version of the {@code Consent} extension
@@ -43,7 +44,7 @@ public class Consent {
             @Override
             public void error(ExtensionError extensionError) {
                 MobileCore.log(LoggingMode.ERROR, ConsentConstants.LOG_TAG,
-                        "There was an error registering the Consent extension: " + extensionError.getErrorName());
+                        "Consent - There was an error registering the Consent extension: " + extensionError.getErrorName());
             }
         });
     }
@@ -57,9 +58,9 @@ public class Consent {
      *
      * @param xdmFormattedConsents An {@link Map} of consents in predefined XDMformat
      */
-    public static void update(final Map<String,Object> xdmFormattedConsents) {
+    public static void update(final Map<String, Object> xdmFormattedConsents) {
         if (xdmFormattedConsents == null || xdmFormattedConsents.isEmpty()) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Null/Empty consents passed to Consent.update() Public API. Ignoring the API call.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Consent - Null/Empty consents passed to update API. Ignoring the API call.");
             return;
         }
 
@@ -67,7 +68,7 @@ public class Consent {
         final ExtensionErrorCallback<ExtensionError> errorCallback = new ExtensionErrorCallback<ExtensionError>() {
             @Override
             public void error(final ExtensionError extensionError) {
-                MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, String.format("Consents.update() API. Failed to dispatch %s event: Error : %s.", ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
+                MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, String.format("Consent - update API. Failed to dispatch %s event. Ignoring the API call. Error : %s.", ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
                         extensionError.getErrorName()));
             }
         };
@@ -81,12 +82,12 @@ public class Consent {
      * Callback is invoked with null value if no consents were assigned to this user.
      *
      * @param callback a {@link AdobeCallback} of {@link Map} invoked with current consents of the extension
-     *                  If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} can be returned in the
-     *  				eventuality of any error that occurred while getting the user consents.
+     *                 If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} can be returned in the
+     *                 eventuality of any error that occurred while getting the user consents.
      */
-    public static void getConsents(final AdobeCallback<Map<String,Object>> callback) {
+    public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
         if (callback == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Unexpected null callback, provide a callback to retrieve current consents.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Consent - Unexpected null callback, provide a callback to retrieve current consents.");
             return;
         }
 
@@ -95,7 +96,7 @@ public class Consent {
             @Override
             public void error(final ExtensionError extensionError) {
                 returnError(callback, extensionError);
-                MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, String.format("Consents.getConsents() API. Failed to dispatch %s event: Error : %s.", ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
+                MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, String.format("Consent - getConsents API. Failed to dispatch %s event. Ignoring the API call. Error : %s.", ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
                         extensionError.getErrorName()));
             }
         };
@@ -115,19 +116,19 @@ public class Consent {
         }, errorCallback);
     }
 
-
     /**
      * When an {@link AdobeCallbackWithError} is provided, the fail method will be called with provided {@link AdobeError}.
+     *
      * @param callback should not be null, should be instance of {@code AdobeCallbackWithError}
-     * @param error the {@code AdobeError} returned back in the callback
+     * @param error    the {@code AdobeError} returned back in the callback
      */
-    private static void returnError (final AdobeCallback<Map<String,Object>> callback, final AdobeError error) {
+    private static void returnError(final AdobeCallback<Map<String, Object>> callback, final AdobeError error) {
         if (callback == null) {
             return;
         }
 
-        final AdobeCallbackWithError<Map<String,Object>> adobeCallbackWithError = callback instanceof AdobeCallbackWithError ?
-                (AdobeCallbackWithError<Map<String,Object>>) callback : null;
+        final AdobeCallbackWithError<Map<String, Object>> adobeCallbackWithError = callback instanceof AdobeCallbackWithError ?
+                (AdobeCallbackWithError<Map<String, Object>>) callback : null;
 
         if (adobeCallbackWithError != null) {
             adobeCallbackWithError.fail(error);

@@ -105,7 +105,7 @@ public class ConsentEdgeResponseHandlingTests {
 
         // verify persisted data - default consents are not persisted
         final String persistedJson = TestPersistenceHelper.readPersistedData(ConsentConstants.DataStoreKey.DATASTORE_NAME, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
-        Map<String,Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
+        Map<String, Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
         Map<String, String> flattenPersistedMap = flattenMap(persistedMap);
         assertEquals(2, flattenPersistedMap.size());
         assertEquals("n", flattenPersistedMap.get("consents.collect.val"));
@@ -145,7 +145,7 @@ public class ConsentEdgeResponseHandlingTests {
 
         // verify persisted data
         final String persistedJson = TestPersistenceHelper.readPersistedData(ConsentConstants.DataStoreKey.DATASTORE_NAME, ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
-        Map<String,Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
+        Map<String, Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
         Map<String, String> flattenPersistedMap = flattenMap(persistedMap);
         assertEquals(2, flattenPersistedMap.size());
         assertEquals("y", flattenPersistedMap.get("consents.collect.val"));
@@ -212,7 +212,7 @@ public class ConsentEdgeResponseHandlingTests {
         String timestamp = xdmSharedState.get("consents.metadata.time");
 
         // test
-        MobileCore.dispatchEvent(buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("y","n", timestamp)), null);
+        MobileCore.dispatchEvent(buildEdgeConsentPreferenceEventWithConsents(CreateConsentXDMMap("y", "n", timestamp)), null);
         waitForThreads(1000);
 
         // verify that shared state and consent response events are not dispatched

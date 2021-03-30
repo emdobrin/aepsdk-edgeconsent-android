@@ -13,7 +13,8 @@ package com.adobe.marketing.mobile.edge.consent;
 
 import java.util.HashMap;
 
-class ConsentManager {
+final class ConsentManager {
+
     private Consents userOptedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
     private Consents defaultConsents; // holds on to default consents obtained from configuration response
 

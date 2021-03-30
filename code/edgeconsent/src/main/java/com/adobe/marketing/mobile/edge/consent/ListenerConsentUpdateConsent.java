@@ -39,7 +39,7 @@ class ListenerConsentUpdateConsent extends ExtensionListener {
     @Override
     public void hear(final Event event) {
         if (event == null || event.getEventData() == null) {
-            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "Event or Event data is null. Ignoring the event listened by ListenerConsentUpdateConsent.");
+            MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG, "ListenerConsentUpdateConsent - Event or Event data is null. Ignoring the event.");
             return;
         }
 
@@ -47,13 +47,12 @@ class ListenerConsentUpdateConsent extends ExtensionListener {
 
         if (parentExtension == null) {
             MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
-                    "The parent extension associated with the ListenerConsentUpdateConsent is null, ignoring this event.");
+                    "ListenerConsentUpdateConsent - The parent extension associated with this listener is null, ignoring the event.");
             return;
         }
 
         parentExtension.handleConsentUpdate(event);
     }
-
 
     /**
      * Returns the parent extension associated with the listener.

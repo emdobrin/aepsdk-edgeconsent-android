@@ -296,25 +296,25 @@ public class ConsentsTest {
     @Test
     public void test_equalsIgnoreTimeStamp_sameObject() {
         Consents consents = new Consents(CreateConsentXDMMap("n"));
-        assertTrue(consents.equalsIgnoreTimeStamp(consents));
+        assertTrue(consents.equalsIgnoreTimestamp(consents));
 
         Consents consentWithTimestamp = new Consents(CreateConsentXDMMap("n"));
         consentWithTimestamp.setTimestamp(1616985318);
-        assertTrue(consents.equalsIgnoreTimeStamp(consents));
+        assertTrue(consents.equalsIgnoreTimestamp(consents));
     }
 
     @Test
     public void test_equalsIgnoreTimeStamp_whenNull() {
         Consents consents = new Consents(CreateConsentXDMMap("y"));
-        assertFalse(consents.equalsIgnoreTimeStamp(null));
+        assertFalse(consents.equalsIgnoreTimestamp(null));
     }
 
     @Test
     public void test_equalsIgnoreTimeStamp_WhenEmptyConsentAndEqual() {
         Consents first = new Consents(new HashMap<String, Object>());
         Consents second = new Consents(new HashMap<String, Object>());
-        assertTrue(first.equalsIgnoreTimeStamp(second));
-        assertTrue(second.equalsIgnoreTimeStamp(first));
+        assertTrue(first.equalsIgnoreTimestamp(second));
+        assertTrue(second.equalsIgnoreTimestamp(first));
     }
 
     @Test
@@ -329,8 +329,8 @@ public class ConsentsTest {
         first.setTimestamp(1616985318);
         second.setTimestamp(1616985318);
 
-        assertTrue(first.equalsIgnoreTimeStamp(second));
-        assertTrue(second.equalsIgnoreTimeStamp(first));
+        assertTrue(first.equalsIgnoreTimestamp(second));
+        assertTrue(second.equalsIgnoreTimestamp(first));
     }
 
     @Test
@@ -343,12 +343,12 @@ public class ConsentsTest {
         second.setTimestamp(1616985319);
 
         // compare first and second
-        assertTrue(first.equalsIgnoreTimeStamp(second));
-        assertTrue(second.equalsIgnoreTimeStamp(first));
+        assertTrue(first.equalsIgnoreTimestamp(second));
+        assertTrue(second.equalsIgnoreTimestamp(first));
 
         // compare first and third
-        assertTrue(first.equalsIgnoreTimeStamp(third));
-        assertTrue(third.equalsIgnoreTimeStamp(first));
+        assertTrue(first.equalsIgnoreTimestamp(third));
+        assertTrue(third.equalsIgnoreTimestamp(first));
     }
 
     @Test
@@ -359,8 +359,8 @@ public class ConsentsTest {
         first.setTimestamp(1616985318);
         second.setTimestamp(1616985318);
 
-        assertFalse(first.equalsIgnoreTimeStamp(second));
-        assertFalse(second.equalsIgnoreTimeStamp(first));
+        assertFalse(first.equalsIgnoreTimestamp(second));
+        assertFalse(second.equalsIgnoreTimestamp(first));
     }
 
     @Test
@@ -371,8 +371,8 @@ public class ConsentsTest {
         first.setTimestamp(1616985318);
         second.setTimestamp(1616985320);
 
-        assertFalse(first.equalsIgnoreTimeStamp(second));
-        assertFalse(second.equalsIgnoreTimeStamp(first));
+        assertFalse(first.equalsIgnoreTimestamp(second));
+        assertFalse(second.equalsIgnoreTimestamp(first));
     }
 
 }

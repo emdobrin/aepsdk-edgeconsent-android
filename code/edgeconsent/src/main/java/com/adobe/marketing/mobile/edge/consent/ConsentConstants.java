@@ -24,7 +24,8 @@ final class ConsentConstants {
 
         static final String TIME = "time";
         static final String VALUE = "val";
-        private EventDataKey() { }
+
+        private EventDataKey() {}
     }
 
     final class EventSource {
@@ -33,7 +34,8 @@ final class ConsentConstants {
         static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
         static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
         static final String BOOTED = "com.adobe.eventSource.booted";
-        private EventSource() { }
+
+        private EventSource() {}
     }
 
     final class EventType {
@@ -41,13 +43,15 @@ final class ConsentConstants {
         static final String EDGE = "com.adobe.eventType.edge";
         static final String CONFIGURATION = "com.adobe.eventType.configuration";
         static final String HUB = "com.adobe.eventType.hub";
-        private EventType() { }
+
+        private EventType() {}
     }
 
     final class DataStoreKey {
         static final String DATASTORE_NAME = EXTENSION_NAME;
         static final String CONSENT_PREFERENCES = "consent:preferences";
-        private DataStoreKey() { }
+
+        private DataStoreKey() {}
     }
 
     final class EventNames {
@@ -56,13 +60,15 @@ final class ConsentConstants {
         static final String GET_CONSENTS_REQUEST = "Get Consents Request";
         static final String GET_CONSENTS_RESPONSE = "Get Consents Response";
         static final String CONSENT_PREFERENCES_UPDATED = "Consent Preferences Updated";
-        private EventNames() { }
+
+        private EventNames() {}
     }
 
     final class ConfigurationKey {
         static final String DEFAULT_CONSENT = "consent.default";
-        private ConfigurationKey() { }
+
+        private ConfigurationKey() {}
     }
 
-    private ConsentConstants() { }
+    private ConsentConstants() {}
 }
