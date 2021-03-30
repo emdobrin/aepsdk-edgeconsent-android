@@ -45,17 +45,17 @@ ci-javadoc: create-ci
 	(cp -r ./code/$(EXTENSION-LIBRARY-FOLDER-NAME)/build ./ci/javadoc)
 
 ci-generate-library-debug:
-		(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME}  assemblePhoneDebug)
+	(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME}  assemblePhoneDebug)
 
 ci-generate-library-release:
-		(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME}  assemblePhoneRelease)
+	(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME}  assemblePhoneRelease)
 
-ci-publish-staging-all:
-		(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} clean artifactoryPublish)
+build-release:
+	(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} clean assemblePhoneRelease)
 
-ci-publish-main-all:
-		(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} clean artifactoryPublish -PisMain=true)
+ci-publish-staging: clean build-release
+	(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} publishReleasePublicationToSonatypeRepository --stacktrace)
 
-ci-publish:
-		(code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} assemblePhone)
-		(code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} bintrayUpload -PapiKey=$(APIKEY))
+ci-publish-main: clean build-release
+	(./code/gradlew -p code/${EXTENSION-LIBRARY-FOLDER-NAME} publishReleasePublicationToSonatypeRepository -Prelease)
+
