@@ -50,13 +50,11 @@ public class Consent {
 	}
 
 	/**
-	 * Updates the consent for the user with the provided value.
+	 * Merges the existing consents with the given consents. Duplicate keys will take the value of those passed in the API
 	 * <p>
-	 * The provided consents map must be in XDMFormat.
-	 * If the consent is already contained in the extension, the old consent is replaced by the newly specified consent.
-	 * Any new consents provided will be appended to the existing consents list.
+	 * Input example: {"consents": {"collect": {"val": "y"}}}
 	 *
-	 * @param xdmFormattedConsents An {@link Map} of consents in predefined XDMformat
+	 * @param consents A {@link Map} of consents to be merged with the existing consents
 	 */
 	public static void update(final Map<String, Object> xdmFormattedConsents) {
 		if (xdmFormattedConsents == null || xdmFormattedConsents.isEmpty()) {
@@ -82,13 +80,13 @@ public class Consent {
 	}
 
 	/**
-	 * Retrieves the current consents for the user.
+	 * Retrieves the current consent preferences stored in the Consent extension
 	 * <p>
-	 * Callback is invoked with null value if no consents were assigned to this user.
+	 * Output example: {"consents": {"collect": {"val": "y"}}}
 	 *
-	 * @param callback a {@link AdobeCallback} of {@link Map} invoked with current consents of the extension
-	 *                 If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} can be returned in the
-	 *                 eventuality of any error that occurred while getting the user consents.
+	 * @param callback The {@link AdobeCallback} is invoked with the current consent preferences.
+	 *                 If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} is returned
+	 *                 when an unexpected error occurs or the request timed out
 	 */
 	public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
 		if (callback == null) {
