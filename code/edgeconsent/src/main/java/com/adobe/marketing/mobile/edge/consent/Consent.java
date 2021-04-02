@@ -56,8 +56,8 @@ public class Consent {
 	 *
 	 * @param consents A {@link Map} of consents to be merged with the existing consents
 	 */
-	public static void update(final Map<String, Object> xdmFormattedConsents) {
-		if (xdmFormattedConsents == null || xdmFormattedConsents.isEmpty()) {
+	public static void update(final Map<String, Object> consents) {
+		if (consents == null || consents.isEmpty()) {
 			MobileCore.log(LoggingMode.DEBUG, ConsentConstants.LOG_TAG,
 						   "Consent - Null/Empty consents passed to update API. Ignoring the API call.");
 			return;
@@ -75,7 +75,7 @@ public class Consent {
 		};
 		final Event event = new Event.Builder(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
 											  ConsentConstants.EventType.CONSENT, ConsentConstants.EventSource.UPDATE_CONSENT).setEventData(
-			xdmFormattedConsents).build();
+			consents).build();
 		MobileCore.dispatchEvent(event, errorCallback);
 	}
 
