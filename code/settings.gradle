@@ -1,0 +1,3 @@
+include ':edgeconsent'
+include ':app'
+rootProject.name = "edgeconsent-sdk"
