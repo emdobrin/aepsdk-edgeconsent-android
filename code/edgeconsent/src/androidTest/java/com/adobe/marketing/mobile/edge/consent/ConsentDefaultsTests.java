@@ -182,7 +182,7 @@ public class ConsentDefaultsTests {
 
 		final CountDownLatch latch = new CountDownLatch(1);
 		MobileCore.start(
-			new AdobeCallback() {
+			new AdobeCallback<Object>() {
 				@Override
 				public void call(Object o) {
 					latch.countDown();
