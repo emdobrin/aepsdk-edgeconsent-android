@@ -9,25 +9,24 @@
   governing permissions and limitations under the License.
 */
 
-
 package com.adobe.marketing.mobile.edge.consent;
+
+import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
 
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 final class Utility {
+
+	private Utility() {}
 
 	/**
 	 * Method to serialize jsonObject to Map.
@@ -52,8 +51,11 @@ final class Utility {
 			try {
 				value = jsonObject.get(nextKey);
 			} catch (JSONException e) {
-				MobileCore.log(LoggingMode.DEBUG, LOG_TAG,
-							   "Utility(toMap) - Unable to convert jsonObject to Map for key " + nextKey + ", skipping.");
+				MobileCore.log(
+					LoggingMode.DEBUG,
+					LOG_TAG,
+					"Utility(toMap) - Unable to convert jsonObject to Map for key " + nextKey + ", skipping."
+				);
 			}
 
 			if (value == null) {
@@ -92,13 +94,16 @@ final class Utility {
 
 		for (int i = 0; i < size; i++) {
 			Object value = null;
-			Object returnValue = null;
+			Object returnValue;
 
 			try {
 				value = jsonArray.get(i);
 			} catch (JSONException e) {
-				MobileCore.log(LoggingMode.DEBUG, LOG_TAG,
-							   "Utility(toList) - Unable to convert jsonObject to List for index " + i + ", skipping.");
+				MobileCore.log(
+					LoggingMode.DEBUG,
+					LOG_TAG,
+					"Utility(toList) - Unable to convert jsonObject to List for index " + i + ", skipping."
+				);
 			}
 
 			if (value == null) {
@@ -133,13 +138,13 @@ final class Utility {
 		try {
 			return toMap(new JSONObject(map));
 		} catch (NullPointerException e) {
-			MobileCore.log(LoggingMode.DEBUG, LOG_TAG, "Utility(deepCopy) - Unable to deep copy map, json string invalid.");
+			MobileCore.log(
+				LoggingMode.DEBUG,
+				LOG_TAG,
+				"Utility(deepCopy) - Unable to deep copy map, json string invalid."
+			);
 		}
 
 		return null;
 	}
-
-	private Utility() {
-	}
-
 }
