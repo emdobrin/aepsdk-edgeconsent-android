@@ -13,22 +13,25 @@ package com.adobe.marketing.mobile.edge.consent;
 
 final class ConsentConstants {
 
-    static final String LOG_TAG = "Consent";
-    static final String EXTENSION_VERSION = "1.0.0";
-    static final String EXTENSION_NAME = "com.adobe.edge.consent";
+	static final String LOG_TAG = "Consent";
+	static final String EXTENSION_VERSION = "1.0.1";
+	static final String EXTENSION_NAME = "com.adobe.edge.consent";
 
-	final class EventDataKey {
+	private ConsentConstants() {}
+
+	static final class EventDataKey {
+
 		static final String CONSENTS = "consents";
 		static final String METADATA = "metadata";
 		static final String PAYLOAD = "payload";
 
 		static final String TIME = "time";
-		static final String VALUE = "val";
 
 		private EventDataKey() {}
 	}
 
-	final class EventSource {
+	static final class EventSource {
+
 		static final String CONSENT_PREFERENCE = "consent:preferences";
 		static final String UPDATE_CONSENT = "com.adobe.eventSource.updateConsent";
 		static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
@@ -38,7 +41,8 @@ final class ConsentConstants {
 		private EventSource() {}
 	}
 
-	final class EventType {
+	static final class EventType {
+
 		static final String CONSENT = "com.adobe.eventType.edgeConsent";
 		static final String EDGE = "com.adobe.eventType.edge";
 		static final String CONFIGURATION = "com.adobe.eventType.configuration";
@@ -47,14 +51,16 @@ final class ConsentConstants {
 		private EventType() {}
 	}
 
-	final class DataStoreKey {
+	static final class DataStoreKey {
+
 		static final String DATASTORE_NAME = EXTENSION_NAME;
 		static final String CONSENT_PREFERENCES = "consent:preferences";
 
 		private DataStoreKey() {}
 	}
 
-	final class EventNames {
+	static final class EventNames {
+
 		static final String EDGE_CONSENT_UPDATE = "Edge Consent Update Request";
 		static final String CONSENT_UPDATE_REQUEST = "Consent Update Request";
 		static final String GET_CONSENTS_REQUEST = "Get Consents Request";
@@ -64,11 +70,10 @@ final class ConsentConstants {
 		private EventNames() {}
 	}
 
-	final class ConfigurationKey {
+	static final class ConfigurationKey {
+
 		static final String DEFAULT_CONSENT = "consent.default";
 
 		private ConfigurationKey() {}
 	}
-
-	private ConsentConstants() {}
 }
