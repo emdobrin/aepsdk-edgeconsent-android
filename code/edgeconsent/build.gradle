@@ -2,25 +2,25 @@ apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-//apply plugin: "com.diffplug.spotless"
+apply plugin: "com.diffplug.spotless"
 
 jacoco {
     toolVersion = rootProject.ext.jacocoVersion
 }
 
-//preBuild.dependsOn spotlessApply
+preBuild.dependsOn spotlessApply
 
-//spotless {
-//    java {
-//        toggleOffOn("format:off", "format:on")
-//        target "src/*/java/**/*.java"
-//        removeUnusedImports()
-//        prettier(['prettier': rootProject.ext.prettierVersion, 'prettier-plugin-java': rootProject.ext.prettierPluginJavaVersion])
-//                .config(['parser': 'java', 'tabWidth': 4, 'useTabs': true, 'printWidth': 120])
-//        endWithNewline()
-//        licenseHeaderFile "../../config/formatter/adobe.header.txt"
-//    }
-//}
+spotless {
+    java {
+        toggleOffOn("format:off", "format:on")
+        target "src/*/java/**/*.java"
+        removeUnusedImports()
+        prettier(['prettier': rootProject.ext.prettierVersion, 'prettier-plugin-java': rootProject.ext.prettierPluginJavaVersion])
+                .config(['parser': 'java', 'tabWidth': 4, 'useTabs': true, 'printWidth': 120])
+        endWithNewline()
+        licenseHeaderFile "../../config/formatter/adobe.header.txt"
+    }
+}
 
 android {
     namespace 'com.adobe.marketing.mobile.edge.consent'
@@ -191,12 +191,9 @@ task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebug
     executionData "$buildDir/jacoco/testPhoneDebugUnitTest.exec"
 
     reports {
-//        xml.required = true
-//        csv.required = false
-//        html.required = true
-        xml.enabled = true
-        csv.enabled = false
-        html.enabled = true
+        xml.required = true
+        csv.required = false
+        html.required = true
     }
 }
 
@@ -212,13 +209,9 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
     ])
 
     reports {
-//        xml.required = true
-//        csv.required = false
-//        html.required = true
-
-        xml.enabled = true
-        csv.enabled = false
-        html.enabled = true
+        xml.required = true
+        csv.required = false
+        html.required = true
     }
 }
 
