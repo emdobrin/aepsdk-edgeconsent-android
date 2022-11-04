@@ -191,9 +191,9 @@ task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebug
     executionData "$buildDir/jacoco/testPhoneDebugUnitTest.exec"
 
     reports {
-        xml.required = true
-        csv.required = false
-        html.required = true
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
     }
 }
 
@@ -209,9 +209,9 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
     ])
 
     reports {
-        xml.required = true
-        csv.required = false
-        html.required = true
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
     }
 }
 
