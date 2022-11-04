@@ -3,9 +3,28 @@
 
 # Generated files
 bin/
+gen/
+out/
+jacoco.exec
+
+# Built application files
+*.apk
+*.ap_
+
+# Gradle files
+.gradle/
 build/
 ci/
 
 # IntelliJ
 *.iml
 **/.idea/
+
+# Log Files
+*.log
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# .Idea file
+code/.idea*
