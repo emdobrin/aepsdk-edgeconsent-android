@@ -79,9 +79,14 @@ android {
 android.libraryVariants.all { variant ->
     tasks.withType(Javadoc) {
         source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        //ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
 
-        doFirst{classpath = files(variant.javaCompileProvider.get().classpath.files) + files(ext.androidJar)}
+        //doFirst{classpath = files(variant.javaCompileProvider.get().classpath.files) + files(ext.androidJar)}
+
+        doFirst {
+            ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+            classpath = files(variant.javaCompileProvider.get().classpath.files) + files(ext.androidJar)
+        }
 
         exclude "**/BuildConfig.java"
         exclude "**/R.java"
