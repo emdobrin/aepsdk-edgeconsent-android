@@ -25,7 +25,7 @@ ext {
     jacocoVersion = "0.8.8"
 
     // spotless config
-    prettierVersion = "2.3.0"
+    prettierVersion = "2.7.1"
     prettierPluginJavaVersion = "1.6.2"
 }
 
