@@ -27,7 +27,7 @@ spotless {
 android {
     namespace 'com.adobe.marketing.mobile.edge.consent'
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
@@ -78,19 +78,18 @@ android {
     }
 }
 
-afterEvaluate {
+android.libraryVariants.all { variant ->
     tasks.withType(Javadoc) {
         source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
         ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath += files(ext.androidJar)
-        classpath += files(android.libraryVariants.collect { variant ->
-            variant.javaCompileProvider.get().classpath.files
-        })
+
+        doFirst{classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
 
         exclude "**/BuildConfig.java"
         exclude "**/R.java"
         options {
             links "https://developer.android.com/reference"
+         // linksOffline "https://developer.android.com/reference", "file:///${android.sdkDirectory}/docs/reference"
         }
     }
 }
