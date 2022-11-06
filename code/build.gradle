@@ -9,8 +9,8 @@ plugins {
 ext {
     // android config
     minSdkVersion = 19
-    targetSdkVersion = 32
-    compileSdkVersion = 32
+    targetSdkVersion = 33
+    compileSdkVersion = 33
     versionCode = 1
 
     // java config
