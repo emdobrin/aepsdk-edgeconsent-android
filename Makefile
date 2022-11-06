@@ -54,7 +54,7 @@ ci-functional-test: create-ci
 
 ci-javadoc: create-ci
 	(mkdir -p ci/javadoc)
-	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) javadocPublic 2>&1 | tee -a ci/javadocPublic.log)
+	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) javadocPublic > ci/javadocPublic.log 2>&1)
 	(cp -r ./code/$(EXTENSION-LIBRARY-FOLDER-NAME)/build ./ci/javadoc)
 
 ci-generate-library-debug:

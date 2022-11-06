@@ -82,20 +82,20 @@ android.libraryVariants.all { variant ->
     tasks.withType(Javadoc) {
         source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
 
-        doFirst{
-            ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-            classpath += files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
-            failOnError false
-        
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+
+        doFirst{classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
+
+        failOnError false
+
         exclude "**/BuildConfig.java"
         exclude "**/R.java"
         options {
             links "https://developer.android.com/reference"
-         // linksOffline "https://developer.android.com/reference", "file:///${android.sdkDirectory}/docs/reference"
+            //linksOffline "https://developer.android.com/reference/androidx", "file:///${android.sdkDirectory}/docs/reference"
         }
     }
 }
-
 task javadocInternal(type: Javadoc) {
     destinationDir = reporting.file("javadocInternal")
     options.memberLevel = JavadocMemberLevel.PRIVATE
