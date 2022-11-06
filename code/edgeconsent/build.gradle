@@ -85,6 +85,7 @@ android.libraryVariants.all { variant ->
         doFirst{
             ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
             classpath += files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
+            failOnError false
         
         exclude "**/BuildConfig.java"
         exclude "**/R.java"
