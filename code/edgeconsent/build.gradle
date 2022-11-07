@@ -64,38 +64,22 @@ android {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
     }
-
-    sourceSets {
-        String sharedTestUtilJavaDir = 'src/sharedTestUtils/java'
-
-        test {
-            java.srcDirs += [sharedTestUtilJavaDir]
-        }
-
-        androidTest {
-            java.srcDirs += [sharedTestUtilJavaDir]
-        }
-    }
 }
 
-android.libraryVariants.all { variant ->
+afterEvaluate {
     tasks.withType(Javadoc) {
-        source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
-
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-
-        doFirst{classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
-
-        failOnError false
-
-        exclude "**/BuildConfig.java"
-        exclude "**/R.java"
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += files(android.libraryVariants.collect { variant ->
+            variant.javaCompileProvider.get().classpath.files
+        })
         options {
+            source = "8"
             links "https://developer.android.com/reference"
-            //linksOffline "https://developer.android.com/reference/androidx", "file:///${android.sdkDirectory}/docs/reference"
         }
     }
 }
+
 task javadocInternal(type: Javadoc) {
     destinationDir = reporting.file("javadocInternal")
     options.memberLevel = JavadocMemberLevel.PRIVATE
