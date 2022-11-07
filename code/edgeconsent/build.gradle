@@ -64,6 +64,18 @@ android {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
     }
+
+    sourceSets {
+        String sharedTestUtilJavaDir = 'src/sharedTestUtils/java'
+
+        test {
+            java.srcDirs += [sharedTestUtilJavaDir]
+        }
+
+        androidTest {
+            java.srcDirs += [sharedTestUtilJavaDir]
+        }
+    }
 }
 
 afterEvaluate {
