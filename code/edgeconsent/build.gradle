@@ -206,7 +206,7 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
     additionalSourceDirs.setFrom files(android.sourceSets.main.java.sourceFiles)
     sourceDirectories.setFrom files(android.sourceSets.phone.java.sourceFiles)
     executionData fileTree(dir: "$buildDir", includes: [
-            "outputs/code_coverage/phoneDebugAndroidTest/connected/*coverage.ec"
+            "outputs/unit_test_code_coverage/phoneDebugUnitTest/*.exec"
     ])
 
     reports {
