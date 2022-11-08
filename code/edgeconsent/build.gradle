@@ -183,7 +183,7 @@ signing {
 }
 
 task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebugUnitTest") {
-    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def excludeRegex = ['**/BuildConfig.class']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes/com/adobe/marketing/mobile", excludes: excludeRegex)
 
     additionalClassDirs.setFrom files([debugTree])
@@ -199,7 +199,7 @@ task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebug
 }
 
 task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPhoneDebugCoverageReport") {
-    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def excludeRegex = ['**/BuildConfig.class']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes/com/adobe/marketing/mobile", excludes: excludeRegex)
 
     additionalClassDirs.setFrom files([debugTree])
@@ -238,7 +238,6 @@ dependencies {
     // where Objenesis 2 requires minimum Android API 26
     androidTestImplementation 'org.powermock:powermock-module-junit4:1+'
     androidTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
-    androidTestImplementation project(path: ':edgeconsent')
 }
 
 tasks.withType(Test) {
