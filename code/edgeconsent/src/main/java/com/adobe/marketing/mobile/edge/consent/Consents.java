@@ -185,7 +185,7 @@ final class Consents {
 
 	/**
 	 * Compares the current consent instance the with the passed object ignoring the timestamp field in metadata
-	 *
+	 * @param comparingConsent the current consents instance
 	 * @return true, if both the consents are equal ignoring timestamp
 	 */
 	boolean equalsIgnoreTimestamp(final Consents comparingConsent) {

@@ -419,6 +419,7 @@ class ConsentExtension extends Extension {
 	 * Helper methods that take the payload from the edge consent preferences response and builds a XDM formatted consentMap.
 	 *
 	 * @param payload a {@link Map} representing a payload from edge consent response
+	 * @return consentMap in XDM formatted Map
 	 */
 	private Map<String, Object> prepareConsentXDMMapWithPayload(final Map<String, Object> payload) {
 		final Map<String, Object> consentMap = new HashMap<>();
