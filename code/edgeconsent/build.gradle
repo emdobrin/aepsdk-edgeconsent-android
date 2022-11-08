@@ -189,7 +189,7 @@ task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebug
     additionalClassDirs.setFrom files([debugTree])
     additionalSourceDirs.setFrom files(android.sourceSets.main.java.sourceFiles)
     sourceDirectories.setFrom files(android.sourceSets.phone.java.sourceFiles)
-    executionData "$buildDir/jacoco/testPhoneDebugUnitTest.exec"
+    executionData "$buildDir/outputs/unit_test_code_coverage/phoneDebugUnitTest/testPhoneDebugUnitTest.exec"
 
     reports {
         xml.required = true
@@ -206,7 +206,7 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
     additionalSourceDirs.setFrom files(android.sourceSets.main.java.sourceFiles)
     sourceDirectories.setFrom files(android.sourceSets.phone.java.sourceFiles)
     executionData fileTree(dir: "$buildDir", includes: [
-            "outputs/unit_test_code_coverage/phoneDebugUnitTest/*.exec"
+            "outputs/code_coverage/phoneDebugAndroidTest/connected/*coverage.ec"
     ])
 
     reports {
