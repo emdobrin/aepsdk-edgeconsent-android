@@ -28,7 +28,6 @@ android {
     namespace 'com.adobe.marketing.mobile.edge.consent'
 
     compileSdk rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdk rootProject.ext.minSdkVersion
@@ -48,6 +47,7 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled true
+            debuggable true
         }
 
         release {
@@ -146,7 +146,7 @@ publishing {
                     url = 'https://github.com/adobe/aepsdk-edgeconsent-android'
                 }
                 withXml {
-                    def dependenciesNode = asNode.appendNode('dependencies')
+                    def dependenciesNode = asNode().appendNode('dependencies')
 
                     def coreDependencyNode = dependenciesNode.appendNode('dependency')
                     coreDependencyNode.appendNode('groupId', 'com.adobe.marketing.mobile')

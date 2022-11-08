@@ -18,7 +18,6 @@ spotless {
 android {
       namespace "com.adobe.marketing.mobile.consentTestApp"
       compileSdk rootProject.ext.compileSdkVersion
-      buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.adobe.marketing.mobile.consenttestapp"
@@ -37,7 +36,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
