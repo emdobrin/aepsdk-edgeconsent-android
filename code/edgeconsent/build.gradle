@@ -1,8 +1,10 @@
-apply plugin: 'com.android.library'
-apply plugin: 'jacoco'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-apply plugin: "com.diffplug.spotless"
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+    id 'jacoco'
+    id 'com.diffplug.spotless'
+}
 
 jacoco {
     toolVersion = rootProject.ext.jacocoVersion
@@ -23,14 +25,13 @@ spotless {
 }
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    namespace 'com.adobe.marketing.mobile.edge.consent'
+
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName rootProject.moduleVersion
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner rootProject.ext.testInstrumentationRunner
         consumerProguardFiles "consumer-rules.pro"
@@ -77,16 +78,15 @@ android {
     }
 }
 
-android.libraryVariants.all { variant ->
+afterEvaluate {
     tasks.withType(Javadoc) {
-        source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-
-        doFirst{classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
-
-        exclude "**/BuildConfig.java"
-        exclude "**/R.java"
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += files(android.libraryVariants.collect { variant ->
+            variant.javaCompileProvider.get().classpath.files
+        })
         options {
+            source = "8"
             links "https://developer.android.com/reference"
         }
     }
@@ -117,39 +117,6 @@ publish.dependsOn('assemblePhone')
 
 publishing {
     publications {
-        aar(MavenPublication) {
-            groupId = 'com.adobe.marketing.mobile'
-            artifactId = rootProject.moduleName
-            version = rootProject.moduleVersion
-            artifact("$buildDir/outputs/aar/${rootProject.moduleAARName}")
-            artifact javadocPublish
-            pom.withXml {
-                asNode().appendNode('name', mavenRepoName)
-                asNode().appendNode('description', mavenRepoDescription)
-                asNode().appendNode('url', 'https://aep-sdks.gitbook.io/docs/')
-                def scmNode = asNode().appendNode('scm')
-                scmNode.appendNode('url', 'https://github.com/Adobe-Marketing-Cloud/acp-sdks/')
-
-
-                def developersNode = asNode().appendNode('developers')
-                def developerNode = developersNode.appendNode('developer')
-                developerNode.appendNode('id', 'adobe')
-                developerNode.appendNode('name', 'adobe')
-
-                def licensesNode = asNode().appendNode('licenses')
-                def licenseNode = licensesNode.appendNode('license')
-                licenseNode.appendNode('name', 'Adobe Proprietary')
-
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
-
-                def coreDependencyNode = dependenciesNode.appendNode('dependency')
-                coreDependencyNode.appendNode('groupId', 'com.adobe.marketing.mobile')
-                coreDependencyNode.appendNode('artifactId', 'core')
-                coreDependencyNode.appendNode('version', mavenCoreVersion)
-            }
-        }
         release(MavenPublication) {
             groupId = 'com.adobe.marketing.mobile'
             artifactId = rootProject.moduleName
@@ -174,9 +141,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:github.com//Adobe-Marketing-Cloud/acp-sdks.git'
-                    developerConnection = 'scm:git:ssh://github.com//Adobe-Marketing-Cloud/acp-sdks.git'
-                    url = 'https://github.com/Adobe-Marketing-Cloud/acp-sdks'
+                    connection = 'scm:git:github.com//adobe/aepsdk-edgeconsent-android.git'
+                    developerConnection = 'scm:git:ssh://github.com//adobe/aepsdk-edgeconsent-android.git'
+                    url = 'https://github.com/adobe/aepsdk-edgeconsent-android'
                 }
                 withXml {
                     def dependenciesNode = asNode().appendNode('dependencies')
@@ -216,23 +183,23 @@ signing {
 }
 
 task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebugUnitTest") {
-    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def excludeRegex = ['**/BuildConfig.class']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes/com/adobe/marketing/mobile", excludes: excludeRegex)
 
     additionalClassDirs.setFrom files([debugTree])
     additionalSourceDirs.setFrom files(android.sourceSets.main.java.sourceFiles)
     sourceDirectories.setFrom files(android.sourceSets.phone.java.sourceFiles)
-    executionData "$buildDir/jacoco/testPhoneDebugUnitTest.exec"
+    executionData "$buildDir/outputs/unit_test_code_coverage/phoneDebugUnitTest/testPhoneDebugUnitTest.exec"
 
     reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled true
+        xml.required = true
+        csv.required = false
+        html.required = true
     }
 }
 
 task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPhoneDebugCoverageReport") {
-    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def excludeRegex = ['**/BuildConfig.class']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes/com/adobe/marketing/mobile", excludes: excludeRegex)
 
     additionalClassDirs.setFrom files([debugTree])
@@ -243,12 +210,15 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
     ])
 
     reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled true
+        xml.required = true
+        csv.required = false
+        html.required = true
     }
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
 
 dependencies {
     // Adobe Mobile SDK Core
@@ -256,18 +226,18 @@ dependencies {
 
     testImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.10.5'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
     testImplementation 'org.powermock:powermock-api-mockito2:2.0.0'
     testImplementation 'org.powermock:powermock-module-junit4:2.0.0'
     testImplementation 'org.json:json:20180813'
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     // Using older version of PowerMock as it supports minimum Android API < 26
     // the root issue appears to be a dependency with Objenesis in Mockito-Core
     // where Objenesis 2 requires minimum Android API 26
     androidTestImplementation 'org.powermock:powermock-module-junit4:1+'
-    androidTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.10.5'
+    androidTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
 }
 
 tasks.withType(Test) {
