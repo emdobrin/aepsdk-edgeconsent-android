@@ -11,16 +11,19 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.Log;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 final class ConsentStorageService {
+
+	private static final String CLASS_NAME = "ConsentStorageService";
 
 	private ConsentStorageService() {}
 
@@ -38,10 +41,10 @@ final class ConsentStorageService {
 		final SharedPreferences sharedPreferences = getSharedPreference();
 
 		if (sharedPreferences == null) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - Shared Preference value is null. Unable to load saved consents from persistence."
+				CLASS_NAME,
+				"Shared Preference value is null. Unable to load saved consents from persistence."
 			);
 			return null;
 		}
@@ -49,10 +52,10 @@ final class ConsentStorageService {
 		final String jsonString = sharedPreferences.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null);
 
 		if (jsonString == null) {
-			MobileCore.log(
-				LoggingMode.VERBOSE,
+			Log.trace(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - No previous consents were stored in persistence. Current consent is null"
+				CLASS_NAME,
+				"No previous consents were stored in persistence. Current consent is null"
 			);
 			return null;
 		}
@@ -62,10 +65,10 @@ final class ConsentStorageService {
 			final Map<String, Object> consentMap = Utility.toMap(jsonObject);
 			return new Consents(consentMap);
 		} catch (JSONException exception) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - Serialization error while reading consent jsonString from persistence. Unable to load saved consents from persistence."
+				CLASS_NAME,
+				"Serialization error while reading consent jsonString from persistence. Unable to load saved consents from persistence."
 			);
 			return null;
 		}
@@ -83,10 +86,10 @@ final class ConsentStorageService {
 		SharedPreferences sharedPreferences = getSharedPreference();
 
 		if (sharedPreferences == null) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - Shared Preference value is null. Unable to write consents to persistence."
+				CLASS_NAME,
+				"Shared Preference value is null. Unable to write consents to persistence."
 			);
 			return;
 		}
@@ -94,10 +97,10 @@ final class ConsentStorageService {
 		final SharedPreferences.Editor editor = sharedPreferences.edit();
 
 		if (editor == null) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - Shared Preference Editor is null. Unable to write consents to persistence."
+				CLASS_NAME,
+				"Shared Preference Editor is null. Unable to write consents to persistence."
 			);
 			return;
 		}
@@ -125,10 +128,10 @@ final class ConsentStorageService {
 		final Application application = MobileCore.getApplication();
 
 		if (application == null) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - Application value is null. Unable to read/write consent data from persistence."
+				CLASS_NAME,
+				"Application value is null. Unable to read/write consent data from persistence."
 			);
 			return null;
 		}
@@ -136,10 +139,10 @@ final class ConsentStorageService {
 		final Context context = application.getApplicationContext();
 
 		if (context == null) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"ConsentStorageService - Context value is null. Unable to read/write consent data from persistence."
+				CLASS_NAME,
+				"Context value is null. Unable to read/write consent data from persistence."
 			);
 			return null;
 		}

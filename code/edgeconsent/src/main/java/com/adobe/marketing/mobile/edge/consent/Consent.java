@@ -12,16 +12,17 @@
 package com.adobe.marketing.mobile.edge.consent;
 
 import com.adobe.marketing.mobile.AdobeCallback;
-import com.adobe.marketing.mobile.AdobeCallbackWithError;
-import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Event;
-import com.adobe.marketing.mobile.ExtensionError;
-import com.adobe.marketing.mobile.ExtensionErrorCallback;
-import com.adobe.marketing.mobile.LoggingMode;
+import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import java.util.Map;
 
 public class Consent {
+
+	private static final String CLASS_NAME = "Consent";
 
 	private Consent() {}
 
@@ -33,23 +34,25 @@ public class Consent {
 	public static String extensionVersion() {
 		return ConsentConstants.EXTENSION_VERSION;
 	}
+	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
 
 	/**
 	 * Registers the extension with the Mobile SDK. This method should be called only once in your application class.
 	 */
+	@Deprecated
 	public static void registerExtension() {
 		MobileCore.registerExtension(
 			ConsentExtension.class,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(
-						LoggingMode.ERROR,
-						ConsentConstants.LOG_TAG,
-						"Consent - There was an error registering the Consent extension: " +
-						extensionError.getErrorName()
-					);
+			extensionError -> {
+				if (extensionError == null) {
+					return;
 				}
+				Log.error(
+					ConsentConstants.LOG_TAG,
+					CLASS_NAME,
+					"There was an error registering the Consent extension:  %s",
+					extensionError.getErrorName()
+				);
 			}
 		);
 	}
@@ -63,37 +66,23 @@ public class Consent {
 	 */
 	public static void update(final Map<String, Object> consents) {
 		if (consents == null || consents.isEmpty()) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"Consent - Null/Empty consents passed to update API. Ignoring the API call."
+				CLASS_NAME,
+				"Null/Empty consents passed to update API. Ignoring the API call."
 			);
 			return;
 		}
 
 		// create and dispatch an consent fragments update event
-		final ExtensionErrorCallback<ExtensionError> errorCallback = new ExtensionErrorCallback<ExtensionError>() {
-			@Override
-			public void error(final ExtensionError extensionError) {
-				MobileCore.log(
-					LoggingMode.DEBUG,
-					ConsentConstants.LOG_TAG,
-					String.format(
-						"Consent - update API. Failed to dispatch %s event. Ignoring the API call. Error : %s.",
-						ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
-						extensionError.getErrorName()
-					)
-				);
-			}
-		};
 		final Event event = new Event.Builder(
 			ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.UPDATE_CONSENT
+			EventType.CONSENT,
+			EventSource.UPDATE_CONSENT
 		)
 			.setEventData(consents)
 			.build();
-		MobileCore.dispatchEvent(event, errorCallback);
+		MobileCore.dispatchEvent(event);
 	}
 
 	/**
@@ -102,76 +91,23 @@ public class Consent {
 	 * Output example: {"consents": {"collect": {"val": "y"}}}
 	 *
 	 * @param callback The {@link AdobeCallback} is invoked with the current consent preferences.
-	 *                 If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} is returned
-	 *                 when an unexpected error occurs or the request timed out
 	 */
 	public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
 		if (callback == null) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
+			Log.debug(
 				ConsentConstants.LOG_TAG,
-				"Consent - Unexpected null callback, provide a callback to retrieve current consents."
+				CLASS_NAME,
+				"Unexpected null callback, provide a callback to retrieve current consents."
 			);
 			return;
 		}
 
-		// create and dispatch an consent fragments update event
-		final ExtensionErrorCallback<ExtensionError> errorCallback = new ExtensionErrorCallback<ExtensionError>() {
-			@Override
-			public void error(final ExtensionError extensionError) {
-				returnError(callback, extensionError);
-				MobileCore.log(
-					LoggingMode.DEBUG,
-					ConsentConstants.LOG_TAG,
-					String.format(
-						"Consent - getConsents API. Failed to dispatch %s event. Ignoring the API call. Error : %s.",
-						ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST,
-						extensionError.getErrorName()
-					)
-				);
-			}
-		};
-
 		final Event event = new Event.Builder(
 			ConsentConstants.EventNames.GET_CONSENTS_REQUEST,
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.REQUEST_CONTENT
+			EventType.CONSENT,
+			EventSource.REQUEST_CONTENT
 		)
 			.build();
-		MobileCore.dispatchEventWithResponseCallback(
-			event,
-			new AdobeCallback<Event>() {
-				@Override
-				public void call(Event event) {
-					if (event == null || event.getEventData() == null) {
-						returnError(callback, AdobeError.UNEXPECTED_ERROR);
-						return;
-					}
-
-					callback.call(event.getEventData());
-				}
-			},
-			errorCallback
-		);
-	}
-
-	/**
-	 * When an {@link AdobeCallbackWithError} is provided, the fail method will be called with provided {@link AdobeError}.
-	 *
-	 * @param callback should not be null, should be instance of {@code AdobeCallbackWithError}
-	 * @param error    the {@code AdobeError} returned back in the callback
-	 */
-	private static void returnError(final AdobeCallback<Map<String, Object>> callback, final AdobeError error) {
-		if (callback == null) {
-			return;
-		}
-
-		final AdobeCallbackWithError<Map<String, Object>> adobeCallbackWithError = callback instanceof AdobeCallbackWithError
-			? (AdobeCallbackWithError<Map<String, Object>>) callback
-			: null;
-
-		if (adobeCallbackWithError != null) {
-			adobeCallbackWithError.fail(error);
-		}
+		MobileCore.dispatchEvent(event);
 	}
 }

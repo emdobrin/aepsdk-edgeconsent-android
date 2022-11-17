@@ -40,7 +40,12 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation project(':edgeconsent')
-    implementation 'com.adobe.marketing.mobile:core:1+'
-    implementation 'com.adobe.marketing.mobile:edge:1+'
-    implementation 'com.adobe.marketing.mobile:assurance:1+'
+    // implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    implementation('com.adobe.marketing.mobile:edge:1+'){
+        exclude group: 'com.adobe.marketing.mobile', module: 'core'
+    }
+    implementation('com.adobe.marketing.mobile:assurance:1+'){
+        exclude group: 'com.adobe.marketing.mobile', module: 'core'
+    }
 }
