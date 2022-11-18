@@ -100,7 +100,7 @@ public class ConsentExtensionTest {
 		// verify listeners are registered with correct event source and type
 		verify(mockExtensionApi, times(1))
 			.registerEventListener(
-				eq(ConsentConstants.EventType.CONSENT),
+				eq(EventType.CONSENT),
 				eq(ConsentConstants.EventSource.UPDATE_CONSENT),
 				eq(ListenerConsentUpdateConsent.class),
 				any(ExtensionErrorCallback.class)
@@ -151,7 +151,7 @@ public class ConsentExtensionTest {
 
 		// test
 		extension = new ConsentExtension(mockExtensionApi);
-		extension.handleEventHubBoot(buildBootEvent());
+		extension.handleInitEvent();
 
 		verify(mockExtensionApi, times(1))
 			.setXDMSharedEventState(
@@ -179,7 +179,7 @@ public class ConsentExtensionTest {
 
 		// test
 		extension = new ConsentExtension(mockExtensionApi);
-		extension.handleEventHubBoot(buildBootEvent());
+		extension.handleInitEvent();
 
 		verify(mockExtensionApi, times(0))
 			.setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));
