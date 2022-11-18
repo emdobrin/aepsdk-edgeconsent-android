@@ -15,12 +15,14 @@ import static com.adobe.marketing.mobile.TestHelper.getDispatchedEventsWith;
 import static com.adobe.marketing.mobile.TestHelper.getXDMSharedStateFor;
 import static com.adobe.marketing.mobile.TestHelper.resetTestExpectations;
 import static com.adobe.marketing.mobile.TestHelper.waitForThreads;
-import static com.adobe.marketing.mobile.edge.consent.ConsentTestUtil.*;
+import static com.adobe.marketing.mobile.edge.consent.ConsentAndroidTestUtil.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.TestHelper;
 import com.adobe.marketing.mobile.TestPersistenceHelper;
@@ -88,10 +90,7 @@ public class ConsentEdgeResponseHandlingTests {
 		waitForThreads(1000);
 
 		// verify consent response event dispatched
-		List<Event> consentResponseEvents = getDispatchedEventsWith(
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.RESPONSE_CONTENT
-		);
+		List<Event> consentResponseEvents = getDispatchedEventsWith(EventType.CONSENT, EventSource.RESPONSE_CONTENT);
 		assertEquals(1, consentResponseEvents.size());
 		Map<String, String> consentResponseData = flattenMap(consentResponseEvents.get(0).getEventData());
 		assertEquals(3, consentResponseData.size());
@@ -188,12 +187,9 @@ public class ConsentEdgeResponseHandlingTests {
 		waitForThreads(1000);
 
 		// verify that shared state and consent response events are not dispatched
-		List<Event> consentResponseEvents = getDispatchedEventsWith(
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.RESPONSE_CONTENT
-		);
+		List<Event> consentResponseEvents = getDispatchedEventsWith(EventType.CONSENT, EventSource.RESPONSE_CONTENT);
 		assertEquals(0, consentResponseEvents.size());
-		List<Event> sharedStateChangeEvents = getDispatchedEventsWith(ConsentConstants.EventType.HUB, SHARED_STATE);
+		List<Event> sharedStateChangeEvents = getDispatchedEventsWith(EventType.HUB, SHARED_STATE);
 		assertEquals(0, sharedStateChangeEvents.size());
 
 		// verify timestamp has not changed
@@ -230,12 +226,9 @@ public class ConsentEdgeResponseHandlingTests {
 		waitForThreads(1000);
 
 		// verify that shared state and consent response events are not dispatched
-		List<Event> consentResponseEvents = getDispatchedEventsWith(
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.RESPONSE_CONTENT
-		);
+		List<Event> consentResponseEvents = getDispatchedEventsWith(EventType.CONSENT, EventSource.RESPONSE_CONTENT);
 		assertEquals(0, consentResponseEvents.size());
-		List<Event> sharedStateChangeEvents = getDispatchedEventsWith(ConsentConstants.EventType.HUB, SHARED_STATE);
+		List<Event> sharedStateChangeEvents = getDispatchedEventsWith(EventType.HUB, SHARED_STATE);
 		assertEquals(0, sharedStateChangeEvents.size());
 
 		// verify timestamp has not changed

@@ -14,6 +14,8 @@ package com.adobe.marketing.mobile.edge.consent;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,7 +34,7 @@ import java.util.concurrent.CountDownLatch;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class ConsentTestUtil {
+class ConsentAndroidTestUtil {
 
 	public static String SAMPLE_METADATA_TIMESTAMP = "2019-09-23T18:15:45Z";
 	public static String SAMPLE_METADATA_TIMESTAMP_OTHER = "2020-07-23T18:16:45Z";
@@ -63,20 +65,6 @@ class ConsentTestUtil {
 	 *   }
 	 * }
 	 */
-
-	static Map<String, Object> emptyConsentXDMMap() {
-		Map<String, Object> consentMap = new HashMap<>();
-		consentMap.put(ConsentConstants.EventDataKey.CONSENTS, new HashMap<String, Object>());
-		return consentMap;
-	}
-
-	static String CreateConsentsXDMJSONString(final String collectConsentString) {
-		return CreateConsentsXDMJSONString(collectConsentString, null);
-	}
-
-	static String CreateConsentsXDMJSONString(final String collectConsentString, final String adIDConsentString) {
-		return CreateConsentsXDMJSONString(collectConsentString, adIDConsentString, null);
-	}
 
 	static String CreateConsentsXDMJSONString(
 		final String collectConsentString,
@@ -177,78 +165,6 @@ class ConsentTestUtil {
 		return consentData;
 	}
 
-	static String readTimestamp(Consents consents) {
-		Map<String, Object> allConsentMap = getAllConsentsMap(consents);
-
-		if (isNullOrEmpty(allConsentMap)) {
-			return null;
-		}
-
-		Map<String, Object> collectMap = (Map<String, Object>) allConsentMap.get(
-			ConsentConstants.EventDataKey.METADATA
-		);
-
-		if (isNullOrEmpty(collectMap)) {
-			return null;
-		}
-
-		return (String) collectMap.get(ConsentConstants.EventDataKey.TIME);
-	}
-
-	static String readCollectConsent(Consents consents) {
-		Map<String, Object> allConsentMap = getAllConsentsMap(consents);
-
-		if (isNullOrEmpty(allConsentMap)) {
-			return null;
-		}
-
-		Map<String, Object> collectMap = (Map<String, Object>) allConsentMap.get(COLLECT);
-
-		if (isNullOrEmpty(collectMap)) {
-			return null;
-		}
-
-		return (String) collectMap.get("val");
-	}
-
-	static String readAdIdConsent(Consents consents) {
-		Map<String, Object> allConsentMap = getAllConsentsMap(consents);
-
-		if (isNullOrEmpty(allConsentMap)) {
-			return null;
-		}
-
-		Map<String, Object> adIdMap = (Map<String, Object>) allConsentMap.get(ADID);
-
-		if (isNullOrEmpty(adIdMap)) {
-			return null;
-		}
-
-		return (String) adIdMap.get("val");
-	}
-
-	static String readPersonalizeConsent(Consents consents) {
-		Map<String, Object> allConsentMap = getAllConsentsMap(consents);
-
-		if (isNullOrEmpty(allConsentMap)) {
-			return null;
-		}
-
-		Map<String, Object> personalize = (Map<String, Object>) allConsentMap.get(PERSONALIZE);
-
-		if (isNullOrEmpty(personalize)) {
-			return null;
-		}
-
-		Map<String, String> contentMap = (Map<String, String>) personalize.get(CONTENT);
-
-		if (isNullOrEmpty(contentMap)) {
-			return null;
-		}
-
-		return contentMap.get("val");
-	}
-
 	static Map<String, Object> getConsentsSync() {
 		try {
 			final HashMap<String, Object> getConsentResponse = new HashMap<String, Object>();
@@ -291,22 +207,14 @@ class ConsentTestUtil {
 		Map<String, Object> eventData = new HashMap<>();
 		eventData.put("payload", payload);
 		eventData.put("type", "consent:preferences");
-		return new Event.Builder(
-			"Edge Consent Preference",
-			ConsentConstants.EventType.EDGE,
-			ConsentConstants.EventSource.CONSENT_PREFERENCE
-		)
+		return new Event.Builder("Edge Consent Preference", EventType.EDGE, EventSource.CONSENT_PREFERENCE)
 			.setEventData(eventData)
 			.build();
 	}
 
 	static Event buildEdgeConsentPreferenceEvent(final String jsonString) throws JSONException {
 		Map<String, Object> eventData = Utility.toMap(new JSONObject(jsonString));
-		return new Event.Builder(
-			"Edge Consent Preference",
-			ConsentConstants.EventType.EDGE,
-			ConsentConstants.EventSource.CONSENT_PREFERENCE
-		)
+		return new Event.Builder("Edge Consent Preference", EventType.EDGE, EventSource.CONSENT_PREFERENCE)
 			.setEventData(eventData)
 			.build();
 	}

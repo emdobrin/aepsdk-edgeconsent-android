@@ -20,6 +20,8 @@ import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.MobileCore;
 import java.util.ArrayList;
@@ -105,8 +107,8 @@ public class ConsentTest {
 
 		Event dispatchedEvent = eventCaptor.getValue();
 		assertEquals(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST, dispatchedEvent.getName());
-		assertEquals(ConsentConstants.EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
-		assertEquals(ConsentConstants.EventSource.UPDATE_CONSENT.toLowerCase(), dispatchedEvent.getSource());
+		assertEquals(EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
+		assertEquals(EventSource.UPDATE_CONSENT.toLowerCase(), dispatchedEvent.getSource());
 		assertEquals(SAMPLE_CONSENTS_MAP, dispatchedEvent.getEventData());
 		// TODO - enable when ExtensionError creation is available
 		// should not crash on calling the callback
@@ -157,8 +159,8 @@ public class ConsentTest {
 		// verify the dispatched event details
 		Event dispatchedEvent = eventCaptor.getValue();
 		assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
-		assertEquals(ConsentConstants.EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
-		assertEquals(ConsentConstants.EventSource.REQUEST_CONTENT.toLowerCase(), dispatchedEvent.getSource());
+		assertEquals(EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
+		assertEquals(EventSource.REQUEST_CONTENT.toLowerCase(), dispatchedEvent.getSource());
 		assertTrue(dispatchedEvent.getEventData().isEmpty());
 
 		//verify callback responses
@@ -226,8 +228,8 @@ public class ConsentTest {
 	private Event buildConsentResponseEvent(final Map<String, Object> eventData) {
 		return new Event.Builder(
 			ConsentConstants.EventNames.GET_CONSENTS_RESPONSE,
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.RESPONSE_CONTENT
+			EventType.CONSENT,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(eventData)
 			.build();

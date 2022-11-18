@@ -12,29 +12,33 @@
 package com.adobe.marketing.mobile.edge.consent;
 
 import com.adobe.marketing.mobile.AdobeCallback;
+import com.adobe.marketing.mobile.AdobeCallbackWithError;
+import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
-import com.adobe.marketing.mobile.EventSource;
-import com.adobe.marketing.mobile.EventType;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Consent {
 
 	private static final String CLASS_NAME = "Consent";
+	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
+	private static final long CALLBACK_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
 
 	private Consent() {}
 
 	/**
-	 * Returns the version of the {@code Consent} extension
+	 * Returns the version of the {@link Consent} extension
 	 *
 	 * @return The version as {@code String}
 	 */
 	public static String extensionVersion() {
 		return ConsentConstants.EXTENSION_VERSION;
 	}
-	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
 
 	/**
 	 * Registers the extension with the Mobile SDK. This method should be called only once in your application class.
@@ -92,6 +96,7 @@ public class Consent {
 	 *
 	 * @param callback The {@link AdobeCallback} is invoked with the current consent preferences.
 	 */
+
 	public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
 		if (callback == null) {
 			Log.debug(
@@ -102,12 +107,55 @@ public class Consent {
 			return;
 		}
 
+		// dispatch an consent callback response event
 		final Event event = new Event.Builder(
 			ConsentConstants.EventNames.GET_CONSENTS_REQUEST,
 			EventType.CONSENT,
 			EventSource.REQUEST_CONTENT
 		)
 			.build();
-		MobileCore.dispatchEvent(event);
+
+		final AdobeCallbackWithError<Event> callbackWithError = new AdobeCallbackWithError<Event>() {
+			@Override
+			public void call(final Event event) {
+				if (event == null || event.getEventData() == null) {
+					returnError(callback, AdobeError.UNEXPECTED_ERROR);
+					return;
+				}
+				callback.call(event.getEventData());
+			}
+
+			@Override
+			public void fail(final AdobeError adobeError) {
+				returnError(callback, adobeError);
+				Log.error(
+					ConsentConstants.LOG_TAG,
+					CLASS_NAME,
+					"Failed to dispatch %s event: Error : %s.",
+					adobeError.getErrorName()
+				);
+			}
+		};
+		MobileCore.dispatchEventWithResponseCallback(event, CALLBACK_TIMEOUT_MILLIS, callbackWithError);
+	}
+
+	/**
+	 * When an {@link AdobeCallbackWithError} is provided, the fail method will be called with provided {@link AdobeError}.
+	 *
+	 * @param callback should not be null, should be instance of {@code AdobeCallbackWithError}
+	 * @param error    the {@code AdobeError} returned back in the callback
+	 */
+	private static void returnError(final AdobeCallback<Map<String, Object>> callback, final AdobeError error) {
+		if (callback == null) {
+			return;
+		}
+
+		final AdobeCallbackWithError<Map<String, Object>> adobeCallbackWithError = callback instanceof AdobeCallbackWithError
+			? (AdobeCallbackWithError<Map<String, Object>>) callback
+			: null;
+
+		if (adobeCallbackWithError != null) {
+			adobeCallbackWithError.fail(error);
+		}
 	}
 }

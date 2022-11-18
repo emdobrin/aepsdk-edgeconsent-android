@@ -15,7 +15,7 @@ import static com.adobe.marketing.mobile.TestHelper.getDispatchedEventsWith;
 import static com.adobe.marketing.mobile.TestHelper.getXDMSharedStateFor;
 import static com.adobe.marketing.mobile.TestHelper.resetTestExpectations;
 import static com.adobe.marketing.mobile.TestHelper.waitForThreads;
-import static com.adobe.marketing.mobile.edge.consent.ConsentTestUtil.*;
+import static com.adobe.marketing.mobile.edge.consent.ConsentAndroidTestUtil.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

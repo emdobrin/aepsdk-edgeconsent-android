@@ -12,11 +12,11 @@
 package com.adobe.marketing.mobile.edge.consent;
 
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
-import com.adobe.marketing.mobile.EventSource;
-import com.adobe.marketing.mobile.EventType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,25 +77,14 @@ class ConsentExtension extends Extension {
 				EventSource.CONSENT_PREFERENCE,
 				this::handleEdgeConsentPreferenceHandle
 			);
-		getApi()
-			.registerEventListener(
-				EventType.CONSENT,
-				EventSource.UPDATE_CONSENT,
-				this::handleConsentUpdate
-			);
-		getApi()
-			.registerEventListener(
-				EventType.CONSENT,
-				EventSource.REQUEST_CONTENT,
-				this::handleRequestContent
-			);
+		getApi().registerEventListener(EventType.CONSENT, EventSource.UPDATE_CONSENT, this::handleConsentUpdate);
+		getApi().registerEventListener(EventType.CONSENT, EventSource.REQUEST_CONTENT, this::handleRequestContent);
 		getApi()
 			.registerEventListener(
 				EventType.CONFIGURATION,
 				EventSource.RESPONSE_CONTENT,
 				this::handleConfigurationResponse
 			);
-
 
 		handleInitEvent();
 	}
