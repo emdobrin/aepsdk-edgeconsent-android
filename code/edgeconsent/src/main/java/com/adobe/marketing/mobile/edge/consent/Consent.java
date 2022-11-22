@@ -20,7 +20,6 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

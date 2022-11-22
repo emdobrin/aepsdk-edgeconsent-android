@@ -11,6 +11,7 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
+import androidx.annotation.NonNull;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -18,14 +19,12 @@ import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
-
-import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 class ConsentExtension extends Extension {
-	
+
 	private static final String CLASS_NAME = "ConsentExtension";
 	private final ConsentManager consentManager;
 
@@ -239,7 +238,8 @@ class ConsentExtension extends Extension {
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
 		)
-			.setEventData(consentManager.getCurrentConsents().asXDMMap()).inResponseToEvent(event)
+			.setEventData(consentManager.getCurrentConsents().asXDMMap())
+			.inResponseToEvent(event)
 			.build();
 
 		getApi().dispatch(responseEvent);
@@ -302,7 +302,9 @@ class ConsentExtension extends Extension {
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
 		)
-			.setEventData(xdmConsents).inResponseToEvent(event).inResponseToEvent(event)
+			.setEventData(xdmConsents)
+			.inResponseToEvent(event)
+			.inResponseToEvent(event)
 			.build();
 
 		getApi().dispatch(responseEvent);
