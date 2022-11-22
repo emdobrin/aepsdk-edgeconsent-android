@@ -11,6 +11,9 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
+import com.adobe.marketing.mobile.util.CloneFailedException;
+import com.adobe.marketing.mobile.util.DataReader;
+import com.adobe.marketing.mobile.util.EventDataUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +35,11 @@ final class Consents {
 			return;
 		}
 
-		this.consentsMap = Utility.deepCopy(newConsents.consentsMap);
+		try {
+			this.consentsMap = EventDataUtils.clone(newConsents.consentsMap);
+		} catch (CloneFailedException e) {
+			new HashMap<String, Object>();
+		}
 	}
 
 	/**
@@ -45,14 +52,16 @@ final class Consents {
 			return;
 		}
 
-		Object allConsents = xdmMap.get(ConsentConstants.EventDataKey.CONSENTS);
+		Map<String, Object> allConsents = DataReader.optTypedMap(
+			Object.class,
+			xdmMap,
+			ConsentConstants.EventDataKey.CONSENTS,
+			null
+		);
 
 		try {
-			consentsMap =
-				(allConsents instanceof HashMap)
-					? Utility.deepCopy((Map<String, Object>) allConsents)
-					: new HashMap<String, Object>();
-		} catch (final ClassCastException exp) {
+			consentsMap = EventDataUtils.clone(allConsents);
+		} catch (final CloneFailedException exp) {
 			consentsMap = new HashMap<>();
 		}
 	}
@@ -146,11 +155,15 @@ final class Consents {
 	 * @return {@link Map} representing the Consents in XDM format
 	 */
 	Map<String, Object> asXDMMap() {
-		final Map<String, Object> internalConsentMap = consentsMap != null
-			? Utility.deepCopy(consentsMap)
-			: new HashMap<String, Object>();
-
+		Map<String, Object> internalConsentMap = new HashMap<String, Object>();
+		try {
+			internalConsentMap =
+				consentsMap != null ? EventDataUtils.clone(consentsMap) : new HashMap<String, Object>();
+		} catch (CloneFailedException e) {
+			new HashMap<String, Object>();
+		}
 		final Map<String, Object> xdmFormattedMap = new HashMap<>();
+
 		xdmFormattedMap.put(ConsentConstants.EventDataKey.CONSENTS, internalConsentMap);
 		return xdmFormattedMap;
 	}

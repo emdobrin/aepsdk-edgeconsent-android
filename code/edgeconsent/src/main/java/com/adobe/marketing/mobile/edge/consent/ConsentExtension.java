@@ -220,19 +220,6 @@ class ConsentExtension extends Extension {
 	 * @param event the {@link Event} requesting consents
 	 */
 	void handleRequestContent(@NonNull final Event event) {
-		final Map<String, Object> eventData = event.getEventData();
-
-		if (isNullOrEmpty(eventData)) {
-			Log.trace(
-				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
-				"%s - Unable to handle consent request event with id '%s': event data is missing or empty.",
-				CLASS_NAME,
-				event.getUniqueIdentifier()
-			);
-			return;
-		}
-
 		final Event responseEvent = new Event.Builder(
 			ConsentConstants.EventNames.GET_CONSENTS_RESPONSE,
 			EventType.CONSENT,
@@ -262,8 +249,11 @@ class ConsentExtension extends Extension {
 			return;
 		}
 
-		final Map<String, Object> defaultConsentMap = (Map<String, Object>) configData.get(
-			ConsentConstants.ConfigurationKey.DEFAULT_CONSENT
+		final Map<String, Object> defaultConsentMap = DataReader.optTypedMap(
+			Object.class,
+			configData,
+			ConsentConstants.ConfigurationKey.DEFAULT_CONSENT,
+			null
 		);
 
 		if (defaultConsentMap == null || defaultConsentMap.isEmpty()) {
@@ -303,7 +293,6 @@ class ConsentExtension extends Extension {
 			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(xdmConsents)
-			.inResponseToEvent(event)
 			.inResponseToEvent(event)
 			.build();
 

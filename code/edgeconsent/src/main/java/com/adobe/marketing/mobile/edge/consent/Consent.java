@@ -22,13 +22,12 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class Consent {
 
 	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
 	private static final String CLASS_NAME = "Consent";
-	private static final long CALLBACK_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
+	private static final long CALLBACK_TIMEOUT_MILLIS = 500L;
 
 	private Consent() {}
 
