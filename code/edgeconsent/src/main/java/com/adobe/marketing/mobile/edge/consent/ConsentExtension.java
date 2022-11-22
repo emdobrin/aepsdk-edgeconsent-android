@@ -25,9 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 class ConsentExtension extends Extension {
-
+	
 	private static final String CLASS_NAME = "ConsentExtension";
-	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
 	private final ConsentManager consentManager;
 
 	/**
