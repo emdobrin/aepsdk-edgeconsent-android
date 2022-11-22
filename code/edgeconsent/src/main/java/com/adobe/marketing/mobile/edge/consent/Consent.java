@@ -20,13 +20,15 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
+
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class Consent {
 
-	private static final String CLASS_NAME = "Consent";
 	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
+	private static final String CLASS_NAME = "Consent";
 	private static final long CALLBACK_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
 
 	private Consent() {}
@@ -41,7 +43,9 @@ public class Consent {
 	}
 
 	/**
+	 *
 	 * Registers the extension with the Mobile SDK. This method should be called only once in your application class.
+	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link Consent#EXTENSION} instead.
 	 */
 	@Deprecated
 	public static void registerExtension() {

@@ -17,6 +17,9 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.DataReader;
+
+import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,18 +32,7 @@ class ConsentExtension extends Extension {
 
 	/**
 	 * Constructor.
-	 *
-	 * <p>
-	 * Called during the Consent extension's registration.
-	 * The ConsentExtension listens for the following {@link Event}s:
-	 * <ul>
-	 *     <li> {@code ConsentConstants.EventType#EDGE} and EventSource {@Code  ConsentConstants.EventSource#CONSENT_PREFERENCE}</li>
-	 *     <li> {@code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#UPDATE_CONSENT}</li>
-	 *     <li> {@Code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#REQUEST_CONTENT}</li>
-	 *     <li> {@Code ConsentConstants.EventType#CONFIGURATION} and EventSource {{@Code ConsentConstants.EventSource#RESPONSE_CONTENT}</li>
-	 * </ul>
-	 * <p>
-	 * Thread : Background thread created by MobileCore
+	 * It is called by the Mobile SDK when registering the extension and it initializes the extension and registers event listeners.
 	 *
 	 * @param extensionApi {@link ExtensionApi} instance
 	 */
@@ -69,6 +61,18 @@ class ConsentExtension extends Extension {
 		return ConsentConstants.EXTENSION_VERSION;
 	}
 
+	/**
+	 * <p>
+	 * Called during the Consent extension's registration.
+	 * The ConsentExtension listens for the following {@link Event}s:
+	 * <ul>
+	 *     <li> {@code ConsentConstants.EventType#EDGE} and EventSource {@Code  ConsentConstants.EventSource#CONSENT_PREFERENCE}</li>
+	 *     <li> {@code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#UPDATE_CONSENT}</li>
+	 *     <li> {@Code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#REQUEST_CONTENT}</li>
+	 *     <li> {@Code ConsentConstants.EventType#CONFIGURATION} and EventSource {{@Code ConsentConstants.EventSource#RESPONSE_CONTENT}</li>
+	 * </ul>
+	 * <p>
+	 */
 	@Override
 	protected void onRegistered() {
 		getApi()
@@ -111,7 +115,7 @@ class ConsentExtension extends Extension {
 	 *
 	 * @param event the {@link Event} to be processed
 	 */
-	void handleConsentUpdate(final Event event) {
+	void handleConsentUpdate(@NonNull final Event event) {
 		// bail out if event data is empty
 		final Map<String, Object> consentData = event.getEventData();
 
@@ -154,23 +158,14 @@ class ConsentExtension extends Extension {
 	 *
 	 * @param event the Edge consent preferences response {@link Event} to be processed
 	 */
-	void handleEdgeConsentPreferenceHandle(final Event event) {
+	void handleEdgeConsentPreferenceHandle(@NonNull final Event event) {
 		// bail out if event data is empty
 		final Map<String, Object> eventData = event.getEventData();
 
 		// bail out if you don't find payload in edge consent preference response event
 		final List<Map<String, Object>> payload;
 
-		try {
-			payload = (List<Map<String, Object>>) eventData.get(ConsentConstants.EventDataKey.PAYLOAD);
-		} catch (ClassCastException exp) {
-			Log.debug(
-				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
-				"Ignoring the consent:preferences handle event from Edge Network, invalid payload."
-			);
-			return;
-		}
+		payload = DataReader.optTypedListOfMap(Object.class, eventData, ConsentConstants.EventDataKey.PAYLOAD, null);
 
 		if (payload == null || payload.isEmpty()) {
 			Log.debug(
@@ -226,17 +221,7 @@ class ConsentExtension extends Extension {
 	 *
 	 * @param event the {@link Event} requesting consents
 	 */
-	void handleRequestContent(final Event event) {
-		if (event == null) {
-			Log.trace(
-				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
-				"%s - Unable to handle consent request as event is null.",
-				CLASS_NAME
-			);
-			return;
-		}
-
+	void handleRequestContent(@NonNull final Event event) {
 		final Map<String, Object> eventData = event.getEventData();
 
 		if (isNullOrEmpty(eventData)) {
@@ -255,7 +240,7 @@ class ConsentExtension extends Extension {
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
 		)
-			.setEventData(consentManager.getCurrentConsents().asXDMMap())
+			.setEventData(consentManager.getCurrentConsents().asXDMMap()).inResponseToEvent(event)
 			.build();
 
 		getApi().dispatch(responseEvent);
@@ -266,7 +251,7 @@ class ConsentExtension extends Extension {
 	 *
 	 * @param event an {@link Event} representing configuration response event
 	 */
-	void handleConfigurationResponse(final Event event) {
+	void handleConfigurationResponse(@NonNull final Event event) {
 		final Map<String, Object> configData = event.getEventData();
 
 		if (configData == null || configData.isEmpty()) {
@@ -289,6 +274,7 @@ class ConsentExtension extends Extension {
 				"consent.default not found in configuration. Make sure Consent extension is installed in your mobile property"
 			);
 			// do not return here, even with empty default consent go ahead and update the defaultConsent in ConsentManager
+			// This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
 			// This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
 		}
 
@@ -317,7 +303,7 @@ class ConsentExtension extends Extension {
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
 		)
-			.setEventData(xdmConsents)
+			.setEventData(xdmConsents).inResponseToEvent(event).inResponseToEvent(event)
 			.build();
 
 		getApi().dispatch(responseEvent);
