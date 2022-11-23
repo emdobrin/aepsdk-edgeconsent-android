@@ -151,7 +151,7 @@ public class ConsentExtensionTest {
 
 		// test
 		extension = new ConsentExtension(mockExtensionApi);
-		extension.handleInitEvent();
+		extension.handleInitialization();
 
 		verify(mockExtensionApi, times(1))
 			.setXDMSharedEventState(
@@ -179,7 +179,7 @@ public class ConsentExtensionTest {
 
 		// test
 		extension = new ConsentExtension(mockExtensionApi);
-		extension.handleInitEvent();
+		extension.handleInitialization();
 
 		verify(mockExtensionApi, times(0))
 			.setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));

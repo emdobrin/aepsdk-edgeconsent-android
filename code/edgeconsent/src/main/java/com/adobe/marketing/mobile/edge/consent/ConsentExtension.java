@@ -88,13 +88,13 @@ class ConsentExtension extends Extension {
 				this::handleConfigurationResponse
 			);
 
-		handleInitEvent();
+		handleInitialization();
 	}
 
 	/**
 	 * Share the initial consents loaded from persistence to XDM shared state.
 	 */
-	void handleInitEvent() {
+	void handleInitialization() {
 		// share the initial XDMSharedState onRegistered
 		final Consents currentConsents = consentManager.getCurrentConsents();
 
