@@ -64,10 +64,10 @@ class ConsentExtension extends Extension {
 	 * Called during the Consent extension's registration.
 	 * The ConsentExtension listens for the following {@link Event}s:
 	 * <ul>
-	 *     <li> {@code ConsentConstants.EventType#EDGE} and EventSource {@Code  ConsentConstants.EventSource#CONSENT_PREFERENCE}</li>
-	 *     <li> {@code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#UPDATE_CONSENT}</li>
-	 *     <li> {@Code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#REQUEST_CONTENT}</li>
-	 *     <li> {@Code ConsentConstants.EventType#CONFIGURATION} and EventSource {{@Code ConsentConstants.EventSource#RESPONSE_CONTENT}</li>
+	 *     <li> {@code EventType#EDGE} and EventSource {@Code EventSource#CONSENT_PREFERENCE}</li>
+	 *     <li> {@code EventType#CONSENT} and EventSource {@Code EventSource#UPDATE_CONSENT}</li>
+	 *     <li> {@Code EventType#CONSENT} and EventSource {@Code EventSource#REQUEST_CONTENT}</li>
+	 *     <li> {@Code EventType#CONFIGURATION} and EventSource {{@Code EventSource#RESPONSE_CONTENT}</li>
 	 * </ul>
 	 * <p>
 	 */
@@ -161,9 +161,12 @@ class ConsentExtension extends Extension {
 		final Map<String, Object> eventData = event.getEventData();
 
 		// bail out if you don't find payload in edge consent preference response event
-		final List<Map<String, Object>> payload;
-
-		payload = DataReader.optTypedListOfMap(Object.class, eventData, ConsentConstants.EventDataKey.PAYLOAD, null);
+		final List<Map<String, Object>> payload = DataReader.optTypedListOfMap(
+			Object.class,
+			eventData,
+			ConsentConstants.EventDataKey.PAYLOAD,
+			null
+		);
 
 		if (payload == null || payload.isEmpty()) {
 			Log.debug(
@@ -264,7 +267,6 @@ class ConsentExtension extends Extension {
 			);
 			// do not return here, even with empty default consent go ahead and update the defaultConsent in ConsentManager
 			// This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
-			// This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
 		}
 
 		if (consentManager.updateDefaultConsents(new Consents(defaultConsentMap))) {
@@ -287,14 +289,18 @@ class ConsentExtension extends Extension {
 		getApi().createXDMSharedState(xdmConsents, event);
 
 		// create and dispatch an consent response event
-		final Event responseEvent = new Event.Builder(
+		Event.Builder responseBuilder = new Event.Builder(
 			ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED,
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
-		)
-			.setEventData(xdmConsents)
-			.inResponseToEvent(event)
-			.build();
+		);
+		responseBuilder.setEventData(xdmConsents);
+
+		if (event != null) {
+			responseBuilder.inResponseToEvent(event);
+		}
+
+		final Event responseEvent = responseBuilder.build();
 
 		getApi().dispatch(responseEvent);
 	}
@@ -312,7 +318,7 @@ class ConsentExtension extends Extension {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
 				CLASS_NAME,
-				"ConsentExtension - Consent data is null/empty, not dispatching Edge Consent Update event."
+				"Consent data is null/empty, not dispatching Edge Consent Update event."
 			);
 			return;
 		}
@@ -338,9 +344,5 @@ class ConsentExtension extends Extension {
 		final Map<String, Object> consentMap = new HashMap<>();
 		consentMap.put(ConsentConstants.EventDataKey.CONSENTS, payload);
 		return consentMap;
-	}
-
-	private boolean isNullOrEmpty(final Map map) {
-		return map == null || map.isEmpty();
 	}
 }
