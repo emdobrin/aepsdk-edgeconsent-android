@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Date;
+import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
@@ -225,12 +225,16 @@ public class ConsentsTest {
 		Consents consents = new Consents(CreateConsentXDMMap("n"));
 
 		// test
+		String iso8601DateString = TimeUtils.getIso8601DateTimeZoneISO8601();
 		long currentTimestamp = System.currentTimeMillis();
-		String iso8601DateString = DateUtility.dateToISO8601String(new Date(currentTimestamp));
 		consents.setTimestamp(currentTimestamp);
 
 		// verify
-		assertEquals(iso8601DateString, ConsentTestUtil.readTimestamp(consents));
+		String consentTimeStamp = ConsentTestUtil.readTimestamp(consents);
+		String iso8601DateToSecond = stringRemoveByIndex(iso8601DateString, 19);
+		String consentTimeStampToSeconds = stringRemoveByIndex(consentTimeStamp, 19);
+
+		assertEquals(iso8601DateToSecond, consentTimeStampToSeconds);
 	}
 
 	@Test
@@ -385,5 +389,14 @@ public class ConsentsTest {
 
 		assertFalse(first.equalsIgnoreTimestamp(second));
 		assertFalse(second.equalsIgnoreTimestamp(first));
+	}
+
+	//Helper to remove milliseconds from timestamps
+	private static String stringRemoveByIndex(String str, int index) {
+		StringBuilder string = new StringBuilder(str);
+		for (int i = 0; i < 4; i++) {
+			string.deleteCharAt(index);
+		}
+		return string.toString();
 	}
 }

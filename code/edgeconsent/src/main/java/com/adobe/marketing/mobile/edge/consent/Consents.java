@@ -14,7 +14,7 @@ package com.adobe.marketing.mobile.edge.consent;
 import com.adobe.marketing.mobile.util.CloneFailedException;
 import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.EventDataUtils;
-import java.util.Date;
+import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,8 +112,8 @@ final class Consents {
 		} catch (final ClassCastException exception) {
 			return;
 		}
-
-		metaDataContents.put(ConsentConstants.EventDataKey.TIME, DateUtility.dateToISO8601String(new Date(timeStamp)));
+		//TimeStamp Check
+		metaDataContents.put(ConsentConstants.EventDataKey.TIME, TimeUtils.getIso8601DateTimeZoneISO8601());
 		consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
 	}
 

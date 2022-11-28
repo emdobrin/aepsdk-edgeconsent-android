@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 final class ConsentStorageService {
 
-	private static final String CLASS_NAME = "ConsentStorageService";
+	private static final String LOG_SOURCE = "ConsentStorageService";
 
 	private ConsentStorageService() {}
 
@@ -42,7 +42,7 @@ final class ConsentStorageService {
 		if (sharedPreferences == null) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Shared Preference value is null. Unable to load saved consents from persistence."
 			);
 			return null;
@@ -53,7 +53,7 @@ final class ConsentStorageService {
 		if (jsonString == null) {
 			Log.trace(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"No previous consents were stored in persistence. Current consent is null"
 			);
 			return null;
@@ -66,7 +66,7 @@ final class ConsentStorageService {
 		} catch (JSONException exception) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Serialization error while reading consent jsonString from persistence. Unable to load saved consents from persistence."
 			);
 			return null;
@@ -87,7 +87,7 @@ final class ConsentStorageService {
 		if (sharedPreferences == null) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Shared Preference value is null. Unable to write consents to persistence."
 			);
 			return;
@@ -98,7 +98,7 @@ final class ConsentStorageService {
 		if (editor == null) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Shared Preference Editor is null. Unable to write consents to persistence."
 			);
 			return;
@@ -129,7 +129,7 @@ final class ConsentStorageService {
 		if (application == null) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Application value is null. Unable to read/write consent data from persistence."
 			);
 			return null;
@@ -140,7 +140,7 @@ final class ConsentStorageService {
 		if (context == null) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Context value is null. Unable to read/write consent data from persistence."
 			);
 			return null;

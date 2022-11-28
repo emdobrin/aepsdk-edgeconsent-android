@@ -26,7 +26,7 @@ import java.util.Map;
 public class Consent {
 
 	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
-	private static final String CLASS_NAME = "Consent";
+	private static final String LOG_SOURCE = "Consent";
 	private static final long CALLBACK_TIMEOUT_MILLIS = 500L;
 
 	private Consent() {}
@@ -41,7 +41,7 @@ public class Consent {
 	}
 
 	/**
-	 *
+
 	 * Registers the extension with the Mobile SDK. This method should be called only once in your application class.
 	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link Consent#EXTENSION} instead.
 	 */
@@ -55,7 +55,7 @@ public class Consent {
 				}
 				Log.error(
 					ConsentConstants.LOG_TAG,
-					CLASS_NAME,
+					LOG_SOURCE,
 					"There was an error registering the Consent extension:  %s",
 					extensionError.getErrorName()
 				);
@@ -74,7 +74,7 @@ public class Consent {
 		if (consents == null || consents.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Null/Empty consents passed to update API. Ignoring the API call."
 			);
 			return;
@@ -97,13 +97,15 @@ public class Consent {
 	 * Output example: {"consents": {"collect": {"val": "y"}}}
 	 *
 	 * @param callback The {@link AdobeCallback} is invoked with the current consent preferences.
+	 *                 If an {@link AdobeCallbackWithError} is provided, an {@link AdobeError} is returned
+	 *                 when an unexpected error occurs or the request timed out
 	 */
 
 	public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
 		if (callback == null) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Unexpected null callback, provide a callback to retrieve current consents."
 			);
 			return;
@@ -132,7 +134,7 @@ public class Consent {
 				returnError(callback, adobeError);
 				Log.error(
 					ConsentConstants.LOG_TAG,
-					CLASS_NAME,
+					LOG_SOURCE,
 					"Failed to dispatch %s event: Error : %s.",
 					adobeError.getErrorName()
 				);

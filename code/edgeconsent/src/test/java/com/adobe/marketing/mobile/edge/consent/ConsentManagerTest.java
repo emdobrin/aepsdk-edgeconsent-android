@@ -30,14 +30,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ MobileCore.class })
+@RunWith(MockitoJUnitRunner.Silent.class)
+//@PrepareForTest({ MobileCore.class })
 public class ConsentManagerTest {
+
+	private MobileCore mobileCore;
 
 	@Mock
 	Context mockContext;
@@ -59,9 +59,11 @@ public class ConsentManagerTest {
 	// ========================================================================================
 
 	@Before
-	public void before() throws Exception {
-		PowerMockito.mockStatic(MobileCore.class);
-
+	public void setup() {
+		//PowerMockito.mockStatic(MobileCore.class);
+		Mockito.reset();
+		//consentManager = new ConsentManager()
+		Mockito.mockStatic(MobileCore.class);
 		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
 		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
 		Mockito

@@ -16,12 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A third party extension class aiding for assertion against dispatched events, shared state
  * and XDM shared state.
  */
 class MonitorExtension extends Extension {
+
+	static AtomicReference<MonitorExtension> MONITOR_EXTENSION_INSTANCE = new AtomicReference<>(null);
 
 	private static final String LOG_TAG = "MonitorExtension";
 
@@ -30,19 +33,6 @@ class MonitorExtension extends Extension {
 
 	protected MonitorExtension(ExtensionApi extensionApi) {
 		super(extensionApi);
-		extensionApi.registerWildcardListener(
-			MonitorListener.class,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(
-						LoggingMode.ERROR,
-						LOG_TAG,
-						"There was an error registering Extension Listener: " + extensionError.getErrorName()
-					);
-				}
-			}
-		);
 	}
 
 	@Override
@@ -50,21 +40,31 @@ class MonitorExtension extends Extension {
 		return "MonitorExtension";
 	}
 
-	public static void registerExtension() {
-		MobileCore.registerExtension(
-			MonitorExtension.class,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(
-						LoggingMode.ERROR,
-						LOG_TAG,
-						"There was an error registering the Monitor extension: " + extensionError.getErrorName()
-					);
-				}
-			}
-		);
+	@Override
+	protected void onRegistered() {
+		MONITOR_EXTENSION_INSTANCE.set(this);
 	}
+
+	//	@Override
+	//	protected void onRegistered() {
+	//		MONITOR_EXTENSION_INSTANCE.set(this);
+	//	}
+	//
+	//	public static void registerExtension() {
+	//		MobileCore.registerExtension(
+	//			MonitorExtension.class,
+	//			new ExtensionErrorCallback<ExtensionError>() {
+	//				@Override
+	//				public void error(ExtensionError extensionError) {
+	//					MobileCore.log(
+	//						LoggingMode.ERROR,
+	//						LOG_TAG,
+	//						"There was an error registering the Monitor extension: " + extensionError.getErrorName()
+	//					);
+	//				}
+	//			}
+	//		);
+	//	}
 
 	/**
 	 * Unregister the Monitor Extension from the EventHub.
@@ -167,7 +167,7 @@ class MonitorExtension extends Extension {
 	 * @param event
 	 */
 	private void processXDMSharedStateRequest(final Event event) {
-		EventData eventData = event.getData();
+		Map<String, Object> eventData = event.getEventData();
 
 		if (eventData == null) {
 			return;
@@ -179,7 +179,7 @@ class MonitorExtension extends Extension {
 			return;
 		}
 
-		EventData sharedState = getApi().getXDMSharedEventState(stateOwner, event);
+		EventData sharedState = getApi().XDMShareState(stateOwner, event);
 
 		Event responseEvent = new Event.Builder(
 			"Get Shared State Response",
@@ -223,30 +223,6 @@ class MonitorExtension extends Extension {
 			.build();
 
 		MobileCore.dispatchResponseEvent(responseEvent, event, null);
-	}
-
-	/**
-	 * Listener class
-	 */
-	public static class MonitorListener extends ExtensionListener {
-
-		protected MonitorListener(ExtensionApi extension, String type, String source) {
-			super(extension, type, source);
-		}
-
-		@Override
-		public void hear(Event event) {
-			MonitorExtension extension = getParentExtension();
-
-			if (extension != null) {
-				extension.wildcardProcessor(event);
-			}
-		}
-
-		@Override
-		protected MonitorExtension getParentExtension() {
-			return (MonitorExtension) super.getParentExtension();
-		}
 	}
 
 	/**

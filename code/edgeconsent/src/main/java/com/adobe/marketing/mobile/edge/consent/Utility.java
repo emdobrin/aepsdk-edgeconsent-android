@@ -11,10 +11,7 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
-import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
-
-import com.adobe.marketing.mobile.LoggingMode;
-import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 final class Utility {
+
+	private static final String LOG_SOURCE = "Consent";
 
 	private Utility() {}
 
@@ -51,10 +50,10 @@ final class Utility {
 			try {
 				value = jsonObject.get(nextKey);
 			} catch (JSONException e) {
-				MobileCore.log(
-					LoggingMode.DEBUG,
-					LOG_TAG,
-					"Utility(toMap) - Unable to convert jsonObject to Map for key " + nextKey + ", skipping."
+				Log.debug(
+					ConsentConstants.LOG_TAG,
+					LOG_SOURCE,
+					"Utility(toMap) - Unable to convert jsonObject to Map for key \" + nextKey + \", skipping."
 				);
 			}
 
@@ -99,10 +98,10 @@ final class Utility {
 			try {
 				value = jsonArray.get(i);
 			} catch (JSONException e) {
-				MobileCore.log(
-					LoggingMode.DEBUG,
-					LOG_TAG,
-					"Utility(toList) - Unable to convert jsonObject to List for index " + i + ", skipping."
+				Log.debug(
+					ConsentConstants.LOG_TAG,
+					LOG_SOURCE,
+					"Utility(toList) - Unable to convert jsonObject to List for index \" + i + \", skipping."
 				);
 			}
 
@@ -138,9 +137,9 @@ final class Utility {
 		try {
 			return toMap(new JSONObject(map));
 		} catch (NullPointerException e) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
-				LOG_TAG,
+			Log.debug(
+				ConsentConstants.LOG_TAG,
+				LOG_SOURCE,
 				"Utility(deepCopy) - Unable to deep copy map, json string invalid."
 			);
 		}

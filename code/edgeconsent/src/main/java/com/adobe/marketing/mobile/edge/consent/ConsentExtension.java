@@ -25,7 +25,7 @@ import java.util.Map;
 
 class ConsentExtension extends Extension {
 
-	private static final String CLASS_NAME = "ConsentExtension";
+	private static final String LOG_SOURCE = "ConsentExtension";
 	private final ConsentManager consentManager;
 
 	/**
@@ -88,13 +88,13 @@ class ConsentExtension extends Extension {
 				this::handleConfigurationResponse
 			);
 
-		handleInitEvent();
+		handleInitialization();
 	}
 
 	/**
 	 * Share the initial consents loaded from persistence to XDM shared state.
 	 */
-	void handleInitEvent() {
+	void handleInitialization() {
 		// share the initial XDMSharedState onRegistered
 		final Consents currentConsents = consentManager.getCurrentConsents();
 
@@ -120,7 +120,7 @@ class ConsentExtension extends Extension {
 		if (consentData == null || consentData.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Consent data not found in consent update event. Dropping event."
 			);
 			return;
@@ -132,7 +132,7 @@ class ConsentExtension extends Extension {
 		if (newConsents.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Unable to find valid data from consent update event. Dropping event."
 			);
 			return;
@@ -161,14 +161,17 @@ class ConsentExtension extends Extension {
 		final Map<String, Object> eventData = event.getEventData();
 
 		// bail out if you don't find payload in edge consent preference response event
-		final List<Map<String, Object>> payload;
-
-		payload = DataReader.optTypedListOfMap(Object.class, eventData, ConsentConstants.EventDataKey.PAYLOAD, null);
+		final List<Map<String, Object>> payload = DataReader.optTypedListOfMap(
+			Object.class,
+			eventData,
+			ConsentConstants.EventDataKey.PAYLOAD,
+			null
+		);
 
 		if (payload == null || payload.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Ignoring the consent:preferences handle event from Edge Network, empty/missing payload."
 			);
 			return;
@@ -180,7 +183,7 @@ class ConsentExtension extends Extension {
 		if (newConsents.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Ignoring the consent:preferences handle event from Edge Network, no valid consent data found."
 			);
 			return;
@@ -198,7 +201,7 @@ class ConsentExtension extends Extension {
 			if (newConsents.equalsIgnoreTimestamp(currentConsent)) {
 				Log.debug(
 					ConsentConstants.LOG_TAG,
-					CLASS_NAME,
+					LOG_SOURCE,
 					"Ignoring the consent:preferences handle event from Edge Network. There is no modification from existing consent data"
 				);
 				return;
@@ -243,7 +246,7 @@ class ConsentExtension extends Extension {
 		if (configData == null || configData.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"Event data configuration response event is empty, unable to read configuration consent.default. Dropping event."
 			);
 			return;
@@ -259,11 +262,10 @@ class ConsentExtension extends Extension {
 		if (defaultConsentMap == null || defaultConsentMap.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"consent.default not found in configuration. Make sure Consent extension is installed in your mobile property"
 			);
 			// do not return here, even with empty default consent go ahead and update the defaultConsent in ConsentManager
-			// This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
 			// This handles the case where if ConsentExtension was installed and then removed from launch property. Then the defaults should be updated.
 		}
 
@@ -286,15 +288,19 @@ class ConsentExtension extends Extension {
 		// set the shared state
 		getApi().createXDMSharedState(xdmConsents, event);
 
-		// create and dispatch an consent response event
-		final Event responseEvent = new Event.Builder(
+		//create and dispatch an consent response event
+		Event.Builder responseBuilder = new Event.Builder(
 			ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED,
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
-		)
-			.setEventData(xdmConsents)
-			.inResponseToEvent(event)
-			.build();
+		);
+		responseBuilder.setEventData(xdmConsents);
+
+		if (event != null) {
+			responseBuilder.inResponseToEvent(event);
+		}
+
+		final Event responseEvent = responseBuilder.build();
 
 		getApi().dispatch(responseEvent);
 	}
@@ -311,8 +317,8 @@ class ConsentExtension extends Extension {
 		if (consents == null || consents.isEmpty()) {
 			Log.debug(
 				ConsentConstants.LOG_TAG,
-				CLASS_NAME,
-				"ConsentExtension - Consent data is null/empty, not dispatching Edge Consent Update event."
+				LOG_SOURCE,
+				"Consent data is null/empty, not dispatching Edge Consent Update event."
 			);
 			return;
 		}
@@ -338,9 +344,5 @@ class ConsentExtension extends Extension {
 		final Map<String, Object> consentMap = new HashMap<>();
 		consentMap.put(ConsentConstants.EventDataKey.CONSENTS, payload);
 		return consentMap;
-	}
-
-	private boolean isNullOrEmpty(final Map map) {
-		return map == null || map.isEmpty();
 	}
 }
