@@ -38,7 +38,7 @@ final class Consents {
 		try {
 			this.consentsMap = EventDataUtils.clone(newConsents.consentsMap);
 		} catch (CloneFailedException e) {
-			new HashMap<String, Object>();
+			this.consentsMap = new HashMap<String, Object>();
 		}
 	}
 
@@ -155,12 +155,12 @@ final class Consents {
 	 * @return {@link Map} representing the Consents in XDM format
 	 */
 	Map<String, Object> asXDMMap() {
-		Map<String, Object> internalConsentMap = new HashMap<String, Object>();
+		Map<String, Object> internalConsentMap = null;
 		try {
 			internalConsentMap =
 				consentsMap != null ? EventDataUtils.clone(consentsMap) : new HashMap<String, Object>();
 		} catch (CloneFailedException e) {
-			new HashMap<String, Object>();
+			internalConsentMap = new HashMap<String, Object>();
 		}
 		final Map<String, Object> xdmFormattedMap = new HashMap<>();
 
