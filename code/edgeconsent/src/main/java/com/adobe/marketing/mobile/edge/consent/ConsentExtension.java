@@ -64,10 +64,10 @@ class ConsentExtension extends Extension {
 	 * Called during the Consent extension's registration.
 	 * The ConsentExtension listens for the following {@link Event}s:
 	 * <ul>
-	 *     <li> {@code ConsentConstants.EventType#EDGE} and EventSource {@Code  ConsentConstants.EventSource#CONSENT_PREFERENCE}</li>
-	 *     <li> {@code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#UPDATE_CONSENT}</li>
-	 *     <li> {@Code ConsentConstants.EventType#CONSENT} and EventSource {@Code ConsentConstants.EventSource#REQUEST_CONTENT}</li>
-	 *     <li> {@Code ConsentConstants.EventType#CONFIGURATION} and EventSource {{@Code ConsentConstants.EventSource#RESPONSE_CONTENT}</li>
+	 *     <li> {@code EventType#EDGE} and EventSource {@Code EventSource#CONSENT_PREFERENCE}</li>
+	 *     <li> {@code EventType#CONSENT} and EventSource {@Code EventSource#UPDATE_CONSENT}</li>
+	 *     <li> {@Code EventType#CONSENT} and EventSource {@Code EventSource#REQUEST_CONTENT}</li>
+	 *     <li> {@Code EventType#CONFIGURATION} and EventSource {{@Code EventSource#RESPONSE_CONTENT}</li>
 	 * </ul>
 	 * <p>
 	 */
@@ -288,7 +288,7 @@ class ConsentExtension extends Extension {
 		// set the shared state
 		getApi().createXDMSharedState(xdmConsents, event);
 
-		//create and dispatch an consent response event
+		// create and dispatch an consent response event
 		Event.Builder responseBuilder = new Event.Builder(
 			ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED,
 			EventType.CONSENT,
