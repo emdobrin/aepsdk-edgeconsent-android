@@ -165,7 +165,6 @@ public class ConsentExtensionTest {
 		extension = new ConsentExtension(mockExtensionApi);
 		extension.handleInitialization();
 		verify(mockExtensionApi, never()).createXDMSharedState(any(), any());
-
 		verify(mockExtensionApi, never()).dispatch(dispatchedEventCaptor.capture());
 	}
 
