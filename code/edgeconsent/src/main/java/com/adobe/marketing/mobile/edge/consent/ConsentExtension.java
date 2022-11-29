@@ -18,6 +18,8 @@ import com.adobe.marketing.mobile.ExtensionError;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.NamedCollection;
+import com.adobe.marketing.mobile.services.ServiceProvider;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,16 @@ class ConsentExtension extends Extension {
 	 * @param extensionApi {@link ExtensionApi} instance
 	 */
 	protected ConsentExtension(final ExtensionApi extensionApi) {
+		this(extensionApi, null);
+	}
+
+	/**
+	 * Constructor used for testing.
+	 * @param extensionApi {@link ExtensionApi} instance
+	 * @param namedCollection {@link NamedCollection} instance from {@link ServiceProvider}
+	 * @see ConsentExtension(ExtensionApi)
+	 */
+	protected ConsentExtension(final ExtensionApi extensionApi, final NamedCollection namedCollection) {
 		super(extensionApi);
 		ExtensionErrorCallback<ExtensionError> listenerErrorCallback = new ExtensionErrorCallback<ExtensionError>() {
 			@Override
@@ -94,7 +106,15 @@ class ConsentExtension extends Extension {
 			ListenerEventHubBoot.class,
 			listenerErrorCallback
 		);
-		consentManager = new ConsentManager();
+		consentManager =
+			new ConsentManager(
+				namedCollection == null
+					? ServiceProvider
+						.getInstance()
+						.getDataStoreService()
+						.getNamedCollection(ConsentConstants.DataStoreKey.DATASTORE_NAME)
+					: namedCollection
+			);
 	}
 
 	/**
