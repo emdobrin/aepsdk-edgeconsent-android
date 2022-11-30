@@ -27,7 +27,7 @@ public class Consent {
 
 	public static final Class<? extends Extension> EXTENSION = ConsentExtension.class;
 	private static final String CLASS_NAME = "Consent";
-	private static final long CALLBACK_TIMEOUT_MILLIS = 500L;
+	private static final long CALLBACK_TIMEOUT_MILLIS = 5000L;
 
 	private Consent() {}
 

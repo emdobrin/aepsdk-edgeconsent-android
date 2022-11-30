@@ -280,7 +280,8 @@ class ConsentExtension extends Extension {
 	 * <p>
 	 * Will not share the XDMSharedEventState or dispatch event if consents is null.
 	 *
-	 * @param event the {@link Event} that triggered the consents update
+	 * @param event the {@link Event} that triggered the consents update. The event can be null on the first call when extension initializes.
+	 *
 	 */
 	private void shareCurrentConsents(final Event event) {
 		final Map<String, Object> xdmConsents = consentManager.getCurrentConsents().asXDMMap();
@@ -289,18 +290,13 @@ class ConsentExtension extends Extension {
 		getApi().createXDMSharedState(xdmConsents, event);
 
 		// create and dispatch an consent response event
-		Event.Builder responseBuilder = new Event.Builder(
+		Event responseEvent = new Event.Builder(
 			ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED,
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
-		);
-		responseBuilder.setEventData(xdmConsents);
-
-		if (event != null) {
-			responseBuilder.inResponseToEvent(event);
-		}
-
-		final Event responseEvent = responseBuilder.build();
+		)
+			.setEventData(xdmConsents)
+			.build();
 
 		getApi().dispatch(responseEvent);
 	}
