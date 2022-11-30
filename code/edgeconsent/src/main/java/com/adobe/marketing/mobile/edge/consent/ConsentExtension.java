@@ -37,7 +37,13 @@ class ConsentExtension extends Extension {
 	 * @param extensionApi {@link ExtensionApi} instance
 	 */
 	protected ConsentExtension(final ExtensionApi extensionApi) {
-		this(extensionApi, null);
+		this(
+			extensionApi,
+			ServiceProvider
+				.getInstance()
+				.getDataStoreService()
+				.getNamedCollection(ConsentConstants.DataStoreKey.DATASTORE_NAME)
+		);
 	}
 
 	/**
@@ -48,15 +54,7 @@ class ConsentExtension extends Extension {
 	 */
 	protected ConsentExtension(final ExtensionApi extensionApi, final NamedCollection namedCollection) {
 		super(extensionApi);
-		consentManager =
-			new ConsentManager(
-				namedCollection == null
-					? ServiceProvider
-						.getInstance()
-						.getDataStoreService()
-						.getNamedCollection(ConsentConstants.DataStoreKey.DATASTORE_NAME)
-					: namedCollection
-			);
+		consentManager = new ConsentManager(namedCollection);
 	}
 
 	/**
