@@ -14,6 +14,7 @@ package com.adobe.marketing.mobile.edge.consent;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.NamedCollection;
+import com.adobe.marketing.mobile.util.JSONUtils;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONException;
@@ -125,7 +126,7 @@ final class ConsentManager {
 
 		try {
 			final JSONObject jsonObject = new JSONObject(jsonString);
-			final Map<String, Object> consentMap = Utility.toMap(jsonObject);
+			final Map<String, Object> consentMap = JSONUtils.toMap(jsonObject);
 			return new Consents(consentMap);
 		} catch (JSONException exception) {
 			MobileCore.log(
@@ -144,7 +145,7 @@ final class ConsentManager {
 	 * Call this method to save the consents to persistence.
 	 * The consents are converted to jsonString and stored into persistence.
 	 *
-	 * @param consents the consents that needs to be persisted under key {@link ConsentConstants.DataStoreKey#CONSENT_PREFERENCES}
+	 * @param consents the consents that need to be persisted under key {@link ConsentConstants.DataStoreKey#CONSENT_PREFERENCES}
 	 */
 	private void saveConsentsToPersistence(final Consents consents) {
 		if (namedCollection == null) {
