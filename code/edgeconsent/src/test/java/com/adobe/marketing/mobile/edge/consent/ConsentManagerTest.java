@@ -16,14 +16,11 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.NamedCollection;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,46 +37,30 @@ import org.powermock.reflect.Whitebox;
 public class ConsentManagerTest {
 
 	@Mock
-	Context mockContext;
-
-	@Mock
-	SharedPreferences mockSharedPreference;
-
-	@Mock
-	SharedPreferences.Editor mockSharedPreferenceEditor;
-
-	@Mock
-	Application mockApplication;
+	NamedCollection mockNamedCollection;
 
 	private ConsentManager consentManager;
 
 	// ========================================================================================
 	// Test Scenario    : consentManager load consents from persistence on boot
-	// Test method      : constructor, loadFromPreference , getCurrentConsents
+	// Test method      : constructor, loadFromPersistence , getCurrentConsents
 	// ========================================================================================
 
 	@Before
 	public void before() throws Exception {
 		PowerMockito.mockStatic(MobileCore.class);
-
-		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
-		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
-		Mockito
-			.when(mockContext.getSharedPreferences(ConsentConstants.DataStoreKey.DATASTORE_NAME, 0))
-			.thenReturn(mockSharedPreference);
-		Mockito.when(mockSharedPreference.edit()).thenReturn(mockSharedPreferenceEditor);
 	}
 
 	@Test
-	public void test_Constructor_LoadsFromSharedPreference() {
+	public void test_Constructor_LoadsFromPersistence() {
 		// setup
 		final String updatedConsentsJSON = CreateConsentsXDMJSONString("y", null, SAMPLE_METADATA_TIMESTAMP);
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn(updatedConsentsJSON);
 
 		// test
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 
 		// verify
 		Consents currentConsents = consentManager.getCurrentConsents();
@@ -90,14 +71,14 @@ public class ConsentManagerTest {
 	}
 
 	@Test
-	public void test_LoadFromSharedPreference_whenNull() {
+	public void test_LoadFromPersistence_whenNull() {
 		// setup
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn(null);
 
 		// test
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 
 		// verify
 		Consents currentConsents = consentManager.getCurrentConsents();
@@ -105,74 +86,44 @@ public class ConsentManagerTest {
 	}
 
 	@Test
-	public void test_LoadFromSharedPreference_whenInvalidJSON() {
+	public void test_LoadFromPersistence_whenInvalidJSON() {
 		// setup
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn("{InvalidJSON}[]$62&23Fsd^%");
 
 		// test
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 
 		// verify
 		Consents currentConsents = consentManager.getCurrentConsents();
 		assertTrue(currentConsents.isEmpty());
 	}
 
-	@Test
-	public void test_LoadFromSharedPreference_whenSharedPreferenceNull() {
-		// setup
-		Mockito
-			.when(mockContext.getSharedPreferences(ConsentConstants.DataStoreKey.DATASTORE_NAME, 0))
-			.thenReturn(null);
-
+	@Test(expected = Test.None.class)
+	public void test_LoadFromPersistence_whenNullNamedCollection() {
 		// test
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(null);
 
 		// verify
 		Consents currentConsents = consentManager.getCurrentConsents();
 		assertTrue(currentConsents.isEmpty());
-	}
-
-	@Test
-	public void test_LoadFromSharedPreference_whenApplicationNull() {
-		// setup
-		Mockito.when(MobileCore.getApplication()).thenReturn(null);
-
-		// test
-		consentManager = new ConsentManager();
-
-		// verify
-		Consents currentConsents = consentManager.getCurrentConsents();
-		assertTrue(currentConsents.isEmpty());
-	}
-
-	@Test
-	public void test_LoadFromSharedPreference_whenContextNull() {
-		// setup
-		Mockito.when(mockApplication.getApplicationContext()).thenReturn(null);
-
-		// test
-		consentManager = new ConsentManager();
-
-		// verify
-		Consents currentConsents = consentManager.getCurrentConsents();
-		assertTrue(currentConsents.isEmpty());
+		// no exception is expected when attempting to read current consents or write new consents
 	}
 
 	// ========================================================================================
 	// Test Scenario    : consentManager ability to merge with current consent and persist
-	// Test method      : mergeAndPersist, saveToPreference
+	// Test method      : mergeAndPersist, saveToPersistence
 	// ========================================================================================
 
 	@Test
 	public void test_MergeAndPersist() {
 		// setup currentConsent
-		final String sharedPreferenceJSON = CreateConsentsXDMJSONString("y", "n", "vi", SAMPLE_METADATA_TIMESTAMP);
+		final String persistedJSON = CreateConsentsXDMJSONString("y", "n", "vi", SAMPLE_METADATA_TIMESTAMP);
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
-			.thenReturn(sharedPreferenceJSON);
-		consentManager = new ConsentManager(); // consentManager now loads the persisted data
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.thenReturn(persistedJSON);
+		consentManager = new ConsentManager(mockNamedCollection); // consentManager now loads the persisted data
 
 		// test
 		Consents newConsent = new Consents(CreateConsentXDMMap("n", null, "pi", SAMPLE_METADATA_TIMESTAMP_OTHER));
@@ -185,9 +136,9 @@ public class ConsentManagerTest {
 		assertEquals("pi", readPersonalizeConsent(mergedConsent)); // assert PersonalizeConsent value has changed on merge
 		assertEquals(SAMPLE_METADATA_TIMESTAMP_OTHER, ConsentTestUtil.readTimestamp(mergedConsent)); // assert time has changed on merge
 
-		// verify if correct data is written in shared preference
-		verify(mockSharedPreferenceEditor, times(1))
-			.putString(
+		// verify if correct data is written in persistence
+		verify(mockNamedCollection, times(1))
+			.setString(
 				ConsentConstants.DataStoreKey.CONSENT_PREFERENCES,
 				CreateConsentsXDMJSONString("n", "n", "pi", SAMPLE_METADATA_TIMESTAMP_OTHER)
 			);
@@ -196,11 +147,11 @@ public class ConsentManagerTest {
 	@Test
 	public void test_MergeAndPersist_nullConsent() {
 		// setup currentConsent
-		final String sharedPreferenceJSON = CreateConsentsXDMJSONString("y", "n", SAMPLE_METADATA_TIMESTAMP);
+		final String persistedJSON = CreateConsentsXDMJSONString("y", "n", SAMPLE_METADATA_TIMESTAMP);
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
-			.thenReturn(sharedPreferenceJSON);
-		consentManager = new ConsentManager(); // consentManager now loads the persisted data
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.thenReturn(persistedJSON);
+		consentManager = new ConsentManager(mockNamedCollection); // consentManager now loads the persisted data
 
 		// test
 		consentManager.mergeAndPersist(null);
@@ -211,9 +162,9 @@ public class ConsentManagerTest {
 		assertEquals("n", readAdIdConsent(mergedConsent)); // assert adIdConsent value has not changed on merge
 		assertEquals(SAMPLE_METADATA_TIMESTAMP, ConsentTestUtil.readTimestamp(mergedConsent)); // assert time has not changed on merge
 
-		// verify shared preference is correct
-		verify(mockSharedPreferenceEditor, times(1))
-			.putString(
+		// verify persistence data is correct
+		verify(mockNamedCollection, times(1))
+			.setString(
 				ConsentConstants.DataStoreKey.CONSENT_PREFERENCES,
 				CreateConsentsXDMJSONString("y", "n", SAMPLE_METADATA_TIMESTAMP)
 			);
@@ -222,11 +173,11 @@ public class ConsentManagerTest {
 	@Test
 	public void test_MergeAndPersist_emptyConsent() {
 		// setup currentConsent
-		final String sharedPreferenceJSON = CreateConsentsXDMJSONString("y", "n", SAMPLE_METADATA_TIMESTAMP);
+		final String persistedJSON = CreateConsentsXDMJSONString("y", "n", SAMPLE_METADATA_TIMESTAMP);
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
-			.thenReturn(sharedPreferenceJSON);
-		consentManager = new ConsentManager(); // consentManager now loads the persisted data
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.thenReturn(persistedJSON);
+		consentManager = new ConsentManager(mockNamedCollection); // consentManager now loads the persisted data
 
 		// test
 		consentManager.mergeAndPersist(new Consents(new HashMap<String, Object>()));
@@ -237,9 +188,9 @@ public class ConsentManagerTest {
 		assertEquals("n", readAdIdConsent(mergedConsent)); // assert adIdConsent value has not changed on merge
 		assertEquals(SAMPLE_METADATA_TIMESTAMP, ConsentTestUtil.readTimestamp(mergedConsent)); // assert time has not changed on merge
 
-		// verify shared preference is correct
-		verify(mockSharedPreferenceEditor, times(1))
-			.putString(
+		// verify persistence data is correct
+		verify(mockNamedCollection, times(1))
+			.setString(
 				ConsentConstants.DataStoreKey.CONSENT_PREFERENCES,
 				CreateConsentsXDMJSONString("y", "n", SAMPLE_METADATA_TIMESTAMP)
 			);
@@ -249,9 +200,9 @@ public class ConsentManagerTest {
 	public void test_MergeAndPersist_whenExistingConsentsNull_AndNewConsentValid() {
 		// setup currentConsent
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn(null);
-		consentManager = new ConsentManager(); // consentManager now loads nothing from persisted data
+		consentManager = new ConsentManager(mockNamedCollection); // consentManager now loads nothing from persisted data
 
 		// test
 		Consents newConsent = new Consents(CreateConsentXDMMap("n"));
@@ -263,22 +214,14 @@ public class ConsentManagerTest {
 		assertNull(readAdIdConsent(mergedConsent)); // assert adID consent is null
 		assertNull(ConsentTestUtil.readTimestamp(mergedConsent)); // assert timestamp is null
 
-		// verify shared preference is not disturbed
-		verify(mockSharedPreferenceEditor, times(1))
-			.putString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, CreateConsentsXDMJSONString("n", null));
+		// verify persistence is not disturbed
+		verify(mockNamedCollection, times(1))
+			.setString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, CreateConsentsXDMJSONString("n", null));
 	}
 
-	@Test
-	public void test_MergeAndPersist_whenSharedPreferenceNull() {
-		// setup currentConsent
-		final String sharedPreferenceJSON = CreateConsentsXDMJSONString("y");
-		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
-			.thenReturn(sharedPreferenceJSON);
-		consentManager = new ConsentManager(); // consentManager now loads the persisted data
-		Mockito
-			.when(mockContext.getSharedPreferences(ConsentConstants.DataStoreKey.DATASTORE_NAME, 0))
-			.thenReturn(null);
+	@Test(expected = Test.None.class)
+	public void test_MergeAndPersist_whenNullNamedCollection() {
+		consentManager = new ConsentManager(null);
 
 		// test
 		Consents newConsent = new Consents(CreateConsentXDMMap("n"));
@@ -287,40 +230,16 @@ public class ConsentManagerTest {
 
 		// verify that in-memory variable are still correct
 		assertEquals("n", readCollectConsent(mergedConsent)); // assert CollectConsent value is merged
-
-		// verify shared preference is not disturbed
-		verify(mockSharedPreferenceEditor, times(0)).putString(anyString(), anyString());
-	}
-
-	@Test
-	public void test_MergeAndPersist_whenSharedPreferenceEditorNull() {
-		// setup currentConsent
-		final String sharedPreferenceJSON = CreateConsentsXDMJSONString("y");
-		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
-			.thenReturn(sharedPreferenceJSON);
-		consentManager = new ConsentManager(); // consentManager now loads the persisted data
-		Mockito.when(mockSharedPreference.edit()).thenReturn(null);
-
-		// test
-		Consents newConsent = new Consents(CreateConsentXDMMap("n"));
-		consentManager.mergeAndPersist(newConsent);
-		Consents mergedConsent = consentManager.getCurrentConsents();
-
-		// verify that in-memory variable are still correct
-		assertEquals("n", readCollectConsent(mergedConsent)); // assert CollectConsent value is merged
-
-		// verify shared preference is not disturbed
-		verify(mockSharedPreferenceEditor, times(0)).putString(anyString(), anyString());
+		// no exception is expected when attempting to read current consents or write new consents
 	}
 
 	@Test
 	public void test_MergeAndPersist_whenExistingAndNewConsentEmpty() {
 		// setup currentConsent to be null
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn(null);
-		consentManager = new ConsentManager(); // consentManager now loads the persisted data
+		consentManager = new ConsentManager(mockNamedCollection); // consentManager now loads the persisted data
 
 		// test
 		Consents newConsent = new Consents(new HashMap<String, Object>());
@@ -331,8 +250,8 @@ public class ConsentManagerTest {
 		assertTrue(mergedConsent.isEmpty());
 		assertTrue(consentManager.getCurrentConsents().isEmpty());
 
-		// verify that consents is removed from shared preference
-		verify(mockSharedPreferenceEditor, times(1)).remove(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
+		// verify that consents is removed from persistence
+		verify(mockNamedCollection, times(1)).remove(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
 	}
 
 	@Test
@@ -346,7 +265,7 @@ public class ConsentManagerTest {
 		// Updated  = YES
 		// Updated Current Consent  Collect  NO AdID   NO
 
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 
 		// test
 		// update default consent with Collect NO
@@ -380,7 +299,7 @@ public class ConsentManagerTest {
 		// Updated Current Consent  Collect YES AdID  NO
 
 		// setup
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 		consentManager.mergeAndPersist(new Consents(CreateConsentXDMMap("y", "n", "vi", SAMPLE_METADATA_TIMESTAMP)));
 
 		// test
@@ -419,7 +338,7 @@ public class ConsentManagerTest {
 		// Updated Current Consent  Collect YES AdID  YES
 
 		// setup
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 		consentManager.mergeAndPersist(new Consents(CreateConsentXDMMap("y")));
 
 		// test
@@ -459,7 +378,7 @@ public class ConsentManagerTest {
 		// Updated Current Consent  Collect YES
 
 		// setup
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(mockNamedCollection);
 		assertTrue(consentManager.updateDefaultConsents(new Consents(CreateConsentXDMMap("n", "n"))));
 
 		// setup 2

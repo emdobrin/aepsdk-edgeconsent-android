@@ -19,6 +19,12 @@ import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
+import com.adobe.marketing.mobile.ExtensionError;
+import com.adobe.marketing.mobile.ExtensionErrorCallback;
+import com.adobe.marketing.mobile.LoggingMode;
+import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.NamedCollection;
+import com.adobe.marketing.mobile.services.ServiceProvider;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +41,70 @@ class ConsentExtension extends Extension {
 	 * @param extensionApi {@link ExtensionApi} instance
 	 */
 	protected ConsentExtension(final ExtensionApi extensionApi) {
+		this(extensionApi, null);
+	}
+
+	/**
+	 * Constructor used for testing.
+	 * @param extensionApi {@link ExtensionApi} instance
+	 * @param namedCollection {@link NamedCollection} instance from {@link ServiceProvider}
+	 * @see ConsentExtension(ExtensionApi)
+	 */
+	protected ConsentExtension(final ExtensionApi extensionApi, final NamedCollection namedCollection) {
 		super(extensionApi);
 		consentManager = new ConsentManager();
+		ExtensionErrorCallback<ExtensionError> listenerErrorCallback = new ExtensionErrorCallback<ExtensionError>() {
+			@Override
+			public void error(final ExtensionError extensionError) {
+				MobileCore.log(
+					LoggingMode.ERROR,
+					ConsentConstants.LOG_TAG,
+					String.format(
+						"ConsentExtension - Failed to register listener, error: %s",
+						extensionError.getErrorName()
+					)
+				);
+			}
+		};
+		extensionApi.registerEventListener(
+			ConsentConstants.EventType.EDGE,
+			ConsentConstants.EventSource.CONSENT_PREFERENCE,
+			ListenerEdgeConsentPreference.class,
+			listenerErrorCallback
+		);
+		extensionApi.registerEventListener(
+			ConsentConstants.EventType.CONSENT,
+			ConsentConstants.EventSource.UPDATE_CONSENT,
+			ListenerConsentUpdateConsent.class,
+			listenerErrorCallback
+		);
+		extensionApi.registerEventListener(
+			ConsentConstants.EventType.CONSENT,
+			ConsentConstants.EventSource.REQUEST_CONTENT,
+			ListenerConsentRequestContent.class,
+			listenerErrorCallback
+		);
+		extensionApi.registerEventListener(
+			ConsentConstants.EventType.CONFIGURATION,
+			ConsentConstants.EventSource.RESPONSE_CONTENT,
+			ListenerConfigurationResponseContent.class,
+			listenerErrorCallback
+		);
+		extensionApi.registerEventListener(
+			ConsentConstants.EventType.HUB,
+			ConsentConstants.EventSource.BOOTED,
+			ListenerEventHubBoot.class,
+			listenerErrorCallback
+		);
+		consentManager =
+			new ConsentManager(
+				namedCollection == null
+					? ServiceProvider
+						.getInstance()
+						.getDataStoreService()
+						.getNamedCollection(ConsentConstants.DataStoreKey.DATASTORE_NAME)
+					: namedCollection
+			);
 	}
 
 	/**

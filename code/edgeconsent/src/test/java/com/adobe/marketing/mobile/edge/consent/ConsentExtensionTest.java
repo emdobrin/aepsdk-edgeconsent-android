@@ -22,13 +22,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.NamedCollection;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONException;
@@ -55,29 +53,13 @@ public class ConsentExtensionTest {
 	ExtensionApi mockExtensionApi;
 
 	@Mock
-	Application mockApplication;
-
-	@Mock
-	Context mockContext;
-
-	@Mock
-	SharedPreferences mockSharedPreference;
-
-	@Mock
-	SharedPreferences.Editor mockSharedPreferenceEditor;
+	NamedCollection mockNamedCollection;
 
 	@Before
 	public void setup() {
 		PowerMockito.mockStatic(MobileCore.class);
 
-		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
-		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
-		Mockito
-			.when(mockContext.getSharedPreferences(ConsentConstants.DataStoreKey.DATASTORE_NAME, 0))
-			.thenReturn(mockSharedPreference);
-		Mockito.when(mockSharedPreference.edit()).thenReturn(mockSharedPreferenceEditor);
-
-		extension = new ConsentExtension(mockExtensionApi);
+		extension = new ConsentExtension(mockExtensionApi, mockNamedCollection);
 	}
 
 	// ========================================================================================
@@ -150,8 +132,8 @@ public class ConsentExtensionTest {
 		final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
 		// test
-		extension = new ConsentExtension(mockExtensionApi);
-		extension.handleInitialization();
+		extension = new ConsentExtension(mockExtensionApi, mockNamedCollection);
+		extension.handleEventHubBoot(buildBootEvent());
 
 		verify(mockExtensionApi, times(1))
 			.setXDMSharedEventState(
@@ -178,8 +160,8 @@ public class ConsentExtensionTest {
 		setupExistingConsents(null);
 
 		// test
-		extension = new ConsentExtension(mockExtensionApi);
-		extension.handleInitialization();
+		extension = new ConsentExtension(mockExtensionApi, mockNamedCollection);
+		extension.handleEventHubBoot(buildBootEvent());
 
 		verify(mockExtensionApi, times(0))
 			.setXDMSharedEventState(any(Map.class), any(Event.class), any(ExtensionErrorCallback.class));
@@ -794,9 +776,9 @@ public class ConsentExtensionTest {
 
 	private void setupExistingConsents(final String jsonString) {
 		Mockito
-			.when(mockSharedPreference.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
+			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn(jsonString);
-		ConsentManager consentManager = new ConsentManager(); // loads the shared preference
+		ConsentManager consentManager = new ConsentManager(mockNamedCollection); // loads the data from persistence
 		Whitebox.setInternalState(extension, "consentManager", consentManager);
 	}
 
