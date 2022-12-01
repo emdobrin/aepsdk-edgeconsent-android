@@ -82,7 +82,7 @@ public class ConsentExtensionTest {
 		// verify listeners are registered with correct event source and type
 		verify(mockExtensionApi, times(1))
 			.registerEventListener(
-				eq(ConsentConstants.EventType.CONSENT),
+				eq(EventType.CONSENT),
 				eq(ConsentConstants.EventSource.UPDATE_CONSENT),
 				eq(ListenerConsentUpdateConsent.class),
 				any(ExtensionErrorCallback.class)

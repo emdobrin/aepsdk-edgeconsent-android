@@ -14,7 +14,7 @@ package com.adobe.marketing.mobile.edge.consent;
 final class ConsentConstants {
 
 	static final String LOG_TAG = "Consent";
-	static final String EXTENSION_VERSION = "1.0.1";
+	static final String EXTENSION_VERSION = "2.0.0";
 	static final String EXTENSION_NAME = "com.adobe.edge.consent";
 
 	private ConsentConstants() {}
@@ -28,27 +28,6 @@ final class ConsentConstants {
 		static final String TIME = "time";
 
 		private EventDataKey() {}
-	}
-
-	static final class EventSource {
-
-		static final String CONSENT_PREFERENCE = "consent:preferences";
-		static final String UPDATE_CONSENT = "com.adobe.eventSource.updateConsent";
-		static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
-		static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
-		static final String BOOTED = "com.adobe.eventSource.booted";
-
-		private EventSource() {}
-	}
-
-	static final class EventType {
-
-		static final String CONSENT = "com.adobe.eventType.edgeConsent";
-		static final String EDGE = "com.adobe.eventType.edge";
-		static final String CONFIGURATION = "com.adobe.eventType.configuration";
-		static final String HUB = "com.adobe.eventType.hub";
-
-		private EventType() {}
 	}
 
 	static final class DataStoreKey {
