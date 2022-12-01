@@ -18,6 +18,8 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.services.NamedCollection;
+import com.adobe.marketing.mobile.services.ServiceProvider;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +37,24 @@ class ConsentExtension extends Extension {
 	 * @param extensionApi {@link ExtensionApi} instance
 	 */
 	protected ConsentExtension(final ExtensionApi extensionApi) {
+		this(
+			extensionApi,
+			ServiceProvider
+				.getInstance()
+				.getDataStoreService()
+				.getNamedCollection(ConsentConstants.DataStoreKey.DATASTORE_NAME)
+		);
+	}
+
+	/**
+	 * Constructor used for testing.
+	 * @param extensionApi {@link ExtensionApi} instance
+	 * @param namedCollection {@link NamedCollection} instance from {@link ServiceProvider}
+	 * @see ConsentExtension(ExtensionApi)
+	 */
+	protected ConsentExtension(final ExtensionApi extensionApi, final NamedCollection namedCollection) {
 		super(extensionApi);
-		consentManager = new ConsentManager();
+		consentManager = new ConsentManager(namedCollection);
 	}
 
 	/**
@@ -280,7 +298,8 @@ class ConsentExtension extends Extension {
 	 * <p>
 	 * Will not share the XDMSharedEventState or dispatch event if consents is null.
 	 *
-	 * @param event the {@link Event} that triggered the consents update
+	 * @param event the {@link Event} that triggered the consents update. The event can be null on the first call when extension initializes.
+	 *
 	 */
 	private void shareCurrentConsents(final Event event) {
 		final Map<String, Object> xdmConsents = consentManager.getCurrentConsents().asXDMMap();
@@ -289,18 +308,13 @@ class ConsentExtension extends Extension {
 		getApi().createXDMSharedState(xdmConsents, event);
 
 		// create and dispatch an consent response event
-		Event.Builder responseBuilder = new Event.Builder(
+		Event responseEvent = new Event.Builder(
 			ConsentConstants.EventNames.CONSENT_PREFERENCES_UPDATED,
 			EventType.CONSENT,
 			EventSource.RESPONSE_CONTENT
-		);
-		responseBuilder.setEventData(xdmConsents);
-
-		if (event != null) {
-			responseBuilder.inResponseToEvent(event);
-		}
-
-		final Event responseEvent = responseBuilder.build();
+		)
+			.setEventData(xdmConsents)
+			.build();
 
 		getApi().dispatch(responseEvent);
 	}

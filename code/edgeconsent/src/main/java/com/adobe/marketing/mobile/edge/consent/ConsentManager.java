@@ -11,24 +11,33 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
+import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.services.NamedCollection;
+import com.adobe.marketing.mobile.util.JSONUtils;
 import java.util.HashMap;
+import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 final class ConsentManager {
 
+	private static final String LOG_SOURCE = "ConsentManager";
+	private final NamedCollection namedCollection;
 	private Consents userOptedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
 	private Consents defaultConsents; // holds on to default consents obtained from configuration response
 
 	/**
-	 * Constructor.
-	 * <p>
-	 * Initializes the {@link #userOptedConsents} from data in persistence.
+	 * Constructor - initializes the {@link #userOptedConsents} from data in persistence.
+	 *
+	 * @param namedCollection used for reading/writing consent preferences to persistence
 	 */
-	ConsentManager() {
-		userOptedConsents = ConsentStorageService.loadConsentsFromPersistence();
+	ConsentManager(final NamedCollection namedCollection) {
+		this.namedCollection = namedCollection;
+		userOptedConsents = loadConsentsFromPersistence();
 
 		// Initiate update consent with empty consent object if nothing is loaded from persistence
 		if (userOptedConsents == null) {
-			userOptedConsents = new Consents(new HashMap<String, Object>());
+			userOptedConsents = new Consents(new HashMap<>());
 		}
 	}
 
@@ -40,7 +49,7 @@ final class ConsentManager {
 	void mergeAndPersist(final Consents newConsents) {
 		// merge and persist
 		userOptedConsents.merge(newConsents);
-		ConsentStorageService.saveConsentsToPersistence(userOptedConsents);
+		saveConsentsToPersistence(userOptedConsents);
 	}
 
 	/**
@@ -78,5 +87,74 @@ final class ConsentManager {
 		currentConsents.merge(userOptedConsents);
 
 		return currentConsents;
+	}
+
+	/**
+	 * Loads the requested consents from persistence.
+	 * The jsonString from persistence is serialized into {@link Consents} object and returned.
+	 *
+	 * @return {@link Consent} the previously persisted consents. Returns null if there was any
+	 * 		   {@link JSONException} while serializing JSONString to {@code Consents} object.
+	 */
+	private Consents loadConsentsFromPersistence() {
+		if (namedCollection == null) {
+			Log.warning(
+				ConsentConstants.LOG_TAG,
+				LOG_SOURCE,
+				"loadConsentsFromPersistence failed due to unexpected null namedCollection."
+			);
+			return null;
+		}
+
+		final String jsonString = namedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null);
+
+		if (jsonString == null) {
+			Log.trace(
+				ConsentConstants.LOG_TAG,
+				LOG_SOURCE,
+				"No previous consents were stored in persistence. Current consent is null."
+			);
+
+			return null;
+		}
+
+		try {
+			final JSONObject jsonObject = new JSONObject(jsonString);
+			final Map<String, Object> consentMap = JSONUtils.toMap(jsonObject);
+			return new Consents(consentMap);
+		} catch (JSONException exception) {
+			Log.debug(
+				ConsentConstants.LOG_TAG,
+				LOG_SOURCE,
+				"Serialization error while reading consent jsonString from persistence. Unable to load saved consents from persistence."
+			);
+			return null;
+		}
+	}
+
+	/**
+	 * Call this method to save the consents to persistence.
+	 * The consents are converted to jsonString and stored into persistence.
+	 *
+	 * @param consents the consents that need to be persisted under key {@link ConsentConstants.DataStoreKey#CONSENT_PREFERENCES}
+	 */
+	private void saveConsentsToPersistence(final Consents consents) {
+		if (namedCollection == null) {
+			Log.warning(
+				ConsentConstants.LOG_TAG,
+				LOG_SOURCE,
+				"saveConsentsToPersistence failed due to unexpected null namedCollection."
+			);
+			return;
+		}
+
+		if (consents.isEmpty()) {
+			namedCollection.remove(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES);
+			return;
+		}
+
+		final JSONObject jsonObject = new JSONObject(consents.asXDMMap());
+		final String jsonString = jsonObject.toString();
+		namedCollection.setString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, jsonString);
 	}
 }
