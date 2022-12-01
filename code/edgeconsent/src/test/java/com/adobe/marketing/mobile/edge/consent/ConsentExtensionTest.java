@@ -71,7 +71,6 @@ public class ConsentExtensionTest {
 		//TODO
 		Mockito.reset(mockExtensionApi);
 		Mockito.mockStatic(MobileCore.class);
-
 		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
 		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
 		Mockito

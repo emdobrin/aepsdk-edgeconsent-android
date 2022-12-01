@@ -45,26 +45,26 @@ class MonitorExtension extends Extension {
 		MONITOR_EXTENSION_INSTANCE.set(this);
 	}
 
-	//	@Override
-	//	protected void onRegistered() {
-	//		MONITOR_EXTENSION_INSTANCE.set(this);
-	//	}
-	//
-	//	public static void registerExtension() {
-	//		MobileCore.registerExtension(
-	//			MonitorExtension.class,
-	//			new ExtensionErrorCallback<ExtensionError>() {
-	//				@Override
-	//				public void error(ExtensionError extensionError) {
-	//					MobileCore.log(
-	//						LoggingMode.ERROR,
-	//						LOG_TAG,
-	//						"There was an error registering the Monitor extension: " + extensionError.getErrorName()
-	//					);
-	//				}
-	//			}
-	//		);
-	//	}
+	@Override
+	protected void onRegistered() {
+		MONITOR_EXTENSION_INSTANCE.set(this);
+	}
+
+	public static void registerExtension() {
+		MobileCore.registerExtension(
+			MonitorExtension.class,
+			new ExtensionErrorCallback<ExtensionError>() {
+				@Override
+				public void error(ExtensionError extensionError) {
+					MobileCore.log(
+						LoggingMode.ERROR,
+						LOG_TAG,
+						"There was an error registering the Monitor extension: " + extensionError.getErrorName()
+					);
+				}
+			}
+		);
+	}
 
 	/**
 	 * Unregister the Monitor Extension from the EventHub.

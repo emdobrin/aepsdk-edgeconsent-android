@@ -14,6 +14,10 @@ package com.adobe.marketing.mobile.edge.consent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+//import static org.junit.Assert.assertTrue;
+//
+//import com.adobe.marketing.mobile.AdobeCallback;
+//import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -136,88 +140,75 @@ public class ConsentTest {
 			assertEquals(EventType.CONSENT, dispatchedEvent.getType());
 			assertEquals(EventSource.UPDATE_CONSENT, dispatchedEvent.getSource());
 			assertEquals(SAMPLE_CONSENTS_MAP, dispatchedEvent.getEventData());
-			// TODO - enable when ExtensionError creation is available
-			// should not crash on calling the callback
-			//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
 		}
 	}
 
-	//	@Test
-	//	public void testUpdate_withNull() {
-	//		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
-	//			mobileCoreMockedStatic.reset();
-	//			ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-	//
-	//			// test
-	//			Consent.update(null);
-	//
-	//			// verify
-	//			Event dispatchedEvent = eventCaptor.getAllValues().get(0);
-	//
-	//			assertNull(dispatchedEvent);
-	//			//			assertEquals(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST, dispatchedEvent.getName());
-	//			//			assertEquals(EventType.CONSENT, dispatchedEvent.getType());
-	//			//			assertEquals(EventSource.UPDATE_CONSENT, dispatchedEvent.getSource());
-	//			//			assertEquals(SAMPLE_CONSENTS_MAP, dispatchedEvent.getEventData());
-	//			// TODO - enable when ExtensionError creation is available
-	//			// should not crash on calling the callback
-	//			//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
-	//		}
-	//		// test
-	//		Consent.update(null);
-	//
-	//		// verify
-	//		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
-	//		MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
-	//}
+	@Test
+	public void testUpdate_withNull() {
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			mobileCoreMockedStatic.reset();
+			ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
-	//	// ========================================================================================
-	//	// getConsents Public API
-	//	// ========================================================================================
-	//	@Test
-	//	public void testGetConsents() {
-	//		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
-	//			// setup
-	//			final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-	//			final ArgumentCaptor<AdobeCallbackWithError> adobeCallbackCaptor = ArgumentCaptor.forClass(
-	//					AdobeCallbackWithError.class
-	//			);
-	//			final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
+			// test
+			Consent.update(null);
+
+			// verify
+			mobileCoreMockedStatic.verifyNoInteractions();
+		}
+	}
+
+	// ========================================================================================
+	// getConsents Public API
+	// ========================================================================================
+	//		@Test
+	//		public void testGetConsents() {
+	//			try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+	//				// setup
+	//				final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+	//				final ArgumentCaptor<AdobeCallback> adobeCallbackCaptor = ArgumentCaptor.forClass(AdobeCallback.class);
+	//				final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
 	//
-	//			// test
-	//			Consent.getConsents(
-	//				new AdobeCallback<Map<String, Object>>() {
-	//					@Override
-	//					public void call(Map<String, Object> stringObjectMap) {
-	//						callbackReturnValues.add(stringObjectMap);
+	//				// test
+	//				Consent.getConsents(
+	//					new AdobeCallback<Map<String, Object>>() {
+	//						@Override
+	//						public void call(Map<String, Object> stringObjectMap) {
+	//							callbackReturnValues.add(stringObjectMap);
+	//						}
 	//					}
-	//				}
-	//			);
+	//				);
 	//
-	//			// verify
-	//			mobileCoreMockedStatic.verify(() ->
-	//				MobileCore.dispatchEventWithResponseCallback(
-	//					eventCaptor.capture(),
-	//					5L,
-	//					adobeCallbackCaptor<eventCaptor>
+	//				// verify
+	//				mobileCoreMockedStatic.verify(() -> {
+	//							MobileCore.dispatchEventWithResponseCallback(
+	//									eventCaptor.capture(),
+	//									500L,
+	//									adobeCallbackCaptor.capture()
+	//							);
+	//						}
 	//				)
-	//			);
 	//
-	//			// verify the dispatched event details
-	//			Event dispatchedEvent = eventCaptor.getValue();
-	//			assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
-	//			assertEquals(EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
-	//			assertEquals(EventSource.REQUEST_CONTENT.toLowerCase(), dispatchedEvent.getSource());
-	//			assertTrue(dispatchedEvent.getEventData().isEmpty());
+	//				mobileCoreMockedStatic.verify(() ->
+	//					MobileCore.dispatchEventWithResponseCallback(
+	//						eventCaptor.capture(), 500L, adobeCallbackCaptor.capture());
+	//						)
+	//				);
 	//
-	//			//verify callback responses
-	//			adobeCallbackCaptor.getValue().call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
-	//			assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
-	//			// TODO - enable when ExtensionError creation is available
-	//			// should not crash on calling the callback
-	//			//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
+	//	 verify the dispatched event details
+	//				Event dispatchedEvent = eventCaptor.getValue();
+	//				assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
+	//				assertEquals(EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
+	//				assertEquals(EventSource.REQUEST_CONTENT.toLowerCase(), dispatchedEvent.getSource());
+	//				assertTrue(dispatchedEvent.getEventData().isEmpty());
+	//
+	//				//verify callback responses
+	//				adobeCallbackCaptor.getValue().call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
+	//				assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
+	//				// TODO - enable when ExtensionError creation is available
+	//				// should not crash on calling the callback
+	//				//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
+	//			}
 	//		}
-	//	}
 
 	//	@Test
 	//	public void testGetConsents_NullCallback() {
