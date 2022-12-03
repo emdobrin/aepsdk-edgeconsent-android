@@ -31,7 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-//@PrepareForTest({ MobileCore.class })
 public class ConsentManagerTest {
 
 	private MobileCore mobileCore;
@@ -47,9 +46,7 @@ public class ConsentManagerTest {
 	// ========================================================================================
 
 	@Before
-
-	public void setup() {
-	}
+	public void setup() {}
 
 	@Test
 	public void test_Constructor_LoadsFromPersistence() {
