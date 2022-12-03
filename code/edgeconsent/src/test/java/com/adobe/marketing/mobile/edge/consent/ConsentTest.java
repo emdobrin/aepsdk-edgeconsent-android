@@ -14,8 +14,6 @@ package com.adobe.marketing.mobile.edge.consent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
@@ -186,7 +184,7 @@ public class ConsentTest {
 				MobileCore.dispatchEventWithResponseCallback(
 					eventCaptor.capture(),
 					ArgumentMatchers.anyLong(),
-					ArgumentMatchers.any(AdobeCallbackWithError.class)
+					callbackCaptor.capture()
 				)
 			);
 
@@ -198,15 +196,11 @@ public class ConsentTest {
 			assertEquals(EventType.CONSENT, dispatchedEvent.getType());
 			assertEquals(EventSource.REQUEST_CONTENT, dispatchedEvent.getSource());
 			final Map<String, Object> eventData = dispatchedEvent.getEventData();
-			assertEquals(null, eventData); //TODO check is null or empty
+			assertEquals(null, eventData);
 			//verify callback responses
 
-			//callbackWithError.call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
-			verify(callbackWithError, times(1)).call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
+			callbackWithError.call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
 			assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
-			// TODO - enable when ExtensionError creation is available
-			// should not crash on calling the callback
-			//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
 		}
 	}
 
@@ -214,7 +208,6 @@ public class ConsentTest {
 	public void testGetConsents_NullCallback() {
 		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
 			mobileCoreMockedStatic.reset();
-			ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
 			// test
 			Consent.getConsents(null);
@@ -231,8 +224,10 @@ public class ConsentTest {
 			final String KEY_IS_ERRORCALLBACK_CALLED = "errorCallBackCalled";
 			final String KEY_CAPTUREDERRORCALLBACK = "capturedErrorCallback";
 			final Map<String, Object> errorCapture = new HashMap<>();
-			final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-			final ArgumentCaptor<AdobeCallback> adobeCallbackCaptor = ArgumentCaptor.forClass(AdobeCallback.class);
+			final ArgumentCaptor<AdobeCallbackWithError> adobeCallbackCaptor = ArgumentCaptor.forClass(
+				AdobeCallbackWithError.class
+			);
+
 			final AdobeCallbackWithError callbackWithError = new AdobeCallbackWithError() {
 				@Override
 				public void fail(AdobeError adobeError) {
@@ -250,9 +245,9 @@ public class ConsentTest {
 			// verify if the event is dispatched
 			mobileCoreMockedStatic.verify(() ->
 				MobileCore.dispatchEventWithResponseCallback(
-					eventCaptor.capture(),
+					ArgumentMatchers.any(Event.class),
 					ArgumentMatchers.anyLong(),
-					ArgumentMatchers.any(AdobeCallbackWithError.class)
+					adobeCallbackCaptor.capture()
 				)
 			);
 			// set response event to null
