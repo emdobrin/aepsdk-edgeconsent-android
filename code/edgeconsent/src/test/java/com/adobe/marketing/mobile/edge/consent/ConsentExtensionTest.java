@@ -27,7 +27,6 @@ import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.ExtensionEventListener;
-import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.NamedCollection;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
@@ -48,7 +46,6 @@ import org.powermock.reflect.Whitebox;
 public class ConsentExtensionTest {
 
 	private ConsentExtension extension;
-	private MockedStatic<MobileCore> mockStatic;
 
 	@Mock
 	ExtensionApi mockExtensionApi;
@@ -261,7 +258,7 @@ public class ConsentExtensionTest {
 	}
 
 	// ========================================================================================
-	// handleConsentUpdate  TODO, check case sensitive
+	// handleConsentUpdate
 	// ========================================================================================
 	@Test
 	public void test_handleConsentUpdate() {
@@ -275,7 +272,7 @@ public class ConsentExtensionTest {
 		// verify
 		verify(mockExtensionApi, times(2)).dispatch(eventCaptor.capture());
 
-		// verify the dispatched event TODO
+		// verify the dispatched event
 		// verify
 		// Initial null and null
 		// Updated YES and NO
@@ -401,45 +398,29 @@ public class ConsentExtensionTest {
 			.build();
 
 		final ArgumentCaptor<Event> dispatchEventCaptor = ArgumentCaptor.forClass(Event.class);
-		final ArgumentCaptor<Event> pairedEventCaptor = ArgumentCaptor.forClass(Event.class);
 
 		// test
 		extension.handleRequestContent(event);
 
 		// verify
 		verify(mockExtensionApi, times(1)).dispatch(dispatchEventCaptor.capture());
-		verify(mockExtensionApi, times(1)).dispatch(pairedEventCaptor.capture());
 
 		// verify that response for the request event is dispatched
 		Event dispatchedEvent = dispatchEventCaptor.getValue();
+
 		assertEquals(ConsentConstants.EventNames.GET_CONSENTS_RESPONSE, dispatchedEvent.getName());
 		assertEquals(EventType.CONSENT, dispatchedEvent.getType());
 		assertEquals(EventSource.RESPONSE_CONTENT, dispatchedEvent.getSource());
 		assertEquals(CreateConsentXDMMap("n", "n"), dispatchedEvent.getEventData());
-
-		// verify that the request event is attached as the paired event for the response
-		Event pairedEvent = pairedEventCaptor.getValue();
-		assertEquals(pairedEvent, dispatchedEvent); // TODO  assertEquals(pairedEvent, event);
-		// TODO - enable when ExtensionError creation is available
-		//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
 	}
 
 	@Test
 	public void test_handleRequestContent_NullCurrentConsents() {
 		// setup
-		Event responseEvent = new Event.Builder(
-			"Get Consents Response",
-			EventType.CONSENT,
-			EventSource.RESPONSE_CONTENT
-		)
-			.build();
-
 		Event event = new Event.Builder("Get Consent Request", EventType.CONSENT, EventSource.RESPONSE_CONTENT)
 			.setEventData(null)
-			.inResponseToEvent(responseEvent)
 			.build();
-		ArgumentCaptor<Event> responseEventCaptor = ArgumentCaptor.forClass(Event.class);
-		ArgumentCaptor<Event> pairedEventCaptor = ArgumentCaptor.forClass(Event.class);
+
 		ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
 		// test
@@ -447,9 +428,8 @@ public class ConsentExtensionTest {
 
 		// verify
 		verify(mockExtensionApi, times(1)).dispatch(eventCaptor.capture());
-		verify(mockExtensionApi, times(1)).dispatch(pairedEventCaptor.capture());
 
-		// verify that the response event is dispatched with empty event data  TODO
+		// verify that the response event is dispatched with empty event data
 		Event dispatchedEvent = eventCaptor.getValue();
 		Map consentMap = (Map) dispatchedEvent.getEventData().get("consents");
 		assertTrue(consentMap.isEmpty());

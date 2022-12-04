@@ -390,7 +390,7 @@ public class ConsentsTest {
 		assertFalse(first.equalsIgnoreTimestamp(second));
 		assertFalse(second.equalsIgnoreTimestamp(first));
 	}
-	//	//Helper to remove milliseconds from timestamps
+	//	//Helper to remove milliseconds from timestamps, will be deleted
 	//	private static String stringRemoveByIndex(String str, int index) {
 	//		StringBuilder string = new StringBuilder(str);
 	//		for (int i = 0; i < 4; i++) {

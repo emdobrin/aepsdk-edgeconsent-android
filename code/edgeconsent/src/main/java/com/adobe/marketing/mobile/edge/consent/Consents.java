@@ -112,7 +112,7 @@ final class Consents {
 		} catch (final ClassCastException exception) {
 			return;
 		}
-		//TimeStamp Check
+		//TODO TimeStamp revisit
 		metaDataContents.put(ConsentConstants.EventDataKey.TIME, TimeUtils.getIso8601DateTimeZoneISO8601());
 		consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
 	}
