@@ -227,7 +227,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.5.0'
 
     testImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
-    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
     testImplementation 'org.mockito:mockito-inline:4.5.1'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
     testImplementation 'org.powermock:powermock-api-mockito2:2.0.0'
