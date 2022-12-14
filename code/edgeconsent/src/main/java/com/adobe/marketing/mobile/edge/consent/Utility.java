@@ -55,7 +55,7 @@ final class Utility {
 				Log.debug(
 					LOG_TAG,
 					LOG_SOURCE,
-					"Utility(toMap) - Unable to convert jsonObject to Map for key \" + nextKey + \", skipping."
+					"toMap - Unable to convert jsonObject to Map for key \" + nextKey + \", skipping."
 				);
 			}
 
@@ -103,7 +103,7 @@ final class Utility {
 				Log.debug(
 					LOG_TAG,
 					LOG_SOURCE,
-					"Utility(toList) - Unable to convert jsonObject to List for index \" + i + \", skipping."
+					"toList - Unable to convert jsonObject to List for index \" + i + \", skipping."
 				);
 			}
 
@@ -139,7 +139,7 @@ final class Utility {
 		try {
 			return toMap(new JSONObject(map));
 		} catch (NullPointerException e) {
-			Log.debug(LOG_TAG, LOG_SOURCE, "Utility(deepCopy) - Unable to deep copy map, json string invalid.");
+			Log.debug(LOG_TAG, LOG_SOURCE, "deepCopy - Unable to deep copy map, json string invalid.");
 		}
 
 		return null;

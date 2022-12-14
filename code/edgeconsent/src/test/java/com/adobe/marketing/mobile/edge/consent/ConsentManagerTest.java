@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.NamedCollection;
 import java.util.HashMap;
 import org.junit.Before;
@@ -30,10 +29,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ConsentManagerTest {
-
-	private MobileCore mobileCore;
 
 	@Mock
 	NamedCollection mockNamedCollection;

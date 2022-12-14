@@ -42,7 +42,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ConsentExtensionTest {
 
 	private ConsentExtension extension;
@@ -154,6 +154,17 @@ public class ConsentExtensionTest {
 		// test
 		String moduleName = extension.getName();
 		assertEquals("getName should return the correct module name", ConsentConstants.EXTENSION_NAME, moduleName);
+	}
+
+	//
+	// ========================================================================================
+	// getName
+	// ========================================================================================
+	@Test
+	public void test_getFamilyName() {
+		// test
+		String moduleName = extension.getFriendlyName();
+		assertEquals("getFamilyName should return the correct module name", ConsentConstants.FRIENDLY_NAME, moduleName);
 	}
 
 	// ========================================================================================

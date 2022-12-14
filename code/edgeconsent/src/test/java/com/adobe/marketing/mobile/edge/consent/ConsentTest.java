@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.app.Application;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
@@ -29,22 +30,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ConsentTest {
 
 	private static Map<String, Object> SAMPLE_CONSENTS_MAP = ConsentTestUtil.CreateConsentXDMMap("y");
 
+	@Mock
+	Application mockApplication;
+
 	@Before
-	public void setup() {}
+	public void setup() {
+		Mockito.reset(mockApplication);
+	}
 
 	// ========================================================================================
 	// extensionVersion
@@ -65,7 +74,7 @@ public class ConsentTest {
 	// registerExtension
 	// ========================================================================================
 	@Test
-	public void testRegistration() {
+	public void testRegistration_deprecated() {
 		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
 			// mock MobileCore.registerExtension()
 			ArgumentCaptor<Class> extensionClassCaptor = ArgumentCaptor.forClass(Class.class);
@@ -89,19 +98,21 @@ public class ConsentTest {
 	// publicExtensionConstants
 	// ========================================================================================
 	@Test
-	public void test_publicExtensionConstants() {
-		assertEquals(ConsentExtension.class, Consent.EXTENSION);
+	public void test_publicExtensionConstants() throws InterruptedException {
+		MobileCore.setApplication(mockApplication);
+
+		final CountDownLatch latch = new CountDownLatch(1);
 		List<Class<? extends Extension>> extensions = new ArrayList<>();
 		extensions.add(Consent.EXTENSION);
-		// should not throw exceptions
-		MobileCore.registerExtensions(extensions, null);
+		MobileCore.registerExtensions(extensions, o -> latch.countDown());
+		assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
 	}
 
 	// ========================================================================================
 	// Registration without Error
 	// ========================================================================================
 	@Test
-	public void test_registerExtension_withoutError() {
+	public void test_registerExtension_withoutError_deprecated() {
 		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
 			// mock MobileCore.registerExtension()
 			ArgumentCaptor<Class> extensionClassCaptor = ArgumentCaptor.forClass(Class.class);
@@ -127,7 +138,6 @@ public class ConsentTest {
 	@Test
 	public void testUpdate() {
 		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
-			mobileCoreMockedStatic.reset();
 			ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
 			// test
@@ -148,8 +158,6 @@ public class ConsentTest {
 	@Test
 	public void testUpdate_withNull() {
 		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
-			mobileCoreMockedStatic.reset();
-
 			// test
 			Consent.update(null);
 
@@ -207,8 +215,6 @@ public class ConsentTest {
 	@Test
 	public void testGetConsents_NullCallback() {
 		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
-			mobileCoreMockedStatic.reset();
-
 			// test
 			Consent.getConsents(null);
 
