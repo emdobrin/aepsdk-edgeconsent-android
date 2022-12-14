@@ -745,6 +745,6 @@ public class ConsentExtensionTest {
 
 	private void verifyNoEventDispatched() {
 		ArgumentCaptor<Event> eventCaptor2 = ArgumentCaptor.forClass(Event.class);
-		verify(mockExtensionApi, times(0)).dispatch(eventCaptor2.capture());
+		verify(mockExtensionApi, times(0)).dispatch(any(Event.class));
 	}
 }
