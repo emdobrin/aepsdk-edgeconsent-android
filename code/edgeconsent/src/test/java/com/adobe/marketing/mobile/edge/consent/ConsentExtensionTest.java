@@ -56,6 +56,7 @@ public class ConsentExtensionTest {
 	@Before
 	public void setup() {
 		Mockito.reset(mockExtensionApi);
+		Mockito.reset(mockNamedCollection);
 		extension = new ConsentExtension(mockExtensionApi, mockNamedCollection);
 	}
 
