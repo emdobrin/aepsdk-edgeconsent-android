@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class MonitorExtension extends Extension {
 
+	//TODO: This file is part of the functional test, will be updated in the functional test PR.
+
 	static AtomicReference<MonitorExtension> MONITOR_EXTENSION_INSTANCE = new AtomicReference<>(null);
 
 	private static final String LOG_TAG = "MonitorExtension";

@@ -251,6 +251,7 @@ public class ConsentBootUpTests {
 			MobileCore.updateConfiguration(config);
 		}
 
+		//TODO: This file is part of the functional test, will be updated in the functional test PR. These lines need to be comments for this PR.
 		List<Class<? extends Extension>> extensions = new ArrayList<>();
 		//extensions.add(Consent.);
 		//extensions.add(MonitorExtension.class);
