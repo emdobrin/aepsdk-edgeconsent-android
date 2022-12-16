@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,11 +97,11 @@ public class ConsentTest {
 	// ========================================================================================
 	@Test
 	public void test_publicExtensionConstants() throws InterruptedException {
-			assertEquals(ConsentExtension.class, Consent.EXTENSION);
-			List<Class<? extends Extension>> extensions = new ArrayList<>();
-			extensions.add(Consent.EXTENSION);
-			// should not throw exceptions
-			MobileCore.registerExtensions(extensions, null);
+		assertEquals(ConsentExtension.class, Consent.EXTENSION);
+		List<Class<? extends Extension>> extensions = new ArrayList<>();
+		extensions.add(Consent.EXTENSION);
+		// should not throw exceptions
+		MobileCore.registerExtensions(extensions, null);
 	}
 
 	// ========================================================================================
