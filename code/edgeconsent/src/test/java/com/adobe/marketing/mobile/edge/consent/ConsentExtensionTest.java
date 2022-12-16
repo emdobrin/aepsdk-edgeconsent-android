@@ -159,13 +159,13 @@ public class ConsentExtensionTest {
 
 	//
 	// ========================================================================================
-	// getName
+	// getFriendlyName
 	// ========================================================================================
 	@Test
-	public void test_getFamilyName() {
+	public void test_getFriendlyName() {
 		// test
 		String moduleName = extension.getFriendlyName();
-		assertEquals("getFamilyName should return the correct module name", ConsentConstants.FRIENDLY_NAME, moduleName);
+		assertEquals("getFriendlyName should return the correct module name", ConsentConstants.FRIENDLY_NAME, moduleName);
 	}
 
 	// ========================================================================================
