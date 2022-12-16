@@ -96,7 +96,7 @@ public class ConsentTest {
 	// publicExtensionConstants
 	// ========================================================================================
 	@Test
-	public void test_publicExtensionConstants() throws InterruptedException {
+	public void test_publicExtensionConstants() {
 		assertEquals(ConsentExtension.class, Consent.EXTENSION);
 		List<Class<? extends Extension>> extensions = new ArrayList<>();
 		extensions.add(Consent.EXTENSION);
