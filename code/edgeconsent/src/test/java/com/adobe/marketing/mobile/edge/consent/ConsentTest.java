@@ -99,13 +99,11 @@ public class ConsentTest {
 	// ========================================================================================
 	@Test
 	public void test_publicExtensionConstants() throws InterruptedException {
-		MobileCore.setApplication(mockApplication);
-
-		final CountDownLatch latch = new CountDownLatch(1);
-		List<Class<? extends Extension>> extensions = new ArrayList<>();
-		extensions.add(Consent.EXTENSION);
-		MobileCore.registerExtensions(extensions, o -> latch.countDown());
-		assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+			assertEquals(ConsentExtension.class, Consent.EXTENSION);
+			List<Class<? extends Extension>> extensions = new ArrayList<>();
+			extensions.add(Consent.EXTENSION);
+			// should not throw exceptions
+			MobileCore.registerExtensions(extensions, null);
 	}
 
 	// ========================================================================================
