@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNull;
 
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.TestHelper;
 import com.adobe.marketing.mobile.TestPersistenceHelper;
@@ -57,10 +59,7 @@ public class ConsentDefaultsTests {
 		waitForThreads(1000);
 
 		// verify consent response event dispatched
-		List<Event> consentResponseEvents = getDispatchedEventsWith(
-			ConsentConstants.EventType.CONSENT,
-			ConsentConstants.EventSource.RESPONSE_CONTENT
-		);
+		List<Event> consentResponseEvents = getDispatchedEventsWith(EventType.CONSENT, EventSource.RESPONSE_CONTENT);
 		assertEquals(1, consentResponseEvents.size());
 		Map<String, String> consentResponseData = flattenMap(consentResponseEvents.get(0).getEventData());
 		assertEquals(1, consentResponseData.size()); // verify that only collect consent is updated
@@ -141,10 +140,7 @@ public class ConsentDefaultsTests {
 		waitForThreads(1000);
 
 		// verify edge event for only collectConsent data
-		List<Event> edgeRequestEvents = getDispatchedEventsWith(
-			ConsentConstants.EventType.EDGE,
-			ConsentConstants.EventSource.UPDATE_CONSENT
-		);
+		List<Event> edgeRequestEvents = getDispatchedEventsWith(EventType.EDGE, EventSource.UPDATE_CONSENT);
 		assertEquals(1, edgeRequestEvents.size());
 		Map<String, String> edgeRequestData = flattenMap(edgeRequestEvents.get(0).getEventData());
 		assertEquals(2, edgeRequestData.size()); // verify that only collect consent and metadata are updated

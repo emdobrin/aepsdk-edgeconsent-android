@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.NamedCollection;
 import java.util.HashMap;
 import org.junit.Before;
@@ -27,13 +26,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ MobileCore.class })
+@RunWith(MockitoJUnitRunner.class)
 public class ConsentManagerTest {
 
 	@Mock
@@ -47,9 +43,7 @@ public class ConsentManagerTest {
 	// ========================================================================================
 
 	@Before
-	public void before() throws Exception {
-		PowerMockito.mockStatic(MobileCore.class);
-	}
+	public void setup() {}
 
 	@Test
 	public void test_Constructor_LoadsFromPersistence() {

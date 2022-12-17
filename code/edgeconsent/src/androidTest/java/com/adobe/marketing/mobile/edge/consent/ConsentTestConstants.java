@@ -13,8 +13,6 @@ package com.adobe.marketing.mobile.edge.consent;
 
 public class ConsentTestConstants {
 
-	public static String SAMPLE_METADATA_TIMESTAMP = "2019-09-23T18:15:45Z";
-
 	public final class DataStoreKey {
 
 		public static final String CONFIG_DATASTORE = "AdobeMobile_ConfigState";

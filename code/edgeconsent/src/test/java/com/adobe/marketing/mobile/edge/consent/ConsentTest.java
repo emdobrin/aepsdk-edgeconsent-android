@@ -14,14 +14,16 @@ package com.adobe.marketing.mobile.edge.consent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 
+import android.app.Application;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
+import com.adobe.marketing.mobile.Extension;
+import com.adobe.marketing.mobile.ExtensionError;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.MobileCore;
 import java.util.ArrayList;
@@ -33,20 +35,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ MobileCore.class })
+@RunWith(MockitoJUnitRunner.class)
 public class ConsentTest {
 
 	private static Map<String, Object> SAMPLE_CONSENTS_MAP = ConsentTestUtil.CreateConsentXDMMap("y");
 
+	@Mock
+	Application mockApplication;
+
 	@Before
 	public void setup() {
-		PowerMockito.mockStatic(MobileCore.class);
+		Mockito.reset(mockApplication);
 	}
 
 	// ========================================================================================
@@ -68,158 +72,193 @@ public class ConsentTest {
 	// registerExtension
 	// ========================================================================================
 	@Test
-	public void testRegistration() {
-		// test
-		Consent.registerExtension();
-		final ArgumentCaptor<ExtensionErrorCallback> callbackCaptor = ArgumentCaptor.forClass(
-			ExtensionErrorCallback.class
-		);
+	public void testRegistration_deprecated() {
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// mock MobileCore.registerExtension()
+			ArgumentCaptor<Class> extensionClassCaptor = ArgumentCaptor.forClass(Class.class);
+			ArgumentCaptor<ExtensionErrorCallback> callbackCaptor = ArgumentCaptor.forClass(
+				ExtensionErrorCallback.class
+			);
+			mobileCoreMockedStatic
+				.when(() -> MobileCore.registerExtension(extensionClassCaptor.capture(), callbackCaptor.capture()))
+				.thenReturn(true);
+			// call registerExtension() API
+			Consent.registerExtension();
+			// verify: happy
+			assertNotNull(callbackCaptor.getValue());
+			assertEquals(ConsentExtension.class, extensionClassCaptor.getValue());
+			// verify: not exception when error callback was called
+			callbackCaptor.getValue().error(ExtensionError.UNEXPECTED_ERROR);
+		}
+	}
 
-		// The consent extension should register with core
-		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
-		MobileCore.registerExtension(ArgumentMatchers.eq(ConsentExtension.class), callbackCaptor.capture());
+	// ========================================================================================
+	// publicExtensionConstants
+	// ========================================================================================
+	@Test
+	public void test_publicExtensionConstants() {
+		assertEquals(ConsentExtension.class, Consent.EXTENSION);
+		List<Class<? extends Extension>> extensions = new ArrayList<>();
+		extensions.add(Consent.EXTENSION);
+		// should not throw exceptions
+		MobileCore.registerExtensions(extensions, null);
+	}
 
-		// verify the callback
-		ExtensionErrorCallback extensionErrorCallback = callbackCaptor.getValue();
-		assertNotNull("The extension callback should not be null", extensionErrorCallback);
-		// TODO - enable when ExtensionError creation is available
-		// should not crash on calling the callback
-		//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
+	// ========================================================================================
+	// Registration without Error
+	// ========================================================================================
+	@Test
+	public void test_registerExtension_withoutError_deprecated() {
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// mock MobileCore.registerExtension()
+			ArgumentCaptor<Class> extensionClassCaptor = ArgumentCaptor.forClass(Class.class);
+			ArgumentCaptor<ExtensionErrorCallback> callbackCaptor = ArgumentCaptor.forClass(
+				ExtensionErrorCallback.class
+			);
+			mobileCoreMockedStatic
+				.when(() -> MobileCore.registerExtension(extensionClassCaptor.capture(), callbackCaptor.capture()))
+				.thenReturn(true);
+			// call registerExtension() API
+			Consent.registerExtension();
+			// verify: happy
+			assertNotNull(callbackCaptor.getValue());
+			assertEquals(ConsentExtension.class, extensionClassCaptor.getValue());
+			// verify: not exception when error callback was called
+			callbackCaptor.getValue().error(null);
+		}
 	}
 
 	// ========================================================================================
 	// update Public API
-	// ========================================================================================
+	//========================================================================================
 	@Test
 	public void testUpdate() {
-		// setup
-		final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-		final ArgumentCaptor<ExtensionErrorCallback> callbackCaptor = ArgumentCaptor.forClass(
-			ExtensionErrorCallback.class
-		);
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
-		// test
-		Consent.update(SAMPLE_CONSENTS_MAP);
+			// test
+			Consent.update(SAMPLE_CONSENTS_MAP);
 
-		// verify
-		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
-		MobileCore.dispatchEvent(eventCaptor.capture(), callbackCaptor.capture());
+			// verify
+			mobileCoreMockedStatic.verify(() -> MobileCore.dispatchEvent(eventCaptor.capture()));
+			Event dispatchedEvent = eventCaptor.getValue();
 
-		Event dispatchedEvent = eventCaptor.getValue();
-		assertEquals(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST, dispatchedEvent.getName());
-		assertEquals(EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
-		assertEquals(EventSource.UPDATE_CONSENT.toLowerCase(), dispatchedEvent.getSource());
-		assertEquals(SAMPLE_CONSENTS_MAP, dispatchedEvent.getEventData());
-		// TODO - enable when ExtensionError creation is available
-		// should not crash on calling the callback
-		//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
+			assertNotNull(dispatchedEvent);
+			assertEquals(ConsentConstants.EventNames.CONSENT_UPDATE_REQUEST, dispatchedEvent.getName());
+			assertEquals(EventType.CONSENT, dispatchedEvent.getType());
+			assertEquals(EventSource.UPDATE_CONSENT, dispatchedEvent.getSource());
+			assertEquals(SAMPLE_CONSENTS_MAP, dispatchedEvent.getEventData());
+		}
 	}
 
 	@Test
 	public void testUpdate_withNull() {
-		// test
-		Consent.update(null);
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// test
+			Consent.update(null);
 
-		// verify
-		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
-		MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
+			// verify
+			mobileCoreMockedStatic.verifyNoInteractions();
+		}
 	}
 
-	// ========================================================================================
-	// getConsents Public API
-	// ========================================================================================
 	@Test
 	public void testGetConsents() {
-		// setup
-		final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-		final ArgumentCaptor<AdobeCallback> adobeCallbackCaptor = ArgumentCaptor.forClass(AdobeCallback.class);
-		final ArgumentCaptor<ExtensionErrorCallback> extensionErrorCallbackCaptor = ArgumentCaptor.forClass(
-			ExtensionErrorCallback.class
-		);
-		final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// setup
+			final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+			final ArgumentCaptor<AdobeCallbackWithError<Event>> callbackCaptor = ArgumentCaptor.forClass(
+				AdobeCallbackWithError.class
+			);
 
-		// test
-		Consent.getConsents(
-			new AdobeCallback<Map<String, Object>>() {
-				@Override
-				public void call(Map<String, Object> stringObjectMap) {
-					callbackReturnValues.add(stringObjectMap);
+			final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
+
+			// test
+			Consent.getConsents(
+				new AdobeCallback<Map<String, Object>>() {
+					@Override
+					public void call(Map<String, Object> stringObjectMap) {
+						callbackReturnValues.add(stringObjectMap);
+					}
 				}
-			}
-		);
+			);
 
-		// verify
-		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
-		MobileCore.dispatchEventWithResponseCallback(
-			eventCaptor.capture(),
-			adobeCallbackCaptor.capture(),
-			extensionErrorCallbackCaptor.capture()
-		);
+			// verify
+			mobileCoreMockedStatic.verify(() ->
+				MobileCore.dispatchEventWithResponseCallback(
+					eventCaptor.capture(),
+					ArgumentMatchers.anyLong(),
+					callbackCaptor.capture()
+				)
+			);
 
-		// verify the dispatched event details
-		Event dispatchedEvent = eventCaptor.getValue();
-		assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
-		assertEquals(EventType.CONSENT.toLowerCase(), dispatchedEvent.getType());
-		assertEquals(EventSource.REQUEST_CONTENT.toLowerCase(), dispatchedEvent.getSource());
-		assertTrue(dispatchedEvent.getEventData().isEmpty());
+			final Event dispatchedEvent = eventCaptor.getValue();
+			final AdobeCallbackWithError<Event> callbackWithError = callbackCaptor.getValue();
 
-		//verify callback responses
-		adobeCallbackCaptor.getValue().call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
-		assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
-		// TODO - enable when ExtensionError creation is available
-		// should not crash on calling the callback
-		//extensionErrorCallback.error(ExtensionError.UNEXPECTED_ERROR);
+			// verify the dispatched event details
+			assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
+			assertEquals(EventType.CONSENT, dispatchedEvent.getType());
+			assertEquals(EventSource.REQUEST_CONTENT, dispatchedEvent.getSource());
+			final Map<String, Object> eventData = dispatchedEvent.getEventData();
+			assertEquals(null, eventData);
+			//verify callback responses
+
+			callbackWithError.call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
+			assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
+		}
 	}
 
 	@Test
 	public void testGetConsents_NullCallback() {
-		// test
-		Consent.getConsents(null);
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// test
+			Consent.getConsents(null);
 
-		// verify
-		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(0));
-		MobileCore.dispatchEventWithResponseCallback(
-			any(Event.class),
-			any(AdobeCallback.class),
-			any(ExtensionErrorCallback.class)
-		);
+			// verify
+			mobileCoreMockedStatic.verifyNoInteractions();
+		}
 	}
 
 	@Test
 	public void testGetConsents_NullResponseEvent() {
-		// setup
-		final String KEY_IS_ERRORCALLBACK_CALLED = "errorCallBackCalled";
-		final String KEY_CAPTUREDERRORCALLBACK = "capturedErrorCallback";
-		final Map<String, Object> errorCapture = new HashMap<>();
-		final ArgumentCaptor<AdobeCallback> adobeCallbackCaptor = ArgumentCaptor.forClass(AdobeCallback.class);
-		final AdobeCallbackWithError callbackWithError = new AdobeCallbackWithError() {
-			@Override
-			public void fail(AdobeError adobeError) {
-				errorCapture.put(KEY_IS_ERRORCALLBACK_CALLED, true);
-				errorCapture.put(KEY_CAPTUREDERRORCALLBACK, adobeError);
-			}
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// setup
+			final String KEY_IS_ERRORCALLBACK_CALLED = "errorCallBackCalled";
+			final String KEY_CAPTUREDERRORCALLBACK = "capturedErrorCallback";
+			final Map<String, Object> errorCapture = new HashMap<>();
+			final ArgumentCaptor<AdobeCallbackWithError> adobeCallbackCaptor = ArgumentCaptor.forClass(
+				AdobeCallbackWithError.class
+			);
 
-			@Override
-			public void call(Object o) {}
-		};
+			final AdobeCallbackWithError callbackWithError = new AdobeCallbackWithError() {
+				@Override
+				public void fail(AdobeError adobeError) {
+					errorCapture.put(KEY_IS_ERRORCALLBACK_CALLED, true);
+					errorCapture.put(KEY_CAPTUREDERRORCALLBACK, adobeError);
+				}
 
-		// test
-		Consent.getConsents(callbackWithError);
+				@Override
+				public void call(Object o) {}
+			};
 
-		// verify if the event is dispatched
-		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
-		MobileCore.dispatchEventWithResponseCallback(
-			any(Event.class),
-			adobeCallbackCaptor.capture(),
-			any(ExtensionErrorCallback.class)
-		);
+			// test
+			Consent.getConsents(callbackWithError);
 
-		// set response event to null
-		adobeCallbackCaptor.getValue().call(null);
+			// verify if the event is dispatched
+			mobileCoreMockedStatic.verify(() ->
+				MobileCore.dispatchEventWithResponseCallback(
+					ArgumentMatchers.any(Event.class),
+					ArgumentMatchers.anyLong(),
+					adobeCallbackCaptor.capture()
+				)
+			);
+			// set response event to null
+			adobeCallbackCaptor.getValue().call(null);
 
-		// verify
-		assertTrue((boolean) errorCapture.get(KEY_IS_ERRORCALLBACK_CALLED));
-		assertEquals(AdobeError.UNEXPECTED_ERROR, errorCapture.get(KEY_CAPTUREDERRORCALLBACK));
+			// verify
+			assertTrue((boolean) errorCapture.get(KEY_IS_ERRORCALLBACK_CALLED));
+			assertEquals(AdobeError.UNEXPECTED_ERROR, errorCapture.get(KEY_CAPTUREDERRORCALLBACK));
+		}
 	}
 
 	// ========================================================================================
