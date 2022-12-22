@@ -9,34 +9,44 @@
   governing permissions and limitations under the License.
 */
 
-package com.adobe.marketing.mobile;
+package com.adobe.marketing.mobile.edge.consent.util;
 
+import static com.adobe.marketing.mobile.edge.consent.util.ConsentTestConstants.LOG_TAG;
+
+import androidx.annotation.NonNull;
+import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
+import com.adobe.marketing.mobile.Extension;
+import com.adobe.marketing.mobile.ExtensionApi;
+import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.SharedStateResolution;
+import com.adobe.marketing.mobile.SharedStateResult;
+import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.DataReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A third party extension class aiding for assertion against dispatched events, shared state
  * and XDM shared state.
  */
-class MonitorExtension extends Extension {
+public class MonitorExtension extends Extension {
 
-	//TODO: This file is part of the functional test, will be updated in the functional test PR.
+	public static final Class<? extends Extension> EXTENSION = MonitorExtension.class;
 
-	static AtomicReference<MonitorExtension> MONITOR_EXTENSION_INSTANCE = new AtomicReference<>(null);
-
-	private static final String LOG_TAG = "MonitorExtension";
+	private static final String LOG_SOURCE = "MonitorExtension";
 
 	private static final Map<EventSpec, List<Event>> receivedEvents = new HashMap<>();
-	private static final Map<EventSpec, ADBCountDownLatch> expectedEvents = new HashMap<>();
 
 	protected MonitorExtension(ExtensionApi extensionApi) {
 		super(extensionApi);
 	}
 
+	@NonNull
 	@Override
 	protected String getName() {
 		return "MonitorExtension";
@@ -44,28 +54,8 @@ class MonitorExtension extends Extension {
 
 	@Override
 	protected void onRegistered() {
-		MONITOR_EXTENSION_INSTANCE.set(this);
-	}
-
-	@Override
-	protected void onRegistered() {
-		MONITOR_EXTENSION_INSTANCE.set(this);
-	}
-
-	public static void registerExtension() {
-		MobileCore.registerExtension(
-			MonitorExtension.class,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(
-						LoggingMode.ERROR,
-						LOG_TAG,
-						"There was an error registering the Monitor extension: " + extensionError.getErrorName()
-					);
-				}
-			}
-		);
+		super.onRegistered();
+		getApi().registerEventListener(EventType.WILDCARD, EventSource.WILDCARD, this::wildcardProcessor);
 	}
 
 	/**
@@ -74,34 +64,11 @@ class MonitorExtension extends Extension {
 	public static void unregisterExtension() {
 		Event event = new Event.Builder(
 			"Unregister Monitor Extension Request",
-			TestConstants.EventType.MONITOR,
-			TestConstants.EventSource.UNREGISTER
+			ConsentTestConstants.EventType.MONITOR,
+			ConsentTestConstants.EventSource.UNREGISTER
 		)
 			.build();
-		MobileCore.dispatchEvent(
-			event,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(LoggingMode.ERROR, LOG_TAG, "Failed to unregister Monitor extension.");
-				}
-			}
-		);
-	}
-
-	/**
-	 * Add an event to the list of expected events.
-	 * @param type the type of the event.
-	 * @param source the source of the event.
-	 * @param count the number of events expected to be received.
-	 */
-	public static void setExpectedEvent(final String type, final String source, final int count) {
-		EventSpec eventSpec = new EventSpec(source, type);
-		expectedEvents.put(eventSpec, new ADBCountDownLatch(count));
-	}
-
-	public static Map<EventSpec, ADBCountDownLatch> getExpectedEvents() {
-		return expectedEvents;
+		MobileCore.dispatchEvent(event);
 	}
 
 	public static Map<EventSpec, List<Event>> getReceivedEvents() {
@@ -112,9 +79,8 @@ class MonitorExtension extends Extension {
 	 * Resets the map of received and expected events.
 	 */
 	public static void reset() {
-		MobileCore.log(LoggingMode.VERBOSE, LOG_TAG, "Reset expected and received events.");
+		Log.trace(LOG_TAG, LOG_SOURCE, "Reset expected and received events.");
 		receivedEvents.clear();
-		expectedEvents.clear();
 	}
 
 	/**
@@ -127,12 +93,12 @@ class MonitorExtension extends Extension {
 	 * @param event
 	 */
 	public void wildcardProcessor(final Event event) {
-		if (TestConstants.EventType.MONITOR.equalsIgnoreCase(event.getType())) {
-			if (TestConstants.EventSource.SHARED_STATE_REQUEST.equalsIgnoreCase(event.getSource())) {
+		if (ConsentTestConstants.EventType.MONITOR.equalsIgnoreCase(event.getType())) {
+			if (ConsentTestConstants.EventSource.SHARED_STATE_REQUEST.equalsIgnoreCase(event.getSource())) {
 				processSharedStateRequest(event);
-			} else if (TestConstants.EventSource.XDM_SHARED_STATE_REQUEST.equalsIgnoreCase(event.getSource())) {
+			} else if (ConsentTestConstants.EventSource.XDM_SHARED_STATE_REQUEST.equalsIgnoreCase(event.getSource())) {
 				processXDMSharedStateRequest(event);
-			} else if (TestConstants.EventSource.UNREGISTER.equalsIgnoreCase(event.getSource())) {
+			} else if (ConsentTestConstants.EventSource.UNREGISTER.equalsIgnoreCase(event.getSource())) {
 				processUnregisterRequest(event);
 			}
 
@@ -141,17 +107,13 @@ class MonitorExtension extends Extension {
 
 		EventSpec eventSpec = new EventSpec(event.getSource(), event.getType());
 
-		MobileCore.log(LoggingMode.DEBUG, LOG_TAG, "Received and processing event " + eventSpec);
+		Log.debug(LOG_TAG, LOG_SOURCE, "Received and processing event" + eventSpec);
 
 		if (!receivedEvents.containsKey(eventSpec)) {
-			receivedEvents.put(eventSpec, new ArrayList<Event>());
+			receivedEvents.put(eventSpec, new ArrayList<>());
 		}
 
 		receivedEvents.get(eventSpec).add(event);
-
-		if (expectedEvents.containsKey(eventSpec)) {
-			expectedEvents.get(eventSpec).countDown();
-		}
 	}
 
 	/**
@@ -159,7 +121,7 @@ class MonitorExtension extends Extension {
 	 * @param event
 	 */
 	private void processUnregisterRequest(final Event event) {
-		MobileCore.log(LoggingMode.DEBUG, LOG_TAG, "Unregistering the Monitor Extension.");
+		Log.debug(LOG_TAG, LOG_SOURCE, "Unregistering the Monitor Extension.");
 		getApi().unregisterExtension();
 	}
 
@@ -169,30 +131,31 @@ class MonitorExtension extends Extension {
 	 * @param event
 	 */
 	private void processXDMSharedStateRequest(final Event event) {
-		Map<String, Object> eventData = event.getEventData();
+		final Map<String, Object> eventData = event.getEventData();
 
 		if (eventData == null) {
 			return;
 		}
 
-		String stateOwner = eventData.optString(TestConstants.EventDataKey.STATE_OWNER, null);
+		final String stateOwner = DataReader.optString(eventData, ConsentTestConstants.EventDataKey.STATE_OWNER, null);
 
 		if (stateOwner == null) {
 			return;
 		}
 
-		EventData sharedState = getApi().XDMShareState(stateOwner, event);
+		final SharedStateResult sharedStateResult = getApi()
+			.getXDMSharedState(stateOwner, event, false, SharedStateResolution.LAST_SET);
 
 		Event responseEvent = new Event.Builder(
 			"Get Shared State Response",
-			TestConstants.EventType.MONITOR,
-			TestConstants.EventSource.XDM_SHARED_STATE_RESPONSE
+			ConsentTestConstants.EventType.MONITOR,
+			ConsentTestConstants.EventSource.XDM_SHARED_STATE_RESPONSE
 		)
-			.setEventData(sharedState == null ? null : sharedState.toObjectMap())
-			.setPairID(event.getResponsePairID())
+			.setEventData(sharedStateResult == null ? null : sharedStateResult.getValue())
+			.inResponseToEvent(event)
 			.build();
 
-		MobileCore.dispatchResponseEvent(responseEvent, event, null);
+		MobileCore.dispatchEvent(responseEvent);
 	}
 
 	/**
@@ -201,30 +164,31 @@ class MonitorExtension extends Extension {
 	 * @param event
 	 */
 	private void processSharedStateRequest(final Event event) {
-		EventData eventData = event.getData();
+		final Map<String, Object> eventData = event.getEventData();
 
 		if (eventData == null) {
 			return;
 		}
 
-		String stateOwner = eventData.optString(TestConstants.EventDataKey.STATE_OWNER, null);
+		final String stateOwner = DataReader.optString(eventData, ConsentTestConstants.EventDataKey.STATE_OWNER, null);
 
 		if (stateOwner == null) {
 			return;
 		}
 
-		EventData sharedState = getApi().getSharedEventState(stateOwner, event);
+		final SharedStateResult sharedStateResult = getApi()
+			.getSharedState(stateOwner, event, false, SharedStateResolution.LAST_SET);
 
 		Event responseEvent = new Event.Builder(
 			"Get Shared State Response",
-			TestConstants.EventType.MONITOR,
-			TestConstants.EventSource.SHARED_STATE_RESPONSE
+			ConsentTestConstants.EventType.MONITOR,
+			ConsentTestConstants.EventSource.SHARED_STATE_RESPONSE
 		)
-			.setEventData(sharedState == null ? null : sharedState.toObjectMap())
-			.setPairID(event.getResponsePairID())
+			.setEventData(sharedStateResult == null ? null : sharedStateResult.getValue())
+			.inResponseToEvent(event)
 			.build();
 
-		MobileCore.dispatchResponseEvent(responseEvent, event, null);
+		MobileCore.dispatchEvent(responseEvent);
 	}
 
 	/**
@@ -243,7 +207,6 @@ class MonitorExtension extends Extension {
 			if (type == null || type.isEmpty()) {
 				throw new IllegalArgumentException("Event Type cannot be null or empty.");
 			}
-
 			// Normalize strings
 			this.source = source.toLowerCase();
 			this.type = type.toLowerCase();

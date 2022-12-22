@@ -11,43 +11,39 @@
 
 package com.adobe.marketing.mobile.edge.consent;
 
-import static com.adobe.marketing.mobile.TestHelper.getDispatchedEventsWith;
-import static com.adobe.marketing.mobile.TestHelper.getSharedStateFor;
-import static com.adobe.marketing.mobile.TestHelper.getXDMSharedStateFor;
-import static com.adobe.marketing.mobile.TestHelper.resetTestExpectations;
-import static com.adobe.marketing.mobile.TestHelper.waitForThreads;
-import static com.adobe.marketing.mobile.edge.consent.ConsentAndroidTestUtil.*;
+import static com.adobe.marketing.mobile.edge.consent.util.ConsentFunctionalTestUtil.*;
+import static com.adobe.marketing.mobile.edge.consent.util.TestHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
-import com.adobe.marketing.mobile.MobileCore;
-import com.adobe.marketing.mobile.TestHelper;
-import com.adobe.marketing.mobile.TestPersistenceHelper;
+import com.adobe.marketing.mobile.edge.consent.util.ConsentFunctionalTestUtil;
+import com.adobe.marketing.mobile.edge.consent.util.ConsentTestConstants;
+import com.adobe.marketing.mobile.edge.consent.util.MonitorExtension;
+import com.adobe.marketing.mobile.edge.consent.util.TestHelper;
+import com.adobe.marketing.mobile.edge.consent.util.TestPersistenceHelper;
+import com.adobe.marketing.mobile.util.JSONUtils;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class ConsentPublicAPITests {
 
 	@Rule
-	public RuleChain rule = RuleChain
-		.outerRule(new TestHelper.SetupCoreRule())
-		.around(new TestHelper.RegisterMonitorExtensionRule());
+	public TestRule rule = new TestHelper.SetupCoreRule();
 
 	// --------------------------------------------------------------------------------------------
 	// Setup
@@ -60,21 +56,8 @@ public class ConsentPublicAPITests {
 				put("consents", "optedin");
 			}
 		};
-		MobileCore.updateConfiguration(config);
-		Consent.registerExtension();
 
-		final CountDownLatch latch = new CountDownLatch(1);
-		MobileCore.start(
-			new AdobeCallback() {
-				@Override
-				public void call(Object o) {
-					latch.countDown();
-				}
-			}
-		);
-
-		latch.await();
-		resetTestExpectations();
+		TestHelper.registerExtensions(Arrays.asList(MonitorExtension.EXTENSION, Consent.EXTENSION), config);
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -117,7 +100,7 @@ public class ConsentPublicAPITests {
 		// verify in (Persistence, ConsentResponse and XDMSharedState)
 
 		// test
-		Consent.update(ConsentAndroidTestUtil.CreateConsentXDMMap("y"));
+		Consent.update(ConsentFunctionalTestUtil.CreateConsentXDMMap("y"));
 
 		// verify edge event dispatched
 		List<Event> edgeRequestEvents = getDispatchedEventsWith(EventType.EDGE, EventSource.UPDATE_CONSENT);
@@ -146,7 +129,7 @@ public class ConsentPublicAPITests {
 			ConsentConstants.DataStoreKey.DATASTORE_NAME,
 			ConsentConstants.DataStoreKey.CONSENT_PREFERENCES
 		);
-		Map<String, Object> persistedMap = Utility.toMap(new JSONObject(persistedJson));
+		Map<String, Object> persistedMap = JSONUtils.toMap(new JSONObject(persistedJson));
 		Map<String, String> flattenPersistedMap = flattenMap(persistedMap);
 		assertEquals(2, flattenPersistedMap.size());
 		assertEquals("y", flattenPersistedMap.get("consents.collect.val"));
@@ -207,10 +190,10 @@ public class ConsentPublicAPITests {
 		// verify in (Persistence, ConsentResponse and XDMSharedState)
 
 		// test
-		Consent.update(ConsentAndroidTestUtil.CreateConsentXDMMap("y"));
+		Consent.update(ConsentFunctionalTestUtil.CreateConsentXDMMap("y"));
 		waitForThreads(2000);
 		resetTestExpectations();
-		Consent.update(ConsentAndroidTestUtil.CreateConsentXDMMap("n", "y"));
+		Consent.update(ConsentFunctionalTestUtil.CreateConsentXDMMap("n", "y"));
 
 		// verify edge event dispatched
 		List<Event> edgeRequestEvents = getDispatchedEventsWith(EventType.EDGE, EventSource.UPDATE_CONSENT);
@@ -242,7 +225,7 @@ public class ConsentPublicAPITests {
 	@Test
 	public void testGetConsentsAPI() {
 		// setup
-		Consent.update(ConsentAndroidTestUtil.CreateConsentXDMMap("y"));
+		Consent.update(ConsentFunctionalTestUtil.CreateConsentXDMMap("y"));
 
 		// test
 		Map<String, Object> getConsentResponse = getConsentsSync();
@@ -261,17 +244,20 @@ public class ConsentPublicAPITests {
 
 		// returns an xdmFormatted empty consent map
 		Map<String, Object> consentResponse = (Map) getConsentResponse.get(ConsentTestConstants.GetConsentHelper.VALUE);
-		Map<String, Object> consents = (Map) consentResponse.get(ConsentConstants.EventDataKey.CONSENTS);
+		Map<String, Object> consents = (Map) consentResponse.get(ConsentTestConstants.EventDataKey.CONSENTS);
 		assertTrue(consents.isEmpty());
 	}
 
 	@Test
 	public void testGetConsentsAPI_NoCallback() throws InterruptedException {
 		// setup
-		Consent.update(ConsentAndroidTestUtil.CreateConsentXDMMap("y"));
+		Consent.update(ConsentFunctionalTestUtil.CreateConsentXDMMap("y"));
 
 		// test
 		Consent.getConsents(null);
+
+		//add a wait time for mobile core to return the shared state before verifying the test
+		Thread.sleep(2000);
 
 		// verify shared state set
 		Map<String, Object> sharedState = getXDMSharedStateFor(ConsentConstants.EXTENSION_NAME, 2000);

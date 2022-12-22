@@ -13,6 +13,7 @@ package com.adobe.marketing.mobile.edge.consent;
 
 import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
 
+import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.services.NamedCollection;
 import com.adobe.marketing.mobile.util.JSONUtils;
@@ -26,7 +27,10 @@ final class ConsentManager {
 	private static final String LOG_SOURCE = "ConsentManager";
 	private final NamedCollection namedCollection;
 	private Consents userOptedConsents; // holds on to consents that are updated using PublicAPI or from Edge Consent Response
-	private Consents defaultConsents; // holds on to default consents obtained from configuration response
+
+	// Package private for testing
+	@VisibleForTesting
+	Consents defaultConsents; // holds on to default consents obtained from configuration response
 
 	/**
 	 * Constructor - initializes the {@link #userOptedConsents} from data in persistence.

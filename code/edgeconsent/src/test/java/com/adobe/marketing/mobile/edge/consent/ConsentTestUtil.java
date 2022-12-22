@@ -14,6 +14,7 @@ package com.adobe.marketing.mobile.edge.consent;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
+import com.adobe.marketing.mobile.util.JSONUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -250,7 +251,7 @@ class ConsentTestUtil {
 	}
 
 	static Event buildEdgeConsentPreferenceEvent(final String jsonString) throws JSONException {
-		Map<String, Object> eventData = Utility.toMap(new JSONObject(jsonString));
+		Map<String, Object> eventData = JSONUtils.toMap(new JSONObject(jsonString));
 		return new Event.Builder("Edge Consent Preference", EventType.EDGE, EventSource.CONSENT_PREFERENCE)
 			.setEventData(eventData)
 			.build();

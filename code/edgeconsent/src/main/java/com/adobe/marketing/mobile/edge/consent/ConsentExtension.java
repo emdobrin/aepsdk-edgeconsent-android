@@ -30,6 +30,7 @@ import java.util.Map;
 class ConsentExtension extends Extension {
 
 	private static final String LOG_SOURCE = "ConsentExtension";
+
 	private final ConsentManager consentManager;
 
 	/**
@@ -49,14 +50,27 @@ class ConsentExtension extends Extension {
 	}
 
 	/**
-	 * Constructor used for testing.
+	 * Convenience constructor that instantiates a new {@link ConsentManager} using the passed {@link NamedCollection}.
+	 * <p>
+	 * Can be used for testing using mocked {@link ExtensionApi} and/or {@link NamedCollection} instances.
+	 *
 	 * @param extensionApi {@link ExtensionApi} instance
 	 * @param namedCollection {@link NamedCollection} instance from {@link ServiceProvider}
-	 * @see ConsentExtension(ExtensionApi)
 	 */
 	protected ConsentExtension(final ExtensionApi extensionApi, final NamedCollection namedCollection) {
+		this(extensionApi, new ConsentManager(namedCollection));
+	}
+
+	/**
+	 * Primary constructor that instantiates the {@link ConsentExtension}.
+	 *
+	 * @param extensionApi {@link ExtensionApi} instance
+	 * @param consentManager {@link ConsentManager} instance from {@link ServiceProvider}
+	 * @see ConsentExtension(ExtensionApi)
+	 */
+	protected ConsentExtension(final ExtensionApi extensionApi, final ConsentManager consentManager) {
 		super(extensionApi);
-		consentManager = new ConsentManager(namedCollection);
+		this.consentManager = consentManager;
 	}
 
 	/**

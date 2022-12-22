@@ -28,6 +28,7 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.ExtensionEventListener;
 import com.adobe.marketing.mobile.services.NamedCollection;
+import com.adobe.marketing.mobile.util.JSONUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.reflect.Whitebox;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConsentExtensionTest {
@@ -710,12 +710,21 @@ public class ConsentExtensionTest {
 	// private methods
 	// ========================================================================================
 
+	/**
+	 * Sets up existing consents values in persistence by setting up a mocked return value for the
+	 * mocked {@link NamedCollection} using the passed JSON consents {@link String}.
+	 * <p>
+	 * Note that the {@link ConsentManager} only fetches the values from persistence once at instantiation time,
+	 * so this method <b>recreates the {@link ConsentExtension} instance used in the test run</b>. However, it
+	 * does not reset the mocks themselves.
+	 *
+	 * @param jsonString the consents JSON string to set in mocked persistence
+	 */
 	private void setupExistingConsents(final String jsonString) {
 		Mockito
 			.when(mockNamedCollection.getString(ConsentConstants.DataStoreKey.CONSENT_PREFERENCES, null))
 			.thenReturn(jsonString);
-		ConsentManager consentManager = new ConsentManager(mockNamedCollection); // loads the data from persistence
-		Whitebox.setInternalState(extension, "consentManager", consentManager);
+		extension = new ConsentExtension(mockExtensionApi, mockNamedCollection);
 	}
 
 	private Event buildConsentUpdateEvent(final String collectConsentString, final String adIdConsentString) {
@@ -726,14 +735,14 @@ public class ConsentExtensionTest {
 	}
 
 	private Event buildEdgeConsentPreferenceEvent(final String jsonString) throws JSONException {
-		Map<String, Object> eventData = Utility.toMap(new JSONObject(jsonString));
+		Map<String, Object> eventData = JSONUtils.toMap(new JSONObject(jsonString));
 		return new Event.Builder("Edge Consent Preference", EventType.EDGE, EventSource.CONSENT_PREFERENCE)
 			.setEventData(eventData)
 			.build();
 	}
 
 	private Event buildConfigurationResponseEvent(final String jsonString) throws JSONException {
-		final Map<String, Object> consentMap = Utility.toMap(new JSONObject(jsonString));
+		final Map<String, Object> consentMap = JSONUtils.toMap(new JSONObject(jsonString));
 		Map<String, Object> configEventData = new HashMap<String, Object>() {
 			{
 				put(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT, consentMap);

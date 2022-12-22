@@ -9,18 +9,45 @@
   governing permissions and limitations under the License.
 */
 
-package com.adobe.marketing.mobile;
+package com.adobe.marketing.mobile.edge.consent.util;
 
 /**
  * Class to maintain test constants.
  */
-public class TestConstants {
+public class ConsentTestConstants {
+
+	public static final String LOG_TAG = "Consent";
 
 	public static class EventType {
 
 		static final String MONITOR = "com.adobe.functional.eventType.monitor";
 
 		private EventType() {}
+	}
+
+	static final class DataStoreKey {
+
+		public static final String CONFIG_DATASTORE = "AdobeMobile_ConfigState";
+		public static final String CONSENT_DATASTORE = "com.adobe.edge.consent";
+		public static final String CONSENT_PREFERENCES = "consent:preferences";
+
+		private DataStoreKey() {}
+	}
+
+	public final class SharedStateName {
+
+		public static final String CONFIG = "com.adobe.module.configuration";
+		public static final String EVENT_HUB = "com.adobe.module.eventhub";
+
+		private SharedStateName() {}
+	}
+
+	public final class GetConsentHelper {
+
+		public static final String VALUE = "getConsentValue";
+		public static final String ERROR = "getConsentError";
+
+		private GetConsentHelper() {}
 	}
 
 	public static class EventSource {
@@ -38,7 +65,17 @@ public class TestConstants {
 	public static class EventDataKey {
 
 		static final String STATE_OWNER = "stateowner";
+		public static final String CONSENTS = "consents";
+		static final String METADATA = "metadata";
+		static final String TIME = "time";
 
 		private EventDataKey() {}
+	}
+
+	public static final class ConfigurationKey {
+
+		public static final String DEFAULT_CONSENT = "consent.default";
+
+		private ConfigurationKey() {}
 	}
 }

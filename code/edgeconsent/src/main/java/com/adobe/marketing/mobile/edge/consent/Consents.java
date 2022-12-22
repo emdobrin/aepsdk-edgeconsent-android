@@ -15,6 +15,7 @@ import com.adobe.marketing.mobile.util.CloneFailedException;
 import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.EventDataUtils;
 import com.adobe.marketing.mobile.util.TimeUtils;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,8 +113,10 @@ final class Consents {
 		} catch (final ClassCastException exception) {
 			return;
 		}
-		//TODO TimeStamp revisit
-		metaDataContents.put(ConsentConstants.EventDataKey.TIME, TimeUtils.getIso8601DateTimeZoneISO8601());
+		metaDataContents.put(
+			ConsentConstants.EventDataKey.TIME,
+			TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(timeStamp))
+		);
 		consentsMap.put(ConsentConstants.EventDataKey.METADATA, metaDataContents);
 	}
 

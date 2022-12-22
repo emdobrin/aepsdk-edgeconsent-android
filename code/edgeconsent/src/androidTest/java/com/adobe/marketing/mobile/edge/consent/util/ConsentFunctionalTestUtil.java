@@ -9,15 +9,19 @@
   governing permissions and limitations under the License.
 */
 
-package com.adobe.marketing.mobile.edge.consent;
+package com.adobe.marketing.mobile.edge.consent.util;
+
+import static com.adobe.marketing.mobile.edge.consent.util.TestHelper.*;
 
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
-import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.edge.consent.Consent;
+import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.JSONUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -34,10 +38,10 @@ import java.util.concurrent.CountDownLatch;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class ConsentAndroidTestUtil {
+public class ConsentFunctionalTestUtil {
 
+	private static final String LOG_SOURCE = "ConsentFunctionalTestUtil";
 	public static String SAMPLE_METADATA_TIMESTAMP = "2019-09-23T18:15:45Z";
-	public static String SAMPLE_METADATA_TIMESTAMP_OTHER = "2020-07-23T18:16:45Z";
 	private static final String ADID = "adID";
 	private static final String COLLECT = "collect";
 	private static final String PERSONALIZE = "personalize";
@@ -66,7 +70,7 @@ class ConsentAndroidTestUtil {
 	 * }
 	 */
 
-	static String CreateConsentsXDMJSONString(
+	public static String CreateConsentsXDMJSONString(
 		final String collectConsentString,
 		final String adIDConsentString,
 		final String time
@@ -74,7 +78,7 @@ class ConsentAndroidTestUtil {
 		return CreateConsentsXDMJSONString(collectConsentString, adIDConsentString, null, time);
 	}
 
-	static String CreateConsentsXDMJSONString(
+	public static String CreateConsentsXDMJSONString(
 		final String collectConsentString,
 		final String adIDConsentString,
 		final String personalizeConsentString,
@@ -90,15 +94,18 @@ class ConsentAndroidTestUtil {
 		return jsonObject.toString();
 	}
 
-	static Map<String, Object> CreateConsentXDMMap(final String collectConsentString) {
+	public static Map<String, Object> CreateConsentXDMMap(final String collectConsentString) {
 		return CreateConsentXDMMap(collectConsentString, null);
 	}
 
-	static Map<String, Object> CreateConsentXDMMap(final String collectConsentString, final String adIDConsentString) {
+	public static Map<String, Object> CreateConsentXDMMap(
+		final String collectConsentString,
+		final String adIDConsentString
+	) {
 		return CreateConsentXDMMap(collectConsentString, adIDConsentString, null);
 	}
 
-	static Map<String, Object> CreateConsentXDMMap(
+	public static Map<String, Object> CreateConsentXDMMap(
 		final String collectConsentString,
 		final String adIDConsentString,
 		final String time
@@ -106,7 +113,7 @@ class ConsentAndroidTestUtil {
 		return CreateConsentXDMMap(collectConsentString, adIDConsentString, null, time);
 	}
 
-	static Map<String, Object> CreateConsentXDMMap(
+	public static Map<String, Object> CreateConsentXDMMap(
 		final String collectConsentString,
 		final String adIDConsentString,
 		final String personalizeConsentString,
@@ -157,15 +164,15 @@ class ConsentAndroidTestUtil {
 
 		if (time != null) {
 			Map<String, String> metaDataMap = new HashMap<String, String>();
-			metaDataMap.put(ConsentConstants.EventDataKey.TIME, time);
-			consents.put(ConsentConstants.EventDataKey.METADATA, metaDataMap);
+			metaDataMap.put(ConsentTestConstants.EventDataKey.TIME, time);
+			consents.put(ConsentTestConstants.EventDataKey.METADATA, metaDataMap);
 		}
 
-		consentData.put(ConsentConstants.EventDataKey.CONSENTS, consents);
+		consentData.put(ConsentTestConstants.EventDataKey.CONSENTS, consents);
 		return consentData;
 	}
 
-	static Map<String, Object> getConsentsSync() {
+	public static Map<String, Object> getConsentsSync() {
 		try {
 			final HashMap<String, Object> getConsentResponse = new HashMap<String, Object>();
 			final CountDownLatch latch = new CountDownLatch(1);
@@ -192,16 +199,16 @@ class ConsentAndroidTestUtil {
 		}
 	}
 
-	static void applyDefaultConsent(final Map defaultConsentMap) {
+	public static void applyDefaultConsent(final Map defaultConsentMap) {
 		HashMap<String, Object> config = new HashMap<String, Object>() {
 			{
-				put(ConsentConstants.ConfigurationKey.DEFAULT_CONSENT, defaultConsentMap);
+				put(ConsentTestConstants.ConfigurationKey.DEFAULT_CONSENT, defaultConsentMap);
 			}
 		};
 		MobileCore.updateConfiguration(config);
 	}
 
-	static Event buildEdgeConsentPreferenceEventWithConsents(final Map<String, Object> consents) {
+	public static Event buildEdgeConsentPreferenceEventWithConsents(final Map<String, Object> consents) {
 		List<Map<String, Object>> payload = new ArrayList<>();
 		payload.add((Map) (consents.get("consents")));
 		Map<String, Object> eventData = new HashMap<>();
@@ -212,8 +219,8 @@ class ConsentAndroidTestUtil {
 			.build();
 	}
 
-	static Event buildEdgeConsentPreferenceEvent(final String jsonString) throws JSONException {
-		Map<String, Object> eventData = Utility.toMap(new JSONObject(jsonString));
+	public static Event buildEdgeConsentPreferenceEvent(final String jsonString) throws JSONException {
+		Map<String, Object> eventData = JSONUtils.toMap(new JSONObject(jsonString));
 		return new Event.Builder("Edge Consent Preference", EventType.EDGE, EventSource.CONSENT_PREFERENCE)
 			.setEventData(eventData)
 			.build();
@@ -226,9 +233,9 @@ class ConsentAndroidTestUtil {
 	 * @param map map with JSON structure to flatten
 	 * @return new map with flattened structure
 	 */
-	static Map<String, String> flattenMap(final Map<String, Object> map) {
+	public static Map<String, String> flattenMap(final Map<String, Object> map) {
 		if (map == null || map.isEmpty()) {
-			return Collections.<String, String>emptyMap();
+			return Collections.emptyMap();
 		}
 
 		try {
@@ -237,10 +244,10 @@ class ConsentAndroidTestUtil {
 			addKeys("", new ObjectMapper().readTree(jsonObject.toString()), payloadMap);
 			return payloadMap;
 		} catch (IOException e) {
-			MobileCore.log(LoggingMode.ERROR, "FunctionalTestUtils", "Failed to parse JSON object to tree structure.");
+			Log.error(ConsentTestConstants.LOG_TAG, LOG_SOURCE, "Failed to parse JSON object to tree structure.");
 		}
 
-		return Collections.<String, String>emptyMap();
+		return Collections.emptyMap();
 	}
 
 	/**
@@ -257,7 +264,7 @@ class ConsentAndroidTestUtil {
 	 *
 	 * @see <a href="https://stackoverflow.com/a/24150263">Stack Overflow post</a>
 	 */
-	private static void addKeys(String currentPath, JsonNode jsonNode, Map<String, String> map) {
+	public static void addKeys(String currentPath, JsonNode jsonNode, Map<String, String> map) {
 		if (jsonNode.isObject()) {
 			ObjectNode objectNode = (ObjectNode) jsonNode;
 			Iterator<Map.Entry<String, JsonNode>> iter = objectNode.fields();
@@ -277,25 +284,5 @@ class ConsentAndroidTestUtil {
 			ValueNode valueNode = (ValueNode) jsonNode;
 			map.put(currentPath, valueNode.asText());
 		}
-	}
-
-	private static Map<String, Object> getAllConsentsMap(Consents consents) {
-		Map<String, Object> xdmMap = consents.asXDMMap();
-
-		if (isNullOrEmpty(xdmMap)) {
-			return null;
-		}
-
-		Map<String, Object> allConsents = (Map<String, Object>) xdmMap.get(ConsentConstants.EventDataKey.CONSENTS);
-
-		if (isNullOrEmpty(allConsents)) {
-			return null;
-		}
-
-		return allConsents;
-	}
-
-	private static boolean isNullOrEmpty(final Map map) {
-		return (map == null || map.isEmpty());
 	}
 }

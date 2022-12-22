@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.reflect.Whitebox;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConsentManagerTest {
@@ -274,7 +273,7 @@ public class ConsentManagerTest {
 		assertNull(readAdIdConsent(currentConsent)); // assert adID consent is null
 
 		// verify defaultConsent
-		Consents defaultConsents = Whitebox.getInternalState(consentManager, "defaultConsents");
+		Consents defaultConsents = consentManager.defaultConsents;
 		assertEquals("n", readCollectConsent(defaultConsents));
 		assertNull(readAdIdConsent(defaultConsents)); // assert adID consent is null
 	}
@@ -313,7 +312,7 @@ public class ConsentManagerTest {
 		assertEquals(SAMPLE_METADATA_TIMESTAMP, readTimestamp(currentConsent));
 
 		// verify defaultConsent internal variable
-		Consents defaultConsents = Whitebox.getInternalState(consentManager, "defaultConsents");
+		Consents defaultConsents = consentManager.defaultConsents;
 		assertEquals("n", readCollectConsent(defaultConsents));
 		assertEquals("n", readAdIdConsent(defaultConsents));
 	}
@@ -350,7 +349,7 @@ public class ConsentManagerTest {
 		assertEquals("n", readAdIdConsent(currentConsent));
 
 		// verify defaultConsent
-		Consents defaultConsents = Whitebox.getInternalState(consentManager, "defaultConsents");
+		Consents defaultConsents = consentManager.defaultConsents;
 		assertEquals("n", readCollectConsent(defaultConsents));
 		assertEquals("n", readAdIdConsent(defaultConsents));
 	}
@@ -390,7 +389,7 @@ public class ConsentManagerTest {
 		assertNull(readAdIdConsent(currentConsent));
 
 		// verify defaultConsent
-		Consents defaultConsents = Whitebox.getInternalState(consentManager, "defaultConsents");
+		Consents defaultConsents = consentManager.defaultConsents;
 		assertEquals("n", readCollectConsent(defaultConsents));
 		assertNull(readAdIdConsent(defaultConsents));
 	}

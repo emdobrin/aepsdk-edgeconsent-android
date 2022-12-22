@@ -221,25 +221,18 @@ configurations.all {
 }
 
 dependencies {
-
-    // implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
-    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    // TODO: Update the value of mavenCoreVersion in gradle.properties to 2.0.0 when Core 2.0 is published to Maven
+    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
     implementation 'androidx.annotation:annotation:1.5.0'
 
     testImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoVersion}"
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
-    testImplementation 'org.powermock:powermock-api-mockito2:2.0.0'
-    testImplementation 'org.powermock:powermock-module-junit4:2.0.0'
     testImplementation 'org.json:json:20180813'
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    // Using older version of PowerMock as it supports minimum Android API < 26
-    // the root issue appears to be a dependency with Objenesis in Mockito-Core
-    // where Objenesis 2 requires minimum Android API 26
-    androidTestImplementation 'org.powermock:powermock-module-junit4:1+'
     androidTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
 }
 
