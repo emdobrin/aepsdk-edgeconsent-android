@@ -261,6 +261,56 @@ public class ConsentTest {
 		}
 	}
 
+	@Test
+	public void testGetConsentsModifyConsentCallbackResponse() {
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// setup
+			final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+			final ArgumentCaptor<AdobeCallbackWithError<Event>> callbackCaptor = ArgumentCaptor.forClass(
+				AdobeCallbackWithError.class
+			);
+
+			final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
+
+			// test
+			Consent.getConsents(
+				new AdobeCallback<Map<String, Object>>() {
+					@Override
+					public void call(Map<String, Object> stringObjectMap) {
+						callbackReturnValues.add(stringObjectMap);
+					}
+				}
+			);
+
+			// verify
+			mobileCoreMockedStatic.verify(() ->
+				MobileCore.dispatchEventWithResponseCallback(
+					eventCaptor.capture(),
+					ArgumentMatchers.anyLong(),
+					callbackCaptor.capture()
+				)
+			);
+
+			final Event dispatchedEvent = eventCaptor.getValue();
+			final AdobeCallbackWithError<Event> callbackWithError = callbackCaptor.getValue();
+
+			// verify the dispatched event details
+			assertEquals(ConsentConstants.EventNames.GET_CONSENTS_REQUEST, dispatchedEvent.getName());
+			assertEquals(EventType.CONSENT, dispatchedEvent.getType());
+			assertEquals(EventSource.REQUEST_CONTENT, dispatchedEvent.getSource());
+			final Map<String, Object> eventData = dispatchedEvent.getEventData();
+			assertEquals(null, eventData);
+			//verify callback responses
+			callbackWithError.call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
+			assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
+
+			//Verify the responseConsentsMap can be modified
+			SAMPLE_CONSENTS_MAP.put("newkey", "newvalue");
+			callbackReturnValues.get(0).put("newkey", "newvalue");
+			assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
+		}
+	}
+
 	// ========================================================================================
 	// Private method
 	// ========================================================================================
