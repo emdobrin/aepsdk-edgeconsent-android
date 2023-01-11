@@ -22,6 +22,9 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.CloneFailedException;
+import com.adobe.marketing.mobile.util.EventDataUtils;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -124,7 +127,20 @@ public class Consent {
 					returnError(callback, AdobeError.UNEXPECTED_ERROR);
 					return;
 				}
-				callback.call(event.getEventData());
+				Map<String, Object> responseConsentsData = new HashMap<String, Object>();
+
+				try {
+					responseConsentsData = EventDataUtils.clone(event.getEventData());
+				} catch (CloneFailedException ex) {
+					Log.warning(
+						LOG_TAG,
+						LOG_SOURCE,
+						"Failed clone response data, skipping. Exception details: %s",
+						ex.getLocalizedMessage()
+					);
+				}
+
+				callback.call(responseConsentsData);
 			}
 
 			@Override
