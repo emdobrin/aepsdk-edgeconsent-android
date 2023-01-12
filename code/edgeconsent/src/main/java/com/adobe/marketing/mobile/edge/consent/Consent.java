@@ -13,6 +13,7 @@ package com.adobe.marketing.mobile.edge.consent;
 
 import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
 
+import androidx.annotation.NonNull;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
@@ -75,7 +76,7 @@ public class Consent {
 	 *
 	 * @param consents A {@link Map} of consents to be merged with the existing consents
 	 */
-	public static void update(final Map<String, Object> consents) {
+	public static void update(@NonNull final Map<String, Object> consents) {
 		if (consents == null || consents.isEmpty()) {
 			Log.debug(LOG_TAG, LOG_SOURCE, "Null/Empty consents passed to update API. Ignoring the API call.");
 			return;
@@ -102,7 +103,7 @@ public class Consent {
 	 *                 when an unexpected error occurs or the request timed out
 	 */
 
-	public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
+	public static void getConsents(@NonNull final AdobeCallback<Map<String, Object>> callback) {
 		if (callback == null) {
 			Log.debug(
 				LOG_TAG,
