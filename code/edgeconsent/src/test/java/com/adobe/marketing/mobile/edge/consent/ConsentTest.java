@@ -291,8 +291,10 @@ public class ConsentTest {
 				)
 			);
 
-			final Event dispatchedEvent = eventCaptor.getValue();
 			final AdobeCallbackWithError<Event> callbackWithError = callbackCaptor.getValue();
+
+			callbackWithError.call(buildConsentResponseEvent(SAMPLE_CONSENTS_MAP));
+			assertEquals(SAMPLE_CONSENTS_MAP, callbackReturnValues.get(0));
 
 			//Verify the responseConsentsMap can be modified
 			SAMPLE_CONSENTS_MAP.put("newkey", "newvalue");
