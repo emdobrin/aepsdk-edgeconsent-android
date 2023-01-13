@@ -135,6 +135,7 @@ public class ConsentsTest {
 		Consents overridingConsent = new Consents(CreateConsentXDMMap("n", "n", SAMPLE_METADATA_TIMESTAMP));
 		baseConsent.merge(overridingConsent);
 
+		//verify
 		assertEquals("n", ConsentTestUtil.readCollectConsent(baseConsent));
 		assertEquals("n", ConsentTestUtil.readAdIdConsent(baseConsent));
 		assertEquals(SAMPLE_METADATA_TIMESTAMP, ConsentTestUtil.readTimestamp(baseConsent));
