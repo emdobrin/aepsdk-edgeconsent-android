@@ -102,4 +102,17 @@ public class UtilsTest {
 		Map<String, Object> deepCopy = Utils.deepCopy(map);
 		assertNull(deepCopy);
 	}
+
+	@Test
+	public void testOptDeepCopy_whenNull_fallbackNull() {
+		assertNull(Utils.optDeepCopy(null, null));
+	}
+
+	@Test
+	public void testOptDeepCopy_whenNull_fallbackEmptyMap() {
+		Map<String, Object> emptyMap = new HashMap<>();
+		Map<String, Object> copyMap = Utils.optDeepCopy(null, emptyMap);
+		assertNotNull(copyMap);
+		assertEquals(emptyMap, copyMap);
+	}
 }

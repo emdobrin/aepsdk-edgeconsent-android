@@ -129,9 +129,7 @@ public class Consent {
 					return;
 				}
 
-				Map<String, Object> copyResult = Utils.deepCopy(event.getEventData());
-				Map<String, Object> responseConsentsData = copyResult != null ? copyResult : new HashMap<>();
-
+				Map<String, Object> responseConsentsData = Utils.optDeepCopy(event.getEventData(), new HashMap<>());
 				callback.call(responseConsentsData);
 			}
 

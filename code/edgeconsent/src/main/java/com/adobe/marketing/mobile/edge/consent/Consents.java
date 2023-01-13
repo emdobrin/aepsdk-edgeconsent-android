@@ -34,8 +34,7 @@ final class Consents {
 			return;
 		}
 
-		Map<String, Object> copyResult = Utils.deepCopy(newConsents.consentsMap);
-		this.consentsMap = copyResult != null ? copyResult : new HashMap<>();
+		this.consentsMap = Utils.optDeepCopy(newConsents.consentsMap, new HashMap<>());
 	}
 
 	/**
@@ -55,8 +54,7 @@ final class Consents {
 			new HashMap<>()
 		);
 
-		Map<String, Object> copyResult = Utils.deepCopy(allConsents);
-		consentsMap = copyResult != null ? copyResult : new HashMap<>();
+		consentsMap = Utils.optDeepCopy(allConsents, new HashMap<>());
 	}
 
 	/**
@@ -150,9 +148,7 @@ final class Consents {
 	 * @return {@link Map} representing the Consents in XDM format
 	 */
 	Map<String, Object> asXDMMap() {
-		Map<String, Object> internalConsentMap = consentsMap != null
-			? Utils.deepCopy(consentsMap)
-			: new HashMap<String, Object>();
+		Map<String, Object> internalConsentMap = Utils.optDeepCopy(consentsMap, new HashMap<String, Object>());
 		final Map<String, Object> xdmFormattedMap = new HashMap<>();
 
 		xdmFormattedMap.put(ConsentConstants.EventDataKey.CONSENTS, internalConsentMap);
