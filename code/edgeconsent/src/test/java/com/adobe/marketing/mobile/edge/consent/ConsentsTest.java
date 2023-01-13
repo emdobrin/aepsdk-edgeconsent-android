@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.adobe.marketing.mobile.util.TimeUtils;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -121,6 +122,23 @@ public class ConsentsTest {
 
 		// verify
 		assertTrue(consents.isEmpty());
+	}
+
+	@Test
+	public void test_ConsentsCreation_With_ImmutableMap() {
+		// setup
+		Map<String, Object> xdmMap = CreateConsentXDMMap("y", "y");
+		Map<String, Object> immutableXdmMap = Collections.unmodifiableMap(xdmMap);
+		Consents baseConsent = new Consents(immutableXdmMap);
+
+		// test
+		Consents overridingConsent = new Consents(CreateConsentXDMMap("n", "n", SAMPLE_METADATA_TIMESTAMP));
+		baseConsent.merge(overridingConsent);
+
+		//verify
+		assertEquals("n", ConsentTestUtil.readCollectConsent(baseConsent));
+		assertEquals("n", ConsentTestUtil.readAdIdConsent(baseConsent));
+		assertEquals(SAMPLE_METADATA_TIMESTAMP, ConsentTestUtil.readTimestamp(baseConsent));
 	}
 
 	// ========================================================================================
