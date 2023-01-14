@@ -78,6 +78,7 @@ class ConsentExtension extends Extension {
 	 *
 	 * @return unique name of this extension
 	 */
+	@NonNull
 	@Override
 	protected String getName() {
 		return ConsentConstants.EXTENSION_NAME;
@@ -88,6 +89,7 @@ class ConsentExtension extends Extension {
 	 *
 	 * @return unique friendly name of this extension
 	 */
+	@NonNull
 	@Override
 	protected String getFriendlyName() {
 		return ConsentConstants.FRIENDLY_NAME;
@@ -98,6 +100,7 @@ class ConsentExtension extends Extension {
 	 *
 	 * @return the version of this extension
 	 */
+	@NonNull
 	@Override
 	protected String getVersion() {
 		return ConsentConstants.EXTENSION_VERSION;

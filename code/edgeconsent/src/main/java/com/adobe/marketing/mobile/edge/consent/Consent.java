@@ -13,6 +13,7 @@ package com.adobe.marketing.mobile.edge.consent;
 
 import static com.adobe.marketing.mobile.edge.consent.ConsentConstants.LOG_TAG;
 
+import androidx.annotation.NonNull;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
@@ -22,6 +23,7 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,7 @@ public class Consent {
 	 *
 	 * @return The version as {@code String}
 	 */
+	@NonNull
 	public static String extensionVersion() {
 		return ConsentConstants.EXTENSION_VERSION;
 	}
@@ -48,6 +51,7 @@ public class Consent {
 	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link Consent#EXTENSION} instead.
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public static void registerExtension() {
 		MobileCore.registerExtension(
 			ConsentExtension.class,
@@ -72,7 +76,7 @@ public class Consent {
 	 *
 	 * @param consents A {@link Map} of consents to be merged with the existing consents
 	 */
-	public static void update(final Map<String, Object> consents) {
+	public static void update(@NonNull final Map<String, Object> consents) {
 		if (consents == null || consents.isEmpty()) {
 			Log.debug(LOG_TAG, LOG_SOURCE, "Null/Empty consents passed to update API. Ignoring the API call.");
 			return;
@@ -99,7 +103,7 @@ public class Consent {
 	 *                 when an unexpected error occurs or the request timed out
 	 */
 
-	public static void getConsents(final AdobeCallback<Map<String, Object>> callback) {
+	public static void getConsents(@NonNull final AdobeCallback<Map<String, Object>> callback) {
 		if (callback == null) {
 			Log.debug(
 				LOG_TAG,
@@ -124,7 +128,9 @@ public class Consent {
 					returnError(callback, AdobeError.UNEXPECTED_ERROR);
 					return;
 				}
-				callback.call(event.getEventData());
+
+				Map<String, Object> responseConsentsData = Utils.optDeepCopy(event.getEventData(), new HashMap<>());
+				callback.call(responseConsentsData);
 			}
 
 			@Override

@@ -261,6 +261,49 @@ public class ConsentTest {
 		}
 	}
 
+	@Test
+	public void testGetConsentsModifyConsentCallbackResponse() {
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			// setup
+			final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+			final ArgumentCaptor<AdobeCallbackWithError<Event>> callbackCaptor = ArgumentCaptor.forClass(
+				AdobeCallbackWithError.class
+			);
+
+			final List<Map<String, Object>> callbackReturnValues = new ArrayList<>();
+
+			// test
+			Consent.getConsents(
+				new AdobeCallback<Map<String, Object>>() {
+					@Override
+					public void call(Map<String, Object> stringObjectMap) {
+						callbackReturnValues.add(stringObjectMap);
+					}
+				}
+			);
+
+			// verify
+			mobileCoreMockedStatic.verify(() ->
+				MobileCore.dispatchEventWithResponseCallback(
+					eventCaptor.capture(),
+					ArgumentMatchers.anyLong(),
+					callbackCaptor.capture()
+				)
+			);
+
+			final AdobeCallbackWithError<Event> callbackWithError = callbackCaptor.getValue();
+
+			Map<String, Object> verifyConsentMap = ConsentTestUtil.CreateConsentXDMMap("y");
+			callbackWithError.call(buildConsentResponseEvent(verifyConsentMap));
+			assertEquals(verifyConsentMap, callbackReturnValues.get(0));
+
+			//Verify the responseConsentsMap can be modified
+			verifyConsentMap.put("newkey", "newvalue");
+			callbackReturnValues.get(0).put("newkey", "newvalue");
+			assertEquals(verifyConsentMap, callbackReturnValues.get(0));
+		}
+	}
+
 	// ========================================================================================
 	// Private method
 	// ========================================================================================
