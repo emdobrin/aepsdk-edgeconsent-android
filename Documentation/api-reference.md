@@ -78,6 +78,7 @@ Consent.registerExtension();
 ### updateConsents
 
 Merges the existing consents with the given consents. Duplicate keys will take the value of those passed in the API.
+SDK supports collect consents values 'y' and 'n'.
 
 #### Java
 
