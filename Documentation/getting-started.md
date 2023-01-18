@@ -53,7 +53,7 @@ public class MobileApp extends Application {
 
   private final String ENVIRONMENT_FILE_ID = "";
 
-   @Override
+@Override
 	public void onCreate() {
 		super.onCreate();
 		MobileCore.setApplication(this);
@@ -63,9 +63,9 @@ public class MobileApp extends Application {
 
 		// register Adobe extensions
 		MobileCore.registerExtensions(
-				Arrays.asList(Consent.EXTENSION, Edge.EXTENSION, Identity.EXTENSION),
-				o -> Log.d("Sample App", "Mobile SDK was initialized")
+			Arrays.asList(Consent.EXTENSION, Edge.EXTENSION, Assurance.EXTENSION),
+			o -> Log.d("MobileApp", "Mobile SDK was initialized")
 		);
 	}
 }
-  ```
+```

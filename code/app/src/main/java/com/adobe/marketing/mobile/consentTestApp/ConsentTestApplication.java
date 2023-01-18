@@ -18,7 +18,6 @@ import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.consent.Consent;
-
 import java.util.Arrays;
 
 public class ConsentTestApplication extends Application {
@@ -38,8 +37,8 @@ public class ConsentTestApplication extends Application {
 
 		// register Adobe extensions
 		MobileCore.registerExtensions(
-				Arrays.asList(Consent.EXTENSION, Edge.EXTENSION, Assurance.EXTENSION),
-				o -> Log.d(LOG_TAG, "Mobile SDK was initialized")
+			Arrays.asList(Consent.EXTENSION, Edge.EXTENSION, Assurance.EXTENSION),
+			o -> Log.d(LOG_TAG, "Mobile SDK was initialized")
 		);
 	}
 }
