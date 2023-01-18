@@ -27,10 +27,10 @@ The Adobe Experience Platform Consent for Edge Network extension has the followi
 1. Add the Mobile Core and Edge extensions to your project using the app's Gradle file.
 
   ```java
-implementation 'com.adobe.marketing.mobile:core:1.+'
-implementation 'com.adobe.marketing.mobile:edge:1.+'
-implementation 'com.adobe.marketing.mobile:edgeidentity:1.+'
-implementation 'com.adobe.marketing.mobile:edgeconsent:1.+'
+implementation 'com.adobe.marketing.mobile:core:2.+'
+implementation 'com.adobe.marketing.mobile:edge:2.+'
+implementation 'com.adobe.marketing.mobile:edgeidentity:2.+'
+implementation 'com.adobe.marketing.mobile:edgeconsent:2.+'
   ```
 
 2. Import the Mobile Core and Edge extensions in your Application class.
@@ -40,6 +40,10 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.edge.identity.Identity;
 import com.adobe.marketing.mobile.edge.consent.Consent;
+import com.adobe.marketing.mobile.LoggingMode;
+import android.app.Application;
+import java.util.Arrays;
+import android.util.Log;
   ```
 
 3. Register Edge extensions with Mobile Core
@@ -47,23 +51,21 @@ import com.adobe.marketing.mobile.edge.consent.Consent;
   ```java
 public class MobileApp extends Application {
 
-    @Override
-    public void onCreate() {
-      super.onCreate();
-      MobileCore.setApplication(this);
-      try {
-        Edge.registerExtension();
-        Consent.registerExtension(); // register Consent
-        Identity.registerExtension();
-        // register other extensions
-        MobileCore.start(new AdobeCallback() {
-          @Override
-          public void call(final Object o) {
-            MobileCore.configureWithAppID("yourAppId");
-          }});
-      } catch (Exception e) {
-        //Log the exception
-      }
-    }
+  private final String ENVIRONMENT_FILE_ID = "";
+
+   @Override
+	public void onCreate() {
+		super.onCreate();
+		MobileCore.setApplication(this);
+
+		MobileCore.setLogLevel(LoggingMode.DEBUG);
+		MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
+
+		// register Adobe extensions
+		MobileCore.registerExtensions(
+				Arrays.asList(Consent.EXTENSION, Edge.EXTENSION, Identity.EXTENSION),
+				o -> Log.d("Sample App", "Mobile SDK was initialized")
+		);
+	}
 }
   ```

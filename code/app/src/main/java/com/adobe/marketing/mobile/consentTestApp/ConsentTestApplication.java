@@ -13,47 +13,33 @@ package com.adobe.marketing.mobile.consentTestApp;
 
 import android.app.Application;
 import android.util.Log;
-import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Assurance;
 import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.consent.Consent;
 
+import java.util.Arrays;
+
 public class ConsentTestApplication extends Application {
 
 	private static final String LOG_TAG = "ConsentTestApplication";
 
-	// TODO: fill in your Launch environment ID here
-	private final String LAUNCH_ENVIRONMENT_ID = "";
+	// TODO: Set up the Environment File ID from your Launch property for the preferred environment
+	private final String ENVIRONMENT_FILE_ID = "";
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		MobileCore.setApplication(this);
 
-		MobileCore.setLogLevel(LoggingMode.VERBOSE);
+		MobileCore.setLogLevel(LoggingMode.DEBUG);
+		MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
 
-		/* Launch generates a unique environment ID that the SDK uses to retrieve your
-		configuration. This ID is generated when an app configuration is created and published to
-		a given environment. It is strongly recommended to configure the SDK with the Launch
-		environment ID.
-		*/
-		MobileCore.configureWithAppID(LAUNCH_ENVIRONMENT_ID);
-
-		// register AEP Mobile extensions
-		Consent.registerExtension();
-		Edge.registerExtension();
-		Assurance.registerExtension();
-
-		// once all the extensions are registered, call MobileCore.start(...) to start processing the events
-		MobileCore.start(
-			new AdobeCallback() {
-				@Override
-				public void call(final Object o) {
-					Log.d(LOG_TAG, "Mobile SDK was initialized");
-				}
-			}
+		// register Adobe extensions
+		MobileCore.registerExtensions(
+				Arrays.asList(Consent.EXTENSION, Edge.EXTENSION, Assurance.EXTENSION),
+				o -> Log.d(LOG_TAG, "Mobile SDK was initialized")
 		);
 	}
 }

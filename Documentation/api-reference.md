@@ -40,7 +40,7 @@ Retrieves the current consent preferences stored in the Consent extension.
 ```java
 public static void getConsents(final AdobeCallback<Map<String, Object>> callback);
 ```
-* callback - callback invoked with the current consents of the extension. If an AdobeCallbackWithError is provided, an AdobeError, can be returned in the eventuality of any error that occurred while getting the user consents. The callback may be invoked on a different thread
+* callback - callback invoked with the current consents of the extension. If an AdobeCallbackWithError is provided, an AdobeError, can be returned in the eventuality of any error that occurred while getting the user consents. The callback may be invoked on a different thread.
 
 ##### Example
 ```java
@@ -54,31 +54,11 @@ Consent.getConsents(new AdobeCallback<Map<String, Object>>() {
 
 ------
 
-### registerExtension
-
-Registers the Edge Consent extension with the Mobile Core SDK.
-
-#### Java
-
-##### Syntax
-```java
-public static void registerExtension()
-```
-
-##### Example
-```java
-import com.adobe.marketing.mobile.Consent
-
-...
-Consent.registerExtension();
-```
-
-------
 
 ### updateConsents
 
 Merges the existing consents with the given consents. Duplicate keys will take the value of those passed in the API.
-SDK supports collect consents values 'y' and 'n'.
+The Consent extension supports "collect" consents values of 'y' and 'n'.
 
 #### Java
 
