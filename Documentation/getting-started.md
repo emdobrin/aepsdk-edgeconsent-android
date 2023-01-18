@@ -58,7 +58,7 @@ public class MobileApp extends Application {
 		super.onCreate();
 		MobileCore.setApplication(this);
 
-		MobileCore.setLogLevel(LoggingMode.DEBUG);
+		MobileCore.setLogLevel(LoggingMode.VERBOSE);
 		MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
 
 		// register Adobe extensions
