@@ -44,4 +44,9 @@ final class Utils {
 
 		return null;
 	}
+
+	static Map<String, Object> optDeepCopy(final Map<String, Object> map, final Map<String, Object> fallback) {
+		Map<String, Object> ret = deepCopy(map);
+		return ret != null ? ret : fallback;
+	}
 }

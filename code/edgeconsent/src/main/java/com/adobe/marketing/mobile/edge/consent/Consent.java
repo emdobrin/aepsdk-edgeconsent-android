@@ -40,6 +40,7 @@ public class Consent {
 	 *
 	 * @return The version as {@code String}
 	 */
+	@NonNull
 	public static String extensionVersion() {
 		return ConsentConstants.EXTENSION_VERSION;
 	}
@@ -50,6 +51,7 @@ public class Consent {
 	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link Consent#EXTENSION} instead.
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public static void registerExtension() {
 		MobileCore.registerExtension(
 			ConsentExtension.class,
@@ -127,9 +129,7 @@ public class Consent {
 					return;
 				}
 
-				Map<String, Object> copyResult = Utils.deepCopy(event.getEventData());
-				Map<String, Object> responseConsentsData = copyResult != null ? copyResult : new HashMap<>();
-
+				Map<String, Object> responseConsentsData = Utils.optDeepCopy(event.getEventData(), new HashMap<>());
 				callback.call(responseConsentsData);
 			}
 
