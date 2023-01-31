@@ -59,7 +59,7 @@ Consent.getConsents(new AdobeCallback<Map<String, Object>>() {
 Registers the Consent extension with the Mobile Core SDK.
 
 > **Warning**
-> Deprecated as of 2.0.0. Use the [MobileCore.registerExtensions API](https://github.com/adobe/aepsdk-core-android) instead.
+> Deprecated as of 2.0.0. Use the [MobileCore.registerExtensions API](https://github.com/adobe/aepsdk-core-android/blob/main/Documentation/MobileCore/api-reference.md) instead.
 
 #### Java
 
